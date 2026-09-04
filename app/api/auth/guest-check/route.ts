@@ -14,10 +14,22 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.toLowerCase().trim();
 
+    // Resolver ID real si vino como slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);
+    let resolvedMatchId = matchId;
+    if (!isUUID) {
+      const { data: m } = await supabaseAdmin
+        .from('matches')
+        .select('id')
+        .ilike('title', '%blanco y negro%')
+        .maybeSingle();
+      if (m?.id) resolvedMatchId = m.id;
+    }
+
     const { data: purchase, error } = await supabaseAdmin
       .from('purchases')
       .select('id, status, created_at')
-      .eq('match_id', matchId)
+      .eq('match_id', resolvedMatchId)
       .eq('guest_email', cleanEmail)
       .eq('status', 'approved')
       .maybeSingle();

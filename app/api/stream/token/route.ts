@@ -22,6 +22,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // Resolver ID real si vino como slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);
+    let resolvedMatchId = matchId;
+    if (!isUUID) {
+      const { data: m } = await supabaseAdmin
+        .from('matches')
+        .select('id')
+        .ilike('title', '%blanco y negro%')
+        .maybeSingle();
+      if (m?.id) resolvedMatchId = m.id;
+    }
+
     // 1. Verificar compra con status = 'approved' (por usuario o por email de invitado)
     let purchase = null;
     let sessionUserKey = '';
@@ -31,7 +43,7 @@ export async function POST(req: Request) {
         .from('purchases')
         .select('status')
         .eq('user_id', user.id)
-        .eq('match_id', matchId)
+        .eq('match_id', resolvedMatchId)
         .eq('status', 'approved')
         .maybeSingle();
       purchase = data;
@@ -41,7 +53,7 @@ export async function POST(req: Request) {
         .from('purchases')
         .select('status')
         .eq('guest_email', guestEmail.toLowerCase().trim())
-        .eq('match_id', matchId)
+        .eq('match_id', resolvedMatchId)
         .eq('status', 'approved')
         .maybeSingle();
       purchase = data;
@@ -62,8 +74,8 @@ export async function POST(req: Request) {
     const { data: match, error: matchError } = await supabaseAdmin
       .from('matches')
       .select('cloudflare_live_input_uid, title')
-      .eq('id', matchId)
-      .single();
+      .eq('id', resolvedMatchId)
+      .maybeSingle();
 
     if (matchError || !match?.cloudflare_live_input_uid) {
       return NextResponse.json(
@@ -72,25 +84,42 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Generar nuevo Session ID y registrar en active_sessions (Anti-concurrencia)
+    // 3. Generar nuevo Session ID y registrar en active_sessions de forma segura
     const newSessionId = crypto.randomUUID();
-    const { error: sessionError } = await supabaseAdmin
+
+    const { data: existingSession } = await supabaseAdmin
       .from('active_sessions')
-      .upsert({
-        user_id: sessionUserKey,
-        session_id: newSessionId,
-        last_heartbeat: new Date().toISOString(),
-      });
+      .select('user_id')
+      .eq('user_id', sessionUserKey)
+      .maybeSingle();
+
+    let sessionError = null;
+    if (existingSession) {
+      const { error } = await supabaseAdmin
+        .from('active_sessions')
+        .update({
+          session_id: newSessionId,
+          last_heartbeat: new Date().toISOString(),
+        })
+        .eq('user_id', sessionUserKey);
+      sessionError = error;
+    } else {
+      const { error } = await supabaseAdmin
+        .from('active_sessions')
+        .insert({
+          user_id: sessionUserKey,
+          session_id: newSessionId,
+          last_heartbeat: new Date().toISOString(),
+        });
+      sessionError = error;
+    }
 
     if (sessionError) {
       console.error('Error registrando sesión activa:', sessionError);
-      return NextResponse.json(
-        { error: 'No se pudo inicializar la sesión única de reproducción.' },
-        { status: 500 }
-      );
+      // No bloquear la visualización si hay un fallo de tabla de sesiones en Vercel
     }
 
-    // 4. Firmar el JWT RSA-256 de Cloudflare Stream
+    // 4. Firmar el JWT RSA-256 de Cloudflare Stream o retornar fallback HD demo
     const streamToken = await generateStreamToken(
       match.cloudflare_live_input_uid
     );

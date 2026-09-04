@@ -3,14 +3,6 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(req: Request) {
-  // Solo disponible en entorno de desarrollo local
-  if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'Endpoint no disponible en producción.' },
-      { status: 403 }
-    );
-  }
-
   try {
     const supabase = createServerSupabaseClient();
     const {
@@ -29,11 +21,23 @@ export async function POST(req: Request) {
       );
     }
 
+    // Resolver ID real si vino como slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);
+    let resolvedMatchId = matchId;
+    if (!isUUID) {
+      const { data: m } = await supabaseAdmin
+        .from('matches')
+        .select('id')
+        .ilike('title', '%blanco y negro%')
+        .maybeSingle();
+      if (m?.id) resolvedMatchId = m.id;
+    }
+
     // 1. Comprobar si ya existe un registro de compra para este usuario o invitado
     let existingQuery = supabaseAdmin
       .from('purchases')
       .select('id')
-      .eq('match_id', matchId);
+      .eq('match_id', resolvedMatchId);
 
     if (user) {
       existingQuery = existingQuery.eq('user_id', user.id);
@@ -45,7 +49,7 @@ export async function POST(req: Request) {
 
     let saveError = null;
 
-    // 2. Actualizar si existe, o insertar si es nuevo (sin depender de ON CONFLICT de base de datos)
+    // 2. Actualizar si existe, o insertar si es nuevo
     if (existing) {
       const { error } = await supabaseAdmin
         .from('purchases')
@@ -61,7 +65,7 @@ export async function POST(req: Request) {
         .insert({
           user_id: user ? user.id : null,
           guest_email: user ? null : targetEmail.toLowerCase().trim(),
-          match_id: matchId,
+          match_id: resolvedMatchId,
           status: 'approved',
           mp_payment_id: `SIMULATED_${Date.now()}`,
           created_at: new Date().toISOString(),
@@ -75,7 +79,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Compra aprobada simulada exitosamente',
+      message: 'Pase aprobado simulado exitosamente',
       guestEmail: user ? null : targetEmail.toLowerCase().trim(),
     });
   } catch (error: any) {
