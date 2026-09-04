@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #08080a;
+  --background-deep: #050507;
+  --surface-card: #0c0c10;
+  --surface-hover: #14141c;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --foreground: #ffffff;
+  --font-display: 'Barlow Condensed', 'Oswald', Impact, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Tipografía de transmisión deportiva para titulares */
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+/* Tipografía mono/técnica para badges, tags y métricas */
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Scrollbar minimalista estilo forg1 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #08080a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e1e24;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626;
+}
+
+/* Efecto de resplandor sutil para acentos */
+.forg1-glow {
+  box-shadow: 0 0 35px -5px rgba(220, 38, 38, 0.25);
+}
+
+.forg1-card {
+  background: #0c0c10;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.forg1-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
