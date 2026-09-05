@@ -247,7 +247,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Zonas
+              Tablas
             </button>
             <button
               onClick={() => setActiveTab('youtube')}
@@ -324,12 +324,12 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </div>
           )}
 
-          {/* TAB 2: ZONAS Y TABLAS */}
+          {/* TAB 2: TABLAS DE POSICIONES */}
           {activeTab === 'events' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500">
-                  Torneo Regional 2026
+                  Tablas de Posiciones
                 </span>
                 <Trophy className="w-3.5 h-3.5 text-amber-500" />
               </div>
