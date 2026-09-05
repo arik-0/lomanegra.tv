@@ -394,6 +394,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <Link href="/posiciones" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
               Tablas
             </Link>
+            <Link href="/galeria" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
+              Galería
+            </Link>
             <Link href="/admin" onClick={handleLinkClick} className="text-zinc-500 hover:text-red-400 transition-colors">
               Operaciones
             </Link>

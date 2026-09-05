@@ -4,12 +4,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram } from 'lucide-react';
+import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram, Camera } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
+import UserProfileModal from '@/components/UserProfileModal';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -93,6 +95,14 @@ export default function Navbar() {
             <span>Tablas & Play-Offs</span>
           </Link>
 
+          <Link
+            href="/galeria"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all shadow-sm"
+          >
+            <Camera className="w-3.5 h-3.5 text-red-500" />
+            <span>Galería</span>
+          </Link>
+
           <div className="flex items-center gap-2 pl-2 border-l border-zinc-800">
             <a
               href="https://www.youtube.com/@PasionlomonegraByN"
@@ -120,11 +130,20 @@ export default function Navbar() {
           {!loading && (
             <>
               {user ? (
-                <div className="flex items-center gap-2.5">
-                  <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-zinc-300 bg-[#181920] border border-zinc-800 px-3 py-1.5 rounded-lg shadow-sm">
-                    <UserIcon className="w-3.5 h-3.5 text-red-500" />
-                    <span className="truncate max-w-[150px]">{user.email}</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsProfileOpen(true)}
+                    className="flex items-center gap-2 text-xs font-mono text-zinc-300 hover:text-white bg-[#181920] hover:bg-[#22242e] border border-zinc-800 hover:border-zinc-700 px-3 py-1.5 rounded-lg shadow-sm transition group cursor-pointer"
+                    title="Ver puntos de visualización y pases adquiridos"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <UserIcon className="w-3.5 h-3.5 text-red-500 group-hover:scale-110 transition-transform shrink-0" />
+                    <span className="truncate max-w-[110px] sm:max-w-[150px] font-bold">{user.email}</span>
+                    <span className="hidden sm:inline-flex items-center text-[10px] text-amber-400 bg-amber-950/60 border border-amber-800/80 px-1.5 py-0.5 rounded font-black shrink-0">
+                      ★ 1.450 pts
+                    </span>
+                  </button>
+
                   <button
                     onClick={handleSignOut}
                     className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#22242e] text-zinc-300 hover:text-white border border-zinc-800 transition shadow-sm"
@@ -133,6 +152,13 @@ export default function Navbar() {
                     <LogOut className="w-3.5 h-3.5 text-red-500" />
                     <span className="hidden sm:inline">Salir</span>
                   </button>
+
+                  <UserProfileModal
+                    isOpen={isProfileOpen}
+                    onClose={() => setIsProfileOpen(false)}
+                    userEmail={user.email || 'socio@pasionlomonegra.com'}
+                    onSignOut={handleSignOut}
+                  />
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
