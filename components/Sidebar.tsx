@@ -15,6 +15,7 @@ import {
   Film,
   Sparkles,
   ShieldAlert,
+  Instagram,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,31 +26,31 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'matches' | 'events' | 'youtube'>('matches');
 
-  // Listas de YouTube con grabaciones oficiales
+  // Listas de YouTube con grabaciones oficiales de @PasionlomonegraByN
   const youtubePlaylists = [
     {
       id: 'pl-1',
-      title: 'Partidos Completos Grabados',
-      description: 'Revive todas las transmisiones oficiales completas de Blanco y Negro e I.F.C.',
-      videoCount: '18 partidos',
-      badge: '#COMPLETOS',
-      url: 'https://youtube.com',
+      title: 'Transmisiones de Fútbol Mayor',
+      description: 'Partidos completos transmitidos en vivo con relatos oficiales de Pasión Lomonegra.',
+      videoCount: '24 partidos',
+      badge: '#MAYOR',
+      url: 'https://www.youtube.com/@PasionlomonegraByN/playlists',
     },
     {
       id: 'pl-2',
-      title: 'Mejores Goles y Jugadas',
-      description: 'Los compactos, repeticiones en cámara lenta y mejores momentos de cada fecha.',
-      videoCount: '45 videos',
-      badge: '#RESUMENES',
-      url: 'https://youtube.com',
+      title: 'Resúmenes y Goles de Blanco y Negro',
+      description: 'Los compactos de jugadas, goles y mejores momentos de cada fecha.',
+      videoCount: '48 videos',
+      badge: '#GOLES',
+      url: 'https://www.youtube.com/@PasionlomonegraByN/videos',
     },
     {
       id: 'pl-3',
-      title: 'Previas y Entrevistas',
-      description: 'Conferencias de prensa, vestuarios y testimonios exclusivos post-partido.',
-      videoCount: '12 emisiones',
-      badge: '#EXCLUSIVO',
-      url: 'https://youtube.com',
+      title: 'Reserva e Inferiores',
+      description: 'Cobertura de los semilleros y categorías formativas del club.',
+      videoCount: '19 emisiones',
+      badge: '#JUVENILES',
+      url: 'https://www.youtube.com/@PasionlomonegraByN/playlists',
     },
   ];
 
@@ -57,7 +58,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const tournaments = [
     {
       name: 'Liga Regional 2026',
-      category: 'Primera División',
+      category: 'Transmisión de Fútbol Mayor',
       status: 'EN DISPUTA',
       teams: '16 clubes',
     },
@@ -118,13 +119,12 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       >
         {/* Header de Marca */}
         <div className="p-4 border-b border-white/[0.07] flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image
-                src="/teams/blanco-y-negro.png"
-                alt="Logo Blanco y Negro"
-                width={32}
-                height={32}
+                src="/logo-pasion-lomonegra.png"
+                alt="Pasión Lomonegra"
+                fill
                 className="object-contain"
                 priority
               />
@@ -170,7 +170,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Torneos
+              Tablas
             </button>
             <button
               onClick={() => setActiveTab('youtube')}
@@ -228,20 +228,42 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </div>
           )}
 
-          {/* TAB 2: TORNEOS */}
+          {/* TAB 2: TABLAS DE POSICIONES */}
           {activeTab === 'events' && (
             <div className="space-y-3">
-              <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500 px-1 block">
-                Campeonatos Oficiales
-              </span>
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500">
+                  Tablas de Posiciones
+                </span>
+                <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              </div>
+
+              <Link
+                href="/posiciones"
+                className="group block p-3.5 rounded-xl bg-gradient-to-br from-red-950/50 to-[#0c0c10] border border-red-700/60 hover:border-red-500 transition"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[8px] font-mono font-black uppercase text-red-400 bg-red-900/60 px-1.5 py-0.5 rounded">
+                    LIGA REGIONAL
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+                <div className="text-xs font-black text-white group-hover:text-red-400 transition-colors mb-1">
+                  Ver Tablas Completas &rarr;
+                </div>
+                <div className="text-[10px] text-zinc-400 leading-tight">
+                  Fútbol Mayor, Reserva, 3ª, 4ª y 5ª división (Apertura y Clausura).
+                </div>
+              </Link>
 
               <div className="space-y-2">
                 {tournaments.map((t, idx) => (
-                  <div
+                  <Link
                     key={idx}
-                    className="p-3 rounded-xl bg-[#0c0c10] border border-white/[0.06] space-y-1.5"
+                    href="/posiciones"
+                    className="block p-3 rounded-xl bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.06] hover:border-red-500/40 transition"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-1">
                       <span className="text-[8px] font-mono font-bold uppercase text-red-400 bg-red-950/60 border border-red-800/50 px-1.5 py-0.5 rounded">
                         {t.status}
                       </span>
@@ -252,11 +274,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     <h4 className="text-xs font-bold text-white leading-snug">
                       {t.name}
                     </h4>
-                    <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+                    <p className="text-[10px] text-zinc-400 flex items-center gap-1 mt-0.5">
                       <Trophy className="w-3 h-3 text-amber-500" />
                       <span>{t.category}</span>
                     </p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -335,8 +357,32 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <Play className="w-3.5 h-3.5 fill-black" />
             <span>Pase En Vivo</span>
           </Link>
+          {/* Redes Sociales Oficiales */}
+          <div className="flex items-center justify-center gap-3 pt-2.5 pb-1 border-b border-white/[0.05]">
+            <a
+              href="https://www.youtube.com/@PasionlomonegraByN"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-800/40 text-red-400 hover:text-white hover:bg-red-900/60 transition text-[10px]"
+            >
+              <Youtube className="w-3.5 h-3.5" />
+              <span>YouTube</span>
+            </a>
+            <a
+              href="https://www.instagram.com/pasion_lomonegra?igsi=ejZkcWJlejZ1NXU0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-950/40 border border-pink-800/40 text-pink-400 hover:text-white hover:bg-pink-900/60 transition text-[10px]"
+            >
+              <Instagram className="w-3.5 h-3.5" />
+              <span>Instagram</span>
+            </a>
+          </div>
+
           <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mt-2 px-1">
-            <span>Pasión Lomonegra</span>
+            <Link href="/posiciones" className="text-zinc-500 hover:text-white transition-colors">
+              Tablas
+            </Link>
             <Link href="/admin" className="text-zinc-600 hover:text-red-400 transition-colors">
               Operaciones
             </Link>

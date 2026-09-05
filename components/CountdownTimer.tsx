@@ -47,7 +47,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
     return (
       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-950/70 border border-red-700/80 text-red-400 text-xs font-mono font-bold uppercase tracking-wider">
         <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-        <span>PARTIDO EN CURSO // EN VIVO</span>
+        <span>EN DIRECTO</span>
       </div>
     );
   }

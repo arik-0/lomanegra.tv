@@ -55,15 +55,15 @@ export default function SupportChat() {
   return (
     <>
       {/* Botón Flotante de Soporte */}
-      <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-40">
+      <div className="fixed bottom-16 sm:bottom-20 lg:bottom-6 right-3 sm:right-6 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Abrir chat de soporte"
-          className="group relative flex items-center gap-2.5 px-4 py-3 bg-[#0c0c10] hover:bg-zinc-900 border border-red-500/50 hover:border-red-500 text-white rounded-full shadow-[0_8px_30px_rgba(220,38,38,0.25)] active:scale-95 transition-all duration-200"
+          className="group relative flex items-center gap-2 p-2.5 sm:px-4 sm:py-3 bg-[#0c0c10]/95 backdrop-blur-md hover:bg-zinc-900 border border-red-500/60 hover:border-red-500 text-white rounded-full shadow-[0_4px_20px_rgba(220,38,38,0.3)] active:scale-95 transition-all duration-200"
         >
-          <span className="relative flex h-3 w-3">
+          <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-red-500" />
           </span>
 
           <MessageSquare className="w-4 h-4 text-red-500 group-hover:scale-110 transition-transform" />

@@ -73,10 +73,10 @@ function LoginForm() {
 
       {/* Cabecera */}
       <div className="text-center mb-6">
-        <div className="w-12 h-12 relative mx-auto mb-3 drop-shadow-lg">
+        <div className="w-16 h-16 relative mx-auto mb-3 drop-shadow-xl">
           <Image
-            src="/teams/blanco-y-negro.png"
-            alt="Logo Blanco y Negro"
+            src="/logo-pasion-lomonegra.png"
+            alt="Pasión Lomonegra"
             fill
             className="object-contain"
             priority
@@ -97,9 +97,28 @@ function LoginForm() {
 
       {/* Mensajes de Alerta */}
       {errorMsg && (
-        <div className="mb-5 p-3.5 rounded-xl bg-red-950/60 border border-red-800/80 flex items-start gap-2.5 text-red-300 text-xs font-mono">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <span>{errorMsg}</span>
+        <div className="mb-5 p-3.5 rounded-xl bg-red-950/60 border border-red-800/80 space-y-2 text-red-300 text-xs font-mono">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+            <span>
+              {errorMsg.toLowerCase().includes('fetch')
+                ? 'Conexión de autenticación no disponible en este momento. Puedes acceder directamente como invitado sin contraseña.'
+                : errorMsg}
+            </span>
+          </div>
+
+          {email && (
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem('lomonegrotv_guest_email', email);
+                router.push(redirectTo);
+              }}
+              className="w-full mt-2 py-2 px-3 bg-white text-black font-bold text-xs rounded-lg uppercase tracking-wider hover:bg-zinc-200 transition"
+            >
+              Continuar como Invitado ({email}) &rarr;
+            </button>
+          )}
         </div>
       )}
 

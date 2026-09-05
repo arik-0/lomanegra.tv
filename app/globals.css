@@ -58,8 +58,28 @@ h1, h2, h3, h4, .font-display {
 
 .forg1-card {
   background: #0c0c10;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border-subtle);
+  border-radius: 1.5rem;
+}
+
+/* Marquesina de propaganda en movimiento */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
 .forg1-card:hover {

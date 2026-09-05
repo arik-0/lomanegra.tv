@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { LogOut, User as UserIcon, Radio } from 'lucide-react';
+import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 export default function Navbar() {
@@ -39,16 +39,15 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#08080a]/80 backdrop-blur-xl border-b border-white/[0.07] h-14 flex items-center">
+    <header className="sticky top-0 z-40 bg-[#08080a]/90 backdrop-blur-xl border-b border-white/[0.07] h-14 flex items-center">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logotipo en móviles (en desktop está en el Sidebar lateral) */}
-        <Link href="/" className="flex items-center gap-2.5 group lg:hidden">
-          <div className="w-7 h-7 relative flex items-center justify-center group-hover:scale-105 transition-transform">
+        {/* Logotipo Oficial en móviles */}
+        <Link href="/" className="flex items-center gap-2 group lg:hidden">
+          <div className="w-8 h-8 relative flex items-center justify-center group-hover:scale-105 transition-transform">
             <Image
-              src="/teams/blanco-y-negro.png"
-              alt="Logo Blanco y Negro"
-              width={28}
-              height={28}
+              src="/logo-pasion-lomonegra.png"
+              alt="Pasión Lomonegra"
+              fill
               className="object-contain"
               priority
             />
@@ -57,22 +56,43 @@ export default function Navbar() {
             <span className="text-white">PASIÓN</span>
             <span className="text-red-500 ml-1">LOMONEGRA</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/60 text-red-400 text-[8px] font-mono uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-            <span>EN VIVO</span>
-          </div>
         </Link>
 
-        {/* Consola Técnica de Estado en Desktop (Estilo Forg1) */}
-        <div className="hidden lg:flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest text-zinc-400">
+        {/* Enlaces de Cabecera en Desktop */}
+        <div className="hidden lg:flex items-center gap-4 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
           <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-red-950/50 border border-red-800/60 text-red-400">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             <span className="font-bold">SEÑAL EN VIVO</span>
           </div>
-          <span className="text-zinc-700">//</span>
-          <span className="text-white font-bold">PASIÓN LOMONEGRA EN VIVO</span>
-          <span className="text-zinc-700">//</span>
-          <span className="text-zinc-400">1080P ULTRA HD 60FPS</span>
+
+          <Link
+            href="/posiciones"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] hover:text-white transition-colors"
+          >
+            <Trophy className="w-3.5 h-3.5 text-amber-500" />
+            <span>Tablas de Posiciones</span>
+          </Link>
+
+          <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
+            <a
+              href="https://www.youtube.com/@PasionlomonegraByN"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-white/[0.06] text-zinc-400 hover:text-red-500 transition"
+              title="Canal Oficial de YouTube"
+            >
+              <Youtube className="w-4 h-4" />
+            </a>
+            <a
+              href="https://www.instagram.com/pasion_lomonegra?igsi=ejZkcWJlejZ1NXU0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-white/[0.06] text-zinc-400 hover:text-pink-500 transition"
+              title="Instagram Oficial"
+            >
+              <Instagram className="w-4 h-4" />
+            </a>
+          </div>
         </div>
 
         {/* Acciones de Usuario */}

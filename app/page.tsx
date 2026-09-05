@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import CountdownTimer from '@/components/CountdownTimer';
 import SponsorsStrip from '@/components/SponsorsStrip';
+import SponsorsTicker from '@/components/SponsorsTicker';
 import {
   Calendar,
   PlayCircle,
@@ -21,29 +22,40 @@ import {
 export const revalidate = 0; // Datos frescos en cada petición
 
 export default async function HomePage() {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const isSupabaseConfigured =
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
-  // 1. Obtener todos los partidos activos
-  const { data: matches } = await supabaseAdmin
-    .from('matches')
-    .select('*')
-    .eq('is_active', true)
-    .order('date', { ascending: true });
-
-  // 2. Si el usuario está autenticado, obtener sus compras aprobadas
+  let user = null;
+  let matches: any[] | null = null;
   let approvedMatchIds = new Set<string>();
-  if (user) {
-    const { data: purchases } = await supabaseAdmin
-      .from('purchases')
-      .select('match_id')
-      .eq('user_id', user.id)
-      .eq('status', 'approved');
 
-    if (purchases) {
-      approvedMatchIds = new Set(purchases.map((p) => p.match_id));
+  if (isSupabaseConfigured) {
+    try {
+      const supabase = createServerSupabaseClient();
+      const authRes = await supabase.auth.getUser();
+      user = authRes.data.user;
+
+      const { data } = await supabaseAdmin
+        .from('matches')
+        .select('*')
+        .eq('is_active', true)
+        .order('date', { ascending: true });
+      matches = data;
+
+      if (user) {
+        const { data: purchases } = await supabaseAdmin
+          .from('purchases')
+          .select('match_id')
+          .eq('user_id', user.id)
+          .eq('status', 'approved');
+
+        if (purchases) {
+          approvedMatchIds = new Set(purchases.map((p) => p.match_id));
+        }
+      }
+    } catch {
+      matches = null;
     }
   }
 
@@ -88,18 +100,74 @@ export default async function HomePage() {
   // Identificar el partido estelar (Blanco y Negro vs I. F. C. o el primero)
   const activeMatches = matches && matches.length > 0 ? matches : [defaultFeaturedMatch, ...defaultOtherMatches];
 
+  const now = Date.now();
+
+  // Buscar si hay algún partido latente (fecha confirmada y futura o en curso)
+  const latentMatch = activeMatches.find((m) => {
+    if (!m.is_date_confirmed || !m.date) return false;
+    const mTime = new Date(m.date).getTime();
+    return mTime + 3 * 3600 * 1000 >= now;
+  });
+
+  // Si no hay evento latente, buscar uno "A Confirmar"
+  const pendingMatch = activeMatches.find((m) => !m.is_date_confirmed || !m.date);
+
+  const fallbackTbdMatch = {
+    id: 'tbd-next-match',
+    title: 'Club Atlético Blanco y Negro vs Rival a Confirmar',
+    description: 'Próxima fecha del Torneo Oficial de Fútbol Mayor. Transmisión exclusiva de Pasión Lomonegra.',
+    date: null,
+    is_date_confirmed: false,
+    price: 3500,
+    cloudflare_live_input_uid: 'live_input_byn_tbd',
+    image_url: '/matches/blanco-y-negro-vs-ifc.png',
+    is_active: true,
+  };
+
   const featuredMatch =
+    latentMatch ||
+    pendingMatch ||
     activeMatches.find((m) => m.title.toLowerCase().includes('blanco y negro')) ||
     activeMatches[0] ||
-    defaultFeaturedMatch;
+    fallbackTbdMatch;
 
   const otherMatches = activeMatches.filter((m) => m.id !== featuredMatch.id);
 
+  // Lógica dinámica de estado temporal
+  const isFeaturedDateConfirmed = featuredMatch.is_date_confirmed !== false && !!featuredMatch.date;
+  const featuredMatchTime = isFeaturedDateConfirmed && featuredMatch.date ? new Date(featuredMatch.date).getTime() : null;
+
+  let statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
+  let isLiveNow = false;
+
+  if (!isFeaturedDateConfirmed || !featuredMatchTime) {
+    statusBadgeText = 'EVENTO A CONFIRMAR // SEÑAL EN ESPERA';
+  } else {
+    const diffMs = featuredMatchTime - now;
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    if (diffMs <= 0) {
+      statusBadgeText = 'EN DIRECTO';
+      isLiveNow = true;
+    } else if (diffHours <= 1) {
+      statusBadgeText = 'COMIENZA EN BREVE // TRANSMISIÓN EN VIVO';
+    } else if (diffHours <= 12) {
+      statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
+    } else {
+      statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#08080a] text-white px-4 py-6 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-10">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* ============================================================================== */}
-        {/* 1. HERO ESTELAR ESTILO FORG1.COM (HUD TACTICAL FRAME + SHADER GLOW) */}
+        {/* BANDA DE SPONSORS CONTINUA Y DINÁMICA (ARRIBA DE LA TRANSMISIÓN)               */}
+        {/* ============================================================================== */}
+        <SponsorsTicker />
+
+        {/* ============================================================================== */}
+        {/* 1. HERO ESTELAR ESTILO FORG1.COM (HUD TACTICAL FRAME + SHADER GLOW)           */}
         {/* ============================================================================== */}
         {featuredMatch && (
           <section className="relative isolate overflow-hidden rounded-3xl bg-[#0c0c10] border border-white/[0.07] shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
@@ -113,27 +181,93 @@ export default async function HomePage() {
             <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_35%,rgba(220,38,38,0.12),transparent_72%)]" />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-8 lg:p-10 relative z-10">
-              {/* Información y Cuenta Regresiva */}
+              {/* Información y Compra Directa */}
               <div className="lg:col-span-7 space-y-5">
+                {/* Badge Dinámico de Estado */}
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-red-950/70 border border-red-700/80 text-red-400 text-[10px] font-mono font-black uppercase tracking-wider">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                    <span>TRANSMISIÓN EN VIVO // SEÑAL OFICIAL</span>
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-zinc-300 text-[10px] font-mono">
-                    <Radio className="w-3 h-3 text-red-500" />
-                    <span>PASIÓN LOMONEGRA // EN VIVO</span>
+                  <div
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-md text-[10px] font-mono font-black uppercase tracking-wider ${
+                      isLiveNow
+                        ? 'bg-red-600/90 text-white animate-pulse'
+                        : !isFeaturedDateConfirmed
+                        ? 'bg-amber-950/70 border border-amber-700/80 text-amber-400'
+                        : 'bg-red-950/70 border border-red-700/80 text-red-400'
+                    }`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        isLiveNow
+                          ? 'bg-white animate-ping'
+                          : !isFeaturedDateConfirmed
+                          ? 'bg-amber-400'
+                          : 'bg-red-500 animate-ping'
+                      }`}
+                    />
+                    <span>{statusBadgeText}</span>
                   </div>
                 </div>
 
                 <div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
+                    TRANSMISIÓN DE FÚTBOL MAYOR
+                  </div>
                   <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-white leading-none [text-shadow:0_2px_24px_rgba(0,0,0,0.8)]">
                     {featuredMatch.title}
                   </h1>
-                  <p className="mt-3 text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-xl">
+                  <p className="mt-2.5 text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-xl">
                     {featuredMatch.description ||
                       'El gran clásico regional transmitido en directo para toda la hinchada.'}
                   </p>
+                </div>
+
+                {/* ======================================================================= */}
+                {/* PRIORIDAD MÓVIL Y DESKTOP: PRECIO Y BOTÓN DE COMPRA DIRECTA             */}
+                {/* ======================================================================= */}
+                <div className="pt-1 flex flex-wrap items-center gap-4 sm:gap-6">
+                  <div>
+                    <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
+                      Pase de Transmisión
+                    </span>
+                    <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white">
+                      ${Number(featuredMatch.price).toLocaleString('es-AR')}{' '}
+                      <span className="text-xs font-bold text-red-500">ARS</span>
+                    </span>
+                  </div>
+
+                  {approvedMatchIds.has(featuredMatch.id) ? (
+                    <Link
+                      href={`/partido/${featuredMatch.id}`}
+                      className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 bg-white hover:bg-zinc-200 text-black"
+                    >
+                      <PlayCircle className="w-4 h-4 text-red-600" />
+                      <span>Ver Transmisión</span>
+                    </Link>
+                  ) : isFeaturedDateConfirmed ? (
+                    <Link
+                      href={`/partido/${featuredMatch.id}`}
+                      className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 bg-white hover:bg-zinc-200 text-black"
+                    >
+                      <ShoppingCart className="w-4 h-4 text-red-600" />
+                      <span>Comprar Pase Directo</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-2 px-5 py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider bg-zinc-900 border border-amber-800/60 text-amber-400">
+                      <Clock className="w-4 h-4 text-amber-500" />
+                      <span>Venta al Confirmar Fecha</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-4 text-[10px] font-mono text-zinc-500 pt-0.5">
+                  <span className="flex items-center gap-1.5 text-zinc-400">
+                    <CheckCircle2 className="w-3 h-3 text-red-500" />
+                    Sin cuenta requerida
+                  </span>
+                  <span>//</span>
+                  <span>Mercado Pago</span>
+                  <span>//</span>
+                  <span>1 Pantalla HD</span>
                 </div>
 
                 {/* Duelo de Escudos Oficiales */}
@@ -166,64 +300,29 @@ export default async function HomePage() {
                       />
                     </div>
                     <span className="font-bold text-xs sm:text-sm text-white tracking-wide">
-                      I. F. C.
+                      {featuredMatch.title.includes('vs')
+                        ? featuredMatch.title.split('vs')[1].trim()
+                        : 'I. F. C.'}
                     </span>
                   </div>
                 </div>
 
                 {/* Cuenta Regresiva */}
-                <div className="pt-1">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-2">
-                    Inicio de la transmisión:
-                  </span>
-                  <CountdownTimer targetDate={featuredMatch.date} />
-                </div>
-
-                {/* Precio y CTA Principal (Estilo Forg1) */}
-                <div className="pt-3 flex flex-wrap items-center gap-4 sm:gap-6">
-                  <div>
-                    <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
-                      Pase de Partido
+                {isFeaturedDateConfirmed && featuredMatch.date ? (
+                  <div className="pt-1">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-2">
+                      Inicio de la transmisión:
                     </span>
-                    <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white">
-                      ${Number(featuredMatch.price).toLocaleString('es-AR')}{' '}
-                      <span className="text-xs font-bold text-red-500">ARS</span>
-                    </span>
+                    <CountdownTimer targetDate={featuredMatch.date} />
                   </div>
-
-                  <Link
-                    href={`/partido/${featuredMatch.id}`}
-                    className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 ${
-                      approvedMatchIds.has(featuredMatch.id)
-                        ? 'bg-white hover:bg-zinc-200 text-black'
-                        : 'bg-white hover:bg-zinc-200 text-black'
-                    }`}
-                  >
-                    {approvedMatchIds.has(featuredMatch.id) ? (
-                      <>
-                        <PlayCircle className="w-4 h-4 text-red-600" />
-                        <span>Ver Transmisión</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-4 h-4 text-red-600" />
-                        <span>Comprar Pase Directo</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </>
-                    )}
-                  </Link>
-                </div>
-
-                <div className="flex items-center gap-4 text-[10px] font-mono text-zinc-500 pt-1">
-                  <span className="flex items-center gap-1.5 text-zinc-400">
-                    <CheckCircle2 className="w-3 h-3 text-red-500" />
-                    Sin cuenta requerida
-                  </span>
-                  <span>//</span>
-                  <span>Mercado Pago Seguro</span>
-                  <span>//</span>
-                  <span>1 Pantalla HD</span>
-                </div>
+                ) : (
+                  <div className="pt-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-400 text-xs font-mono">
+                      <Clock className="w-3.5 h-3.5 text-amber-400" />
+                      <span>FECHA Y HORARIO A CONFIRMAR POR LA LIGA</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Imagen / Encuadre Oficial del Partido */}
@@ -257,7 +356,7 @@ export default async function HomePage() {
         )}
 
         {/* ============================================================================== */}
-        {/* 2. GRILLA CONECTADA DE 4 MÉTRICAS (FORG1 METRIC GRID) */}
+        {/* 2. GRILLA CONECTADA DE 4 MÉTRICAS (FORG1 METRIC GRID)                          */}
         {/* ============================================================================== */}
         <div className="grid grid-cols-2 lg:grid-cols-4 bg-[#0c0c10] border border-white/[0.07] rounded-3xl overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-white/[0.06] shadow-md">
           {/* Métrica 1 */}
@@ -276,10 +375,18 @@ export default async function HomePage() {
           {/* Métrica 2 */}
           <div className="p-4 sm:p-6 text-left">
             <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
-              KICKOFF
+              COMIENZA
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              HOY 17:00
+              {isFeaturedDateConfirmed && featuredMatchTime ? (
+                new Date(featuredMatch.date).toLocaleDateString('es-AR', {
+                  weekday: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }).toUpperCase()
+              ) : (
+                'A CONFIRMAR'
+              )}
             </div>
             <div className="text-[10px] sm:text-[11px] text-red-400 mt-2 font-mono flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
@@ -342,10 +449,10 @@ export default async function HomePage() {
                     className="group bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.07] hover:border-red-500/40 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 shadow-sm"
                   >
                     <div>
-                      {/* Miniatura 16:9 con Overlay Táctico (Recuadro Verde) */}
+                      {/* Miniatura compacta (Reducida para dar jerarquía al partido principal) */}
                       <Link
                         href={`/partido/${match.id}`}
-                        className="relative block w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
+                        className="relative block w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
                       >
                         {match.image_url ? (
                           <Image
