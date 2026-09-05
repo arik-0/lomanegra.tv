@@ -14,10 +14,23 @@ export default function Navbar() {
 
   useEffect(() => {
     async function getUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          setUser(user);
+          setLoading(false);
+          return;
+        }
+      } catch {}
+
+      if (typeof window !== 'undefined') {
+        const localEmail = localStorage.getItem('lomonegrotv_guest_email');
+        if (localEmail) {
+          setUser({ id: 'local-user', email: localEmail } as User);
+        }
+      }
       setLoading(false);
     }
     getUser();
@@ -34,7 +47,14 @@ export default function Navbar() {
   }, [supabase]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('lomonegrotv_guest_email');
+      localStorage.removeItem('lomonegrotv_user_authenticated');
+    }
+    try {
+      await fetch('/api/auth/authenticate', { method: 'DELETE' });
+      await supabase.auth.signOut();
+    } catch {}
     window.location.href = '/';
   };
 

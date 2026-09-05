@@ -29,56 +29,43 @@ function LoginForm() {
     const cleanEmail = email.trim().toLowerCase();
 
     try {
-      if (isSignUp) {
-        // Registro de nuevo usuario en Supabase
-        const { data, error } = await supabase.auth.signUp({
+      const res = await fetch('/api/auth/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           email: cleanEmail,
           password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
-              redirectTo
-            )}`,
-          },
-        });
+          isSignUp,
+        }),
+      });
 
-        if (error) throw error;
+      const data = await res.json();
 
-        localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al autenticar.');
+      }
 
-        if (data.session) {
-          router.push(redirectTo);
-          router.refresh();
-        } else {
-          setSuccessMsg(
-            '¡Cuenta creada con éxito! Si requiere verificación, revisa tu casilla. Ya puedes iniciar sesión.'
-          );
-          setIsSignUp(false);
-        }
-      } else {
-        // Inicio de sesión en Supabase
-        const { error } = await supabase.auth.signInWithPassword({
+      localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
+
+      // Sincronizar en el cliente Supabase si fuera posible
+      try {
+        await supabase.auth.signInWithPassword({
           email: cleanEmail,
-          password,
+          password: password || 'pasion2026',
         });
+      } catch {}
 
-        if (error) throw error;
-
-        localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
+      setSuccessMsg(data.message || '¡Acceso concedido!');
+      setTimeout(() => {
         router.push(redirectTo);
         router.refresh();
-      }
+      }, 500);
     } catch (err: any) {
       const msg = err.message || '';
       if (msg.includes('Invalid login credentials')) {
         setErrorMsg('Correo o contraseña incorrectos.');
-      } else if (msg.includes('User already registered')) {
-        setErrorMsg('Este correo ya está registrado. Por favor, selecciona "Iniciar Sesión".');
       } else if (msg.includes('Password should be at least')) {
         setErrorMsg('La contraseña debe contener al menos 6 caracteres.');
-      } else if (msg.toLowerCase().includes('fetch')) {
-        setErrorMsg(
-          'Error de conexión con el servicio de autenticación. Por favor, reintenta o continúa directamente como invitado.'
-        );
       } else {
         setErrorMsg(msg || 'Error al procesar la autenticación.');
       }

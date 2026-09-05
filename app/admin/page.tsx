@@ -241,13 +241,22 @@ export default function AdminPage() {
     }
   };
 
+  const formatForDateTimeInput = (dateObj: Date) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const openMatchModal = (match?: Match) => {
     setSaveMatchError('');
     if (match) {
       setEditingMatch(match);
       setFormTitle(match.title);
       setFormDesc(match.description || '');
-      setFormDate(match.date ? match.date.slice(0, 16) : '');
+      setFormDate(match.date ? formatForDateTimeInput(new Date(match.date)) : '');
       setFormIsDateConfirmed(match.is_date_confirmed);
       setFormPrice(match.price);
       setFormStreamUid(match.cloudflare_live_input_uid);
@@ -256,7 +265,9 @@ export default function AdminPage() {
       setEditingMatch(null);
       setFormTitle('Blanco y Negro vs ');
       setFormDesc('Fútbol Mayor • Torneo Oficial');
-      setFormDate(new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 16));
+      const defaultNext = new Date(Date.now() + 24 * 3600 * 1000);
+      defaultNext.setHours(15, 30, 0, 0);
+      setFormDate(formatForDateTimeInput(defaultNext));
       setFormIsDateConfirmed(true);
       setFormPrice(3500);
       setFormStreamUid('live_input_byn');
@@ -1293,6 +1304,10 @@ export default function AdminPage() {
                       onChange={(e) => setFormDate(e.target.value)}
                       className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                     />
+                    <p className="text-[10px] text-zinc-400 mt-1.5 flex items-center gap-1 font-mono">
+                      <span>⏱️</span>
+                      <span>El contador de la página principal se ajustará automáticamente a esta fecha y hora.</span>
+                    </p>
                   </div>
                 )}
 

@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import CountdownTimer from '@/components/CountdownTimer';
+import { getStoredMatches } from '@/lib/adminStore';
+import { MatchHeroBadge, MatchHeroCountdown } from '@/components/MatchHeroStatus';
 import SponsorsStrip from '@/components/SponsorsStrip';
 import SponsorsTicker from '@/components/SponsorsTicker';
 import {
@@ -72,6 +74,15 @@ export default async function HomePage() {
         });
       }
 
+      if (!user) {
+        const cookieStore = cookies();
+        const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
+        const cookieId = cookieStore.get('lomonegro_user_id')?.value;
+        if (cookieEmail) {
+          user = { id: cookieId || 'user-cookie', email: cookieEmail };
+        }
+      }
+
       if (user) {
         const purchasesRes: any = await withTimeout(
           supabaseAdmin
@@ -129,46 +140,45 @@ export default async function HomePage() {
     },
   ];
 
-  // Filtrar exclusivamente partidos de Pasión Lomonegra (Blanco y Negro o Liga Regional)
-  const validMatches = (matches && matches.length > 0 ? matches : []).filter(
+  // Combinar partidos de Supabase con los del almacén de administración
+  const adminMatches = getStoredMatches();
+  const allCandidates = [...(matches || []), ...adminMatches];
+  const seenIds = new Set<string>();
+  const combinedMatches = allCandidates.filter((m) => {
+    if (seenIds.has(m.id)) return false;
+    seenIds.add(m.id);
+    return true;
+  });
+
+  // Filtrar exclusivamente partidos activos de Pasión Lomonegra
+  const validMatches = (combinedMatches.length > 0 ? combinedMatches : [defaultFeaturedMatch, ...defaultOtherMatches]).filter(
     (m) =>
+      m.is_active !== false &&
       !m.title.toLowerCase().includes('boca juniors vs river') &&
       !m.title.toLowerCase().includes('real madrid') &&
       !m.title.toLowerCase().includes('argentina vs')
   );
 
   const activeMatches = validMatches.length > 0 ? validMatches : [defaultFeaturedMatch, ...defaultOtherMatches];
-
   const now = Date.now();
 
-  // Buscar si hay algún partido latente (fecha confirmada y futura o en curso)
-  const latentMatch = activeMatches.find((m) => {
-    if (!m.is_date_confirmed || !m.date) return false;
-    const mTime = new Date(m.date).getTime();
-    return mTime + 3 * 3600 * 1000 >= now;
-  });
+  // Buscar todos los partidos confirmados con fecha futura o en curso (hasta 3 horas de iniciados)
+  // y ordenarlos cronológicamente: el más próximo siempre queda primero
+  const upcomingConfirmedMatches = activeMatches
+    .filter((m) => m.is_date_confirmed !== false && m.date)
+    .map((m) => ({ ...m, timestamp: new Date(m.date!).getTime() }))
+    .filter((m) => !isNaN(m.timestamp) && m.timestamp + 3 * 3600 * 1000 >= now)
+    .sort((a, b) => a.timestamp - b.timestamp);
 
-  // Si no hay evento latente, buscar uno "A Confirmar"
+  // Si no hay partidos confirmados próximos, buscar uno "A Confirmar"
   const pendingMatch = activeMatches.find((m) => !m.is_date_confirmed || !m.date);
 
-  const fallbackTbdMatch = {
-    id: 'tbd-next-match',
-    title: 'Club Atlético Blanco y Negro vs Rival a Confirmar',
-    description: 'Próxima fecha del Torneo Oficial de Fútbol Mayor.',
-    date: null,
-    is_date_confirmed: false,
-    price: 3500,
-    cloudflare_live_input_uid: 'live_input_byn_tbd',
-    image_url: '/matches/blanco-y-negro-vs-ifc.png',
-    is_active: true,
-  };
-
+  // El partido estelar seleccionado automáticamente para el contador
   const featuredMatch =
-    latentMatch ||
-    activeMatches.find((m) => m.title.toLowerCase().includes('blanco y negro')) ||
+    upcomingConfirmedMatches[0] ||
     pendingMatch ||
     activeMatches[0] ||
-    fallbackTbdMatch;
+    defaultFeaturedMatch;
 
   // Sanitizar descripción eliminando textos publicitarios obsoletos o redundantes
   const cleanDescription = (featuredMatch.description || '')
@@ -178,30 +188,8 @@ export default async function HomePage() {
 
   const otherMatches = activeMatches.filter((m) => m.id !== featuredMatch.id);
 
-  // Lógica dinámica de estado temporal
+  // Estado de confirmación de la fecha para el contador
   const isFeaturedDateConfirmed = featuredMatch.is_date_confirmed !== false && !!featuredMatch.date;
-  const featuredMatchTime = isFeaturedDateConfirmed && featuredMatch.date ? new Date(featuredMatch.date).getTime() : null;
-
-  let statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
-  let isLiveNow = false;
-
-  if (!isFeaturedDateConfirmed || !featuredMatchTime) {
-    statusBadgeText = 'EVENTO A CONFIRMAR // SEÑAL EN ESPERA';
-  } else {
-    const diffMs = featuredMatchTime - now;
-    const diffHours = diffMs / (1000 * 60 * 60);
-
-    if (diffMs <= 0) {
-      statusBadgeText = 'EN DIRECTO';
-      isLiveNow = true;
-    } else if (diffHours <= 1) {
-      statusBadgeText = 'COMIENZA EN BREVE // TRANSMISIÓN EN VIVO';
-    } else if (diffHours <= 12) {
-      statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
-    } else {
-      statusBadgeText = 'PRÓXIMA TRANSMISIÓN EN VIVO';
-    }
-  }
 
   return (
     <main className="min-h-screen bg-[#08080a] text-white px-4 py-6 sm:px-6 lg:px-8">
@@ -229,28 +217,10 @@ export default async function HomePage() {
               {/* Información y Compra Directa */}
               <div className="lg:col-span-7 space-y-5">
                 {/* Badge Dinámico de Estado */}
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <div
-                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-md text-[10px] font-mono font-black uppercase tracking-wider ${
-                      isLiveNow
-                        ? 'bg-red-600/90 text-white animate-pulse'
-                        : !isFeaturedDateConfirmed
-                        ? 'bg-amber-950/70 border border-amber-700/80 text-amber-400'
-                        : 'bg-red-950/70 border border-red-700/80 text-red-400'
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        isLiveNow
-                          ? 'bg-white animate-ping'
-                          : !isFeaturedDateConfirmed
-                          ? 'bg-amber-400'
-                          : 'bg-red-500 animate-ping'
-                      }`}
-                    />
-                    <span>{statusBadgeText}</span>
-                  </div>
-                </div>
+                <MatchHeroBadge
+                  targetDate={featuredMatch.date}
+                  isDateConfirmed={isFeaturedDateConfirmed}
+                />
 
                 <div>
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
@@ -353,31 +323,11 @@ export default async function HomePage() {
                   </div>
                 </div>
 
-                {/* Cuenta Regresiva o Estado de Transmisión */}
-                {isFeaturedDateConfirmed && featuredMatch.date ? (
-                  <div className="pt-1">
-                    {isLiveNow ? (
-                      <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-950/60 border border-red-700/80 text-red-400 text-xs font-mono font-bold">
-                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                        <span>SEÑAL EN TRANSMISIÓN DIRECTA EN EL PLAYER</span>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-2">
-                          Comienza en:
-                        </span>
-                        <CountdownTimer targetDate={featuredMatch.date} />
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <div className="pt-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-amber-400 text-xs font-mono">
-                      <Clock className="w-3.5 h-3.5 text-amber-400" />
-                      <span>FECHA Y HORARIO A CONFIRMAR POR LA LIGA</span>
-                    </div>
-                  </div>
-                )}
+                {/* Cuenta Regresiva Sincronizada Automáticamente al Partido */}
+                <MatchHeroCountdown
+                  targetDate={featuredMatch.date}
+                  isDateConfirmed={isFeaturedDateConfirmed}
+                />
               </div>
 
               {/* Imagen / Encuadre Oficial del Partido (Verde = Miniatura de Cancha) */}
@@ -452,7 +402,7 @@ export default async function HomePage() {
               COMIENZA
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              {isFeaturedDateConfirmed && featuredMatchTime ? (
+              {isFeaturedDateConfirmed && featuredMatch.date ? (
                 new Date(featuredMatch.date).toLocaleDateString('es-AR', {
                   weekday: 'short',
                   hour: '2-digit',

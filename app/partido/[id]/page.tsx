@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getStoredMatches } from '@/lib/adminStore';
 import MatchViewClient from './MatchViewClient';
 import { ArrowLeft } from 'lucide-react';
 
@@ -73,6 +75,15 @@ export default async function MatchPage({
       user = authRes?.data?.user || null;
       match = matchRes?.data || null;
 
+      if (!user) {
+        const cookieStore = cookies();
+        const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
+        const cookieId = cookieStore.get('lomonegro_user_id')?.value;
+        if (cookieEmail) {
+          user = { id: cookieId || 'user-cookie', email: cookieEmail };
+        }
+      }
+
       // Verificar compras aprobadas con timeout de 800ms
       const guestEmail = searchParams?.guest_email?.toLowerCase().trim();
       if (match && (user || guestEmail)) {
@@ -116,7 +127,10 @@ export default async function MatchPage({
 
   // Fallback de seguridad inmediato si no se encontró en la DB
   if (!match) {
-    if (params.id === 'b1a9c001-0000-4000-8000-000000000002') {
+    const fromStore = getStoredMatches().find((m) => m.id === params.id);
+    if (fromStore) {
+      match = fromStore;
+    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000002') {
       match = {
         id: 'b1a9c001-0000-4000-8000-000000000002',
         title: 'Blanco y Negro vs Deportivo Sarmiento',
