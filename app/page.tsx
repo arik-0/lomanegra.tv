@@ -32,26 +32,58 @@ export default async function HomePage() {
 
   if (isSupabaseConfigured) {
     try {
-      const supabase = createServerSupabaseClient();
-      const authRes = await supabase.auth.getUser();
-      user = authRes.data.user;
+      const withTimeout = async <T,>(p: PromiseLike<T>, ms = 2500): Promise<T | null> => {
+        let t: any;
+        const timeout = new Promise<null>((res) => { t = setTimeout(() => res(null), ms); });
+        try {
+          const res = await Promise.race([Promise.resolve(p), timeout]);
+          clearTimeout(t);
+          return res as T;
+        } catch {
+          clearTimeout(t);
+          return null;
+        }
+      };
 
-      const { data } = await supabaseAdmin
-        .from('matches')
-        .select('*')
-        .eq('is_active', true)
-        .order('date', { ascending: true });
-      matches = data;
+      const supabase = createServerSupabaseClient();
+      const authRes: any = await withTimeout(supabase.auth.getUser(), 2000);
+      user = authRes?.data?.user || null;
+
+      const matchesRes: any = await withTimeout(
+        supabaseAdmin
+          .from('matches')
+          .select('*')
+          .eq('is_active', true)
+          .order('date', { ascending: true }),
+        2500
+      );
+
+      if (matchesRes && !matchesRes.error && matchesRes.data && matchesRes.data.length > 0) {
+        matches = matchesRes.data.map((m: any) => {
+          const isTbd =
+            m.description?.includes('[A CONFIRMAR]') ||
+            (m.date && new Date(m.date).getFullYear() >= 2099);
+          return {
+            ...m,
+            is_date_confirmed: !isTbd,
+            date: isTbd ? null : m.date,
+            description: (m.description || '').replace('[A CONFIRMAR]', '').trim(),
+          };
+        });
+      }
 
       if (user) {
-        const { data: purchases } = await supabaseAdmin
-          .from('purchases')
-          .select('match_id')
-          .eq('user_id', user.id)
-          .eq('status', 'approved');
+        const purchasesRes: any = await withTimeout(
+          supabaseAdmin
+            .from('purchases')
+            .select('match_id')
+            .eq('user_id', user.id)
+            .eq('status', 'approved'),
+          2000
+        );
 
-        if (purchases) {
-          approvedMatchIds = new Set(purchases.map((p) => p.match_id));
+        if (purchasesRes?.data) {
+          approvedMatchIds = new Set(purchasesRes.data.map((p: any) => p.match_id));
         }
       }
     } catch {
