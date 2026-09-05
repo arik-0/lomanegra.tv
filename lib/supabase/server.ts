@@ -4,10 +4,17 @@ import { cookies } from 'next/headers';
 export function createServerSupabaseClient() {
   const cookieStore = cookies();
 
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key',
-    {
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
+      ? process.env.NEXT_PUBLIC_SUPABASE_URL
+      : 'https://cyigamszhhdluqstjcut.supabase.co';
+
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes('placeholder')
+      ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      : 'sb_publishable_0DiTRMSrhy3FU8Jc-gl-0A_L6_ORFWP';
+
+  return createServerClient(url, key, {
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value;

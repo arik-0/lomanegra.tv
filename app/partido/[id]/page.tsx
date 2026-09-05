@@ -31,7 +31,7 @@ export default async function MatchPage({
   searchParams,
 }: MatchPageProps) {
   const isSupabaseConfigured =
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);

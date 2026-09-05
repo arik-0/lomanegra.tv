@@ -26,11 +26,13 @@ function LoginForm() {
     setErrorMsg(null);
     setSuccessMsg(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+
     try {
       if (isSignUp) {
-        // Registro de nuevo usuario
-        const { error } = await supabase.auth.signUp({
-          email,
+        // Registro de nuevo usuario en Supabase
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
@@ -41,23 +43,45 @@ function LoginForm() {
 
         if (error) throw error;
 
-        setSuccessMsg(
-          'Cuenta creada con éxito. Si requiere confirmación, revisa tu casilla. Ya puedes ingresar.'
-        );
+        localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
+
+        if (data.session) {
+          router.push(redirectTo);
+          router.refresh();
+        } else {
+          setSuccessMsg(
+            '¡Cuenta creada con éxito! Si requiere verificación, revisa tu casilla. Ya puedes iniciar sesión.'
+          );
+          setIsSignUp(false);
+        }
       } else {
-        // Inicio de sesión
+        // Inicio de sesión en Supabase
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: cleanEmail,
           password,
         });
 
         if (error) throw error;
 
+        localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
         router.push(redirectTo);
         router.refresh();
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Error al autenticar.');
+      const msg = err.message || '';
+      if (msg.includes('Invalid login credentials')) {
+        setErrorMsg('Correo o contraseña incorrectos.');
+      } else if (msg.includes('User already registered')) {
+        setErrorMsg('Este correo ya está registrado. Por favor, selecciona "Iniciar Sesión".');
+      } else if (msg.includes('Password should be at least')) {
+        setErrorMsg('La contraseña debe contener al menos 6 caracteres.');
+      } else if (msg.toLowerCase().includes('fetch')) {
+        setErrorMsg(
+          'Error de conexión con el servicio de autenticación. Por favor, reintenta o continúa directamente como invitado.'
+        );
+      } else {
+        setErrorMsg(msg || 'Error al procesar la autenticación.');
+      }
     } finally {
       setLoading(false);
     }
