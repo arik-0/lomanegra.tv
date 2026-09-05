@@ -54,7 +54,7 @@ export default function Navbar() {
             />
           </div>
           <div className="flex items-baseline font-black tracking-tight text-sm">
-            <span className="text-white">LOMANEGRA</span>
+            <span className="text-white">LOMONEGRO</span>
             <span className="text-red-500 font-mono text-[9px] ml-1 font-bold">.TV</span>
           </div>
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/60 text-red-400 text-[8px] font-mono uppercase">

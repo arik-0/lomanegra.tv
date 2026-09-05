@@ -119,7 +119,7 @@ export default async function HomePage() {
                   </div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-zinc-300 text-[10px] font-mono">
                     <Radio className="w-3 h-3 text-red-500" />
-                    <span>LOMANEGRA // STREAMING PPV</span>
+                    <span>LOMONEGRO // STREAMING PPV</span>
                   </div>
                 </div>
 

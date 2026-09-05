@@ -11,7 +11,10 @@ export default function SimulatePurchaseButton({ matchId }: { matchId: string })
   const handleSimulate = async () => {
     try {
       setLoading(true);
-      const guestEmail = localStorage.getItem('lomanegratv_guest_email') || 'invitado@lomanegratv.com';
+      const guestEmail =
+        localStorage.getItem('lomonegrotv_guest_email') ||
+        localStorage.getItem('lomanegratv_guest_email') ||
+        'invitado@lomonegrotv.com';
 
       const res = await fetch('/api/dev/simulate-purchase', {
         method: 'POST',
@@ -23,7 +26,7 @@ export default function SimulatePurchaseButton({ matchId }: { matchId: string })
 
       if (res.ok) {
         if (data.guestEmail) {
-          localStorage.setItem('lomanegratv_guest_email', data.guestEmail);
+          localStorage.setItem('lomonegrotv_guest_email', data.guestEmail);
         }
         window.location.reload();
       } else {

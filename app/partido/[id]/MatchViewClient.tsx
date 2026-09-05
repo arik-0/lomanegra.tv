@@ -58,7 +58,7 @@ export default function MatchViewClient({
   // Al cargar, verificar si hay un email guardado en localStorage para invitados
   useEffect(() => {
     if (!serverHasPaid && !currentUserEmail) {
-      const emailToCheck = queryGuestEmail || localStorage.getItem('lomanegratv_guest_email');
+      const emailToCheck = queryGuestEmail || localStorage.getItem('lomonegrotv_guest_email') || localStorage.getItem('lomanegratv_guest_email');
       if (emailToCheck) {
         verifyGuestEmail(emailToCheck);
       }
@@ -79,7 +79,7 @@ export default function MatchViewClient({
       if (res.ok && data.hasAccess) {
         setHasPaid(true);
         setActiveGuestEmail(email);
-        localStorage.setItem('lomanegratv_guest_email', email);
+        localStorage.setItem('lomonegrotv_guest_email', email);
         setRestoreMessage({
           type: 'success',
           text: `¡Pase encontrado para ${email}! Acceso habilitado.`,

@@ -23,7 +23,7 @@ export default function CheckoutButton({
   useEffect(() => {
     // Recuperar correo de invitado previo si existe
     if (!isUserLoggedIn) {
-      const savedEmail = localStorage.getItem('lomanegratv_guest_email');
+      const savedEmail = localStorage.getItem('lomonegrotv_guest_email') || localStorage.getItem('lomanegratv_guest_email');
       if (savedEmail) {
         setGuestEmail(savedEmail);
       }
@@ -42,7 +42,7 @@ export default function CheckoutButton({
           setLoading(false);
           return;
         }
-        localStorage.setItem('lomanegratv_guest_email', guestEmail.toLowerCase().trim());
+        localStorage.setItem('lomonegrotv_guest_email', guestEmail.toLowerCase().trim());
         if (onGuestEmailConfirmed) {
           onGuestEmailConfirmed(guestEmail.toLowerCase().trim());
         }

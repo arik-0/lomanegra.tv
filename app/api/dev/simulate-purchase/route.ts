@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const { matchId, guestEmail } = body;
 
-    const targetEmail = user?.email || guestEmail || 'invitado@lomanegratv.com';
+    const targetEmail = user?.email || guestEmail || 'invitado@lomonegrotv.com';
 
     if (!matchId) {
       return NextResponse.json(

@@ -68,7 +68,7 @@ export default function SponsorsStrip() {
 
       {/* Footer de Sponsors */}
       <div className="text-center sm:text-left text-xs font-mono text-zinc-500 pt-1 flex flex-wrap items-center gap-2">
-        <span>¿Deseas sumar tu marca a las transmisiones oficiales de Lomanegratv?</span>
+        <span>¿Deseas sumar tu marca a las transmisiones oficiales de Lomonegrotv?</span>
         <span className="text-red-400 hover:text-white transition-colors cursor-pointer underline underline-offset-2">
           Contactar a Producción Comercial &rarr;
         </span>

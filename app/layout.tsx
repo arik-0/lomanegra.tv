@@ -5,9 +5,9 @@ import Navbar from '@/components/Navbar';
 import AppLayoutWrapper from '@/components/AppLayoutWrapper';
 
 export const metadata: Metadata = {
-  title: 'Lomanegratv - Transmisiones Oficiales en Vivo',
+  title: 'Lomonegrotv - Transmisiones Oficiales en Vivo',
   description:
-    'Plataforma oficial de Pay-Per-View de Lomanegratv para ver partidos en vivo y en directo en alta definición con Cloudflare Stream.',
+    'Plataforma oficial de Pay-Per-View de Lomonegrotv para ver partidos en vivo y en directo en alta definición con Cloudflare Stream.',
 };
 
 export default function RootLayout({
@@ -33,7 +33,7 @@ export default function RootLayout({
                   />
                 </div>
                 <span className="font-bold text-white">
-                  Lomanegra<span className="text-red-500">.tv</span>
+                  Lomonegro<span className="text-red-500">.tv</span>
                 </span>
                 <span className="text-zinc-500">· Señal Oficial PPV</span>
               </div>
