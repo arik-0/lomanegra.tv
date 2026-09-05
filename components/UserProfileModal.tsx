@@ -1,20 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
   X,
   Trophy,
   Award,
-  Flame,
-  CheckCircle2,
   Tv,
   Play,
-  Calendar,
   Sparkles,
   LogOut,
-  ChevronRight,
   Shield,
   Clock,
 } from 'lucide-react';
@@ -32,10 +29,14 @@ export default function UserProfileModal({
   userEmail,
   onSignOut,
 }: UserProfileModalProps) {
-  // Puntos de visualización calculados
+  const [mounted, setMounted] = useState(false);
   const [points, setPoints] = useState(1450);
   const targetPoints = 2000;
   const progressPercent = Math.min(100, Math.round((points / targetPoints) * 100));
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Partidos pagos disponibles para el usuario
   const paidMatches = [
@@ -76,15 +77,21 @@ export default function UserProfileModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      {/* Backdrop click */}
-      <div className="fixed inset-0" onClick={onClose} />
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] pointer-events-auto">
+      {/* Backdrop transparente / semioscuro para cerrar al hacer clic afuera */}
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
 
-      {/* Modal Card */}
-      <div className="relative w-full max-w-lg bg-[#111218] border border-zinc-800 rounded-3xl shadow-[0_16px_50px_rgba(0,0,0,0.85)] p-5 sm:p-6 my-auto z-10 space-y-5 text-white font-mono">
+      {/* Pestaña temporal desplegable flotante directamente anclada bajo el Navbar */}
+      <div className="fixed top-14 sm:top-16 right-2 sm:right-6 md:right-8 w-[94vw] sm:w-[440px] max-h-[85vh] overflow-y-auto bg-[#111218] border border-zinc-700/80 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.95)] p-5 sm:p-6 space-y-5 text-white font-mono z-[100000]">
+        {/* Puntero hacia el nombre de usuario arriba a la derecha */}
+        <div className="hidden sm:block absolute -top-2 right-12 w-4 h-4 bg-[#111218] border-t border-l border-zinc-700/80 rotate-45" />
+
         {/* Cabecera del Usuario */}
         <div className="flex items-start justify-between border-b border-zinc-800/80 pb-4">
           <div className="flex items-center gap-3">
@@ -204,7 +211,6 @@ export default function UserProfileModal({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {/* Logos de los equipos */}
                     <div className="flex items-center -space-x-1.5">
                       <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
                         <Image src={m.logo1} alt="Equipo 1" fill className="object-contain" />
@@ -271,6 +277,7 @@ export default function UserProfileModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

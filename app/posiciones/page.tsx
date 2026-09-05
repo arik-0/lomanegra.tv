@@ -119,7 +119,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Shield className="w-4 h-4" />
-              <span>Liga Coronel Suárez (Blanco y Negro)</span>
+              <span>Liga Regional (Blanco y Negro)</span>
             </button>
 
             <button
