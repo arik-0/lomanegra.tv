@@ -42,9 +42,23 @@ export async function POST(req: Request) {
       .single();
 
     if (matchError || !match) {
+      if (matchId === '07ced47c-9f9a-4bce-a073-2c8e84b3de67') {
+        return NextResponse.json(
+          { error: 'Las entradas para este partido no están habilitadas: la fecha aún está a confirmar.' },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { error: 'Partido no encontrado o no disponible para la venta.' },
         { status: 404 }
+      );
+    }
+
+    // Validar si la fecha está confirmada antes de permitir el checkout
+    if (match.is_date_confirmed === false || !match.date) {
+      return NextResponse.json(
+        { error: 'Las entradas para este partido no están habilitadas: la fecha aún está a confirmar.' },
+        { status: 400 }
       );
     }
 

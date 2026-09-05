@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Flybondi Style Wordmark -->
+  <text x="10" y="38" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="1" fill="#eab308">fly</text>
+  <text x="56" y="38" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="1" fill="currentColor">bondi</text>
+  <circle cx="155" cy="20" r="4" fill="#eab308"/>
+  <path d="M10 44h150" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Coca-Cola Style Dynamic Script / Wordmark -->
+  <circle cx="26" cy="30" r="18" fill="#dc2626"/>
+  <path d="M15 32c4-8 18-9 22-2" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <text x="56" y="38" font-family="'Brush Script MT', cursive, Georgia, serif" font-size="34" font-weight="bold" font-style="italic" fill="currentColor">Coca-Cola</text>
+</svg>

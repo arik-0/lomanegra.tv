@@ -133,12 +133,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               <div className="flex items-baseline font-black tracking-tight leading-none text-base">
                 <span className="text-white">PASIÓN</span>
                 <span className="text-red-500 ml-1">LOMONEGRA</span>
-                <span className="text-zinc-500 font-mono text-[9px] ml-1 font-bold">
-                  .TV
-                </span>
               </div>
               <div className="text-[8px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">
-                SEÑAL // PPV OFICIAL
+                SEÑAL // TRANSMISIÓN OFICIAL
               </div>
             </div>
           </Link>
@@ -315,14 +312,14 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           <div className="pt-2">
             <div className="group relative h-14 flex items-center gap-2.5 px-3 overflow-hidden rounded-xl border border-white/[0.07] bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(12,12,16,1)_100%)] transition-[border-color] duration-200 hover:border-red-500/40">
               <div className="shrink-0 w-8 h-8 rounded-lg bg-red-950/40 border border-red-800/60 flex items-center justify-center text-red-400 font-mono text-xs font-black">
-                PPV
+                VIVO
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-[8px] text-zinc-500 tracking-[0.2em] uppercase font-mono leading-tight">
                   Sponsor oficial
                 </div>
                 <div className="text-xs font-black tracking-tight text-white font-mono leading-tight truncate mt-0.5 group-hover:text-red-400 transition-colors">
-                  Tu Marca Aquí
+                  Quilmes Oficial
                 </div>
               </div>
             </div>
@@ -338,8 +335,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <Play className="w-3.5 h-3.5 fill-black" />
             <span>Pase En Vivo</span>
           </Link>
-          <div className="text-center text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mt-2">
-            Pasión Lomonegra &bull; Stream HD
+          <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mt-2 px-1">
+            <span>Pasión Lomonegra</span>
+            <Link href="/admin" className="text-zinc-600 hover:text-red-400 transition-colors">
+              Operaciones
+            </Link>
           </div>
         </div>
       </aside>

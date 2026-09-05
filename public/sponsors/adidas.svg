@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Adidas 3 bars iconic logo -->
+  <g fill="currentColor">
+    <path d="M12 42l10-18h7L19 42h-7z"/>
+    <path d="M26 42l14-26h7L33 42h-7z"/>
+    <path d="M40 42l18-34h7L47 42h-7z"/>
+  </g>
+  <text x="76" y="38" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" letter-spacing="1" fill="currentColor">adidas</text>
+</svg>

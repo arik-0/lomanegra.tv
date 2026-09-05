@@ -10,6 +10,11 @@ export async function generateStreamToken(
   liveInputUid: string,
   durationInSeconds: number = 4 * 60 * 60
 ): Promise<string> {
+  // Si el operador ancló una URL directa de stream (HLS .m3u8 o MP4), retornarla directamente
+  if (liveInputUid.startsWith('http://') || liveInputUid.startsWith('https://')) {
+    return liveInputUid;
+  }
+
   const privateKeyPem = process.env.CLOUDFLARE_STREAM_PRIVATE_KEY;
   const keyId = process.env.CLOUDFLARE_STREAM_KEY_ID;
 

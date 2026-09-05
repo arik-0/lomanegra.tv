@@ -43,29 +43,45 @@ export default async function MatchPage({
     match = data;
   }
 
-  // Fallback de seguridad: si no se encontró en la DB o no hay conexión en Vercel, usar datos oficiales
+  // Fallback de seguridad: si no se encontró en la DB o no hay conexión en Vercel, usar datos estelares
   if (!match) {
-    const { data: fallbackMatch } = await supabaseAdmin
-      .from('matches')
-      .select('*')
-      .eq('is_active', true)
-      .limit(1)
-      .maybeSingle();
-    match = fallbackMatch;
-  }
-
-  if (!match) {
-    match = {
-      id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-      title: 'Blanco y Negro vs I. F. C.',
-      description:
-        'Gran clásico oficial transmitido en vivo y en directo en Ultra HD. Acceso exclusivo Pay-Per-View para hinchas de ambos clubes.',
-      date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-      price: 3500,
-      cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
-      is_active: true,
-      image_url: '/matches/blanco-y-negro-vs-ifc.png',
-    };
+    if (params.id === '07ced47c-9f9a-4bce-a073-2c8e84b3de67') {
+      match = {
+        id: '07ced47c-9f9a-4bce-a073-2c8e84b3de67',
+        title: 'Boca Juniors vs River Plate',
+        description: 'Superclásico Oficial • Torneo Clausura',
+        date: null,
+        is_date_confirmed: false,
+        price: 4999,
+        cloudflare_live_input_uid: 'mock_live_input_superclasico_01',
+        image_url: '/matches/superclasico.svg',
+        is_active: true,
+      };
+    } else if (params.id === 'de261139-f0e7-43d3-bd24-f2f9a7262fdf') {
+      match = {
+        id: 'de261139-f0e7-43d3-bd24-f2f9a7262fdf',
+        title: 'Real Madrid vs Barcelona',
+        description: 'El Clásico de España • Semifinal',
+        date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+        is_date_confirmed: true,
+        price: 6500,
+        cloudflare_live_input_uid: 'mock_live_input_elclasico_02',
+        image_url: '/matches/elclasico.svg',
+        is_active: true,
+      };
+    } else {
+      match = {
+        id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
+        title: 'Blanco y Negro vs I. F. C.',
+        description: 'El gran clásico regional en vivo con relatos en directo para toda la hinchada.',
+        date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+        is_date_confirmed: true,
+        price: 3500,
+        cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
+        image_url: '/matches/blanco-y-negro-vs-ifc.png',
+        is_active: true,
+      };
+    }
   }
 
   // 2. Verificar compra aprobada: si está autenticado o si viene el correo por parámetro

@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Tv,
   CheckCircle2,
+  Clock,
 } from 'lucide-react';
 
 export const revalidate = 0; // Datos frescos en cada petición
@@ -50,9 +51,9 @@ export default async function HomePage() {
   const defaultFeaturedMatch = {
     id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
     title: 'Blanco y Negro vs I. F. C.',
-    description:
-      'El gran clásico regional en vivo con relatos exclusivos, cámaras en campo de juego y repetición completa sin necesidad de abono mensual.',
+    description: 'El clásico regional en vivo con relatos en directo y campo de juego.',
     date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    is_date_confirmed: true,
     price: 3500,
     cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
     image_url: '/matches/blanco-y-negro-vs-ifc.png',
@@ -62,22 +63,24 @@ export default async function HomePage() {
   const defaultOtherMatches = [
     {
       id: '07ced47c-9f9a-4bce-a073-2c8e84b3de67',
-      title: 'Boca Juniors vs River Plate - Superclásico Final',
-      description: 'Transmisión exclusiva en 4K Ultra HD multicámara con relatos oficiales.',
-      date: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString(),
+      title: 'Boca Juniors vs River Plate',
+      description: 'Superclásico Oficial • Torneo Clausura',
+      date: null,
+      is_date_confirmed: false,
       price: 4999,
       cloudflare_live_input_uid: 'mock_live_input_superclasico_01',
-      image_url: null,
+      image_url: '/matches/superclasico.svg',
       is_active: true,
     },
     {
       id: 'de261139-f0e7-43d3-bd24-f2f9a7262fdf',
-      title: 'Real Madrid vs Barcelona - El Clásico',
-      description: 'La gran batalla europea en vivo con previa y post-partido exclusivo.',
+      title: 'Real Madrid vs Barcelona',
+      description: 'El Clásico de España • Semifinal',
       date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+      is_date_confirmed: true,
       price: 6500,
       cloudflare_live_input_uid: 'mock_live_input_elclasico_02',
-      image_url: null,
+      image_url: '/matches/elclasico.svg',
       is_active: true,
     },
   ];
@@ -115,11 +118,11 @@ export default async function HomePage() {
                 <div className="flex flex-wrap items-center gap-2.5">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-red-950/70 border border-red-700/80 text-red-400 text-[10px] font-mono font-black uppercase tracking-wider">
                     <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                    <span>TRANSMISIÓN EN VIVO // FECHA OFICIAL</span>
+                    <span>TRANSMISIÓN EN VIVO // SEÑAL OFICIAL</span>
                   </div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] text-zinc-300 text-[10px] font-mono">
                     <Radio className="w-3 h-3 text-red-500" />
-                    <span>PASIÓN LOMONEGRA // STREAMING PPV</span>
+                    <span>PASIÓN LOMONEGRA // EN VIVO</span>
                   </div>
                 </div>
 
@@ -129,7 +132,7 @@ export default async function HomePage() {
                   </h1>
                   <p className="mt-3 text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-xl">
                     {featuredMatch.description ||
-                      'El gran clásico regional en vivo con relatos exclusivos, cámaras en campo de juego y repetición completa sin necesidad de abono mensual.'}
+                      'El gran clásico regional transmitido en directo para toda la hinchada.'}
                   </p>
                 </div>
 
@@ -330,34 +333,77 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {otherMatches.map((match) => {
                 const hasAccess = approvedMatchIds.has(match.id);
-                const matchDate = new Date(match.date);
+                const isDateConfirmed = match.is_date_confirmed !== false && !!match.date;
+                const matchDate = isDateConfirmed && match.date ? new Date(match.date) : null;
 
                 return (
                   <div
                     key={match.id}
-                    className="group bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.07] hover:border-red-500/40 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-sm"
+                    className="group bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.07] hover:border-red-500/40 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 shadow-sm"
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-3 text-xs font-mono">
-                        <div className="flex items-center gap-1.5 text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-md text-[10px]">
-                          <Calendar className="w-3 h-3 text-red-500" />
-                          <span>
-                            {matchDate.toLocaleString('es-AR', {
-                              dateStyle: 'medium',
-                              timeStyle: 'short',
-                            })}
-                          </span>
+                      {/* Miniatura 16:9 con Overlay Táctico (Recuadro Verde) */}
+                      <Link
+                        href={`/partido/${match.id}`}
+                        className="relative block w-full aspect-video rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
+                      >
+                        {match.image_url ? (
+                          <Image
+                            src={match.image_url}
+                            alt={match.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#101016]">
+                            <Tv className="w-10 h-10 text-zinc-700" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
+
+                        {/* Insignia sobre la miniatura */}
+                        <div className="absolute top-2.5 left-2.5">
+                          {isDateConfirmed ? (
+                            <span className="px-2 py-0.5 rounded bg-black/85 backdrop-blur-md border border-white/[0.1] text-[9px] font-mono text-white font-bold uppercase tracking-wider">
+                              OFICIAL
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded bg-amber-950/90 backdrop-blur-md border border-amber-600/70 text-[9px] font-mono text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5" />
+                              A CONFIRMAR
+                            </span>
+                          )}
                         </div>
+                      </Link>
+
+                      <div className="flex items-center justify-between mb-2 text-xs font-mono">
+                        {isDateConfirmed && matchDate ? (
+                          <div className="flex items-center gap-1.5 text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-md text-[10px]">
+                            <Calendar className="w-3 h-3 text-red-500" />
+                            <span>
+                              {matchDate.toLocaleString('es-AR', {
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                              })}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 text-amber-400 bg-amber-950/40 border border-amber-800/40 px-2 py-0.5 rounded-md text-[10px]">
+                            <Clock className="w-3 h-3 text-amber-500" />
+                            <span className="font-bold">FECHA A DEFINIR</span>
+                          </div>
+                        )}
+
                         <span className="text-[9px] font-bold text-red-400 uppercase tracking-wider">
-                          PPV OFICIAL
+                          TRANSMISIÓN OFICIAL
                         </span>
                       </div>
 
-                      <h3 className="text-base font-black text-white group-hover:text-red-400 transition-colors leading-snug mb-2">
+                      <h3 className="text-base font-black text-white group-hover:text-red-400 transition-colors leading-snug mb-1">
                         {match.title}
                       </h3>
-                      <p className="text-zinc-400 text-xs line-clamp-2 leading-relaxed mb-5">
-                        {match.description || 'Transmisión en vivo oficial para hinchas.'}
+                      <p className="text-zinc-400 text-xs line-clamp-1 leading-relaxed mb-4 font-mono">
+                        {match.description || 'Transmisión oficial para toda la hinchada.'}
                       </p>
                     </div>
 
@@ -372,26 +418,31 @@ export default async function HomePage() {
                         </span>
                       </div>
 
-                      <Link
-                        href={`/partido/${match.id}`}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 ${
-                          hasAccess
-                            ? 'bg-white hover:bg-zinc-200 text-black'
-                            : 'bg-white hover:bg-zinc-200 text-black'
-                        }`}
-                      >
-                        {hasAccess ? (
-                          <>
-                            <PlayCircle className="w-3.5 h-3.5 text-red-600" />
-                            <span>Ver Partido</span>
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-3.5 h-3.5 text-red-600" />
-                            <span>Comprar</span>
-                          </>
-                        )}
-                      </Link>
+                      {hasAccess ? (
+                        <Link
+                          href={`/partido/${match.id}`}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 bg-white hover:bg-zinc-200 text-black"
+                        >
+                          <PlayCircle className="w-3.5 h-3.5 text-red-600" />
+                          <span>Ver Partido</span>
+                        </Link>
+                      ) : isDateConfirmed ? (
+                        <Link
+                          href={`/partido/${match.id}`}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 bg-white hover:bg-zinc-200 text-black"
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5 text-red-600" />
+                          <span>Comprar</span>
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/partido/${match.id}`}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-mono font-bold text-xs uppercase tracking-wider transition-all duration-200 bg-zinc-900 border border-amber-900/50 text-amber-400 hover:bg-zinc-800"
+                        >
+                          <Clock className="w-3 h-3" />
+                          <span>A Confirmar</span>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 );

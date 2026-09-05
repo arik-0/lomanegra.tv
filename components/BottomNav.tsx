@@ -45,7 +45,7 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
         >
           <Ticket className="w-4 h-4" />
           <span className="text-[9px] font-mono uppercase tracking-wider">
-            Pase PPV
+            Pase Digital
           </span>
         </Link>
 

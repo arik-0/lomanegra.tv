@@ -3,11 +3,12 @@ import Image from 'next/image';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import AppLayoutWrapper from '@/components/AppLayoutWrapper';
+import SupportChat from '@/components/SupportChat';
 
 export const metadata: Metadata = {
   title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
   description:
-    'Plataforma oficial de Pay-Per-View de Pasión Lomonegra para ver partidos en vivo y en directo en alta definición con Cloudflare Stream.',
+    'Plataforma oficial de transmisiones en vivo de Pasión Lomonegra para ver partidos en directo en alta definición con Cloudflare Stream.',
 };
 
 export default function RootLayout({
@@ -17,11 +18,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark">
-      <body className="bg-[#08080a] text-white font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white">
+      <body className="bg-[#08080a] text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-red-500 selection:text-white">
         <AppLayoutWrapper>
           <Navbar />
           <div className="flex-1">{children}</div>
-          <footer className="mt-16 pt-7 pb-10 border-t border-white/[0.07] text-zinc-500 text-[11px] font-mono tracking-wide">
+          <SupportChat />
+
+          {/* Footer Técnico Forg1 */}
+          <footer className="border-t border-white/[0.07] bg-[#060608] py-8 text-xs font-mono mb-14 lg:mb-0">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <div className="w-5 h-5 relative shrink-0">
@@ -33,9 +37,9 @@ export default function RootLayout({
                   />
                 </div>
                 <span className="font-bold text-white">
-                  Pasión Lomonegra<span className="text-red-500">.tv</span>
+                  Pasión Lomonegra
                 </span>
-                <span className="text-zinc-500">· Señal Oficial PPV</span>
+                <span className="text-zinc-500">· Transmisión Oficial en Vivo</span>
               </div>
 
               <div className="text-center text-zinc-500">

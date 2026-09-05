@@ -18,6 +18,7 @@ import {
   Tv,
   ArrowRight,
   Info,
+  Clock,
 } from 'lucide-react';
 
 interface MatchViewClientProps {
@@ -25,10 +26,11 @@ interface MatchViewClientProps {
     id: string;
     title: string;
     description: string | null;
-    date: string;
+    date: string | null;
     price: number;
     image_url: string | null;
     cloudflare_live_input_uid: string;
+    is_date_confirmed?: boolean;
   };
   serverHasPaid: boolean;
   currentUserEmail: string | null;
@@ -116,10 +118,13 @@ export default function MatchViewClient({
     verifyGuestEmail(restoreEmail.toLowerCase().trim());
   };
 
-  const matchDate = new Date(match.date).toLocaleString('es-AR', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  });
+  const isDateConfirmed = match.is_date_confirmed !== false && !!match.date;
+  const matchDate = isDateConfirmed && match.date
+    ? new Date(match.date).toLocaleString('es-AR', {
+        dateStyle: 'full',
+        timeStyle: 'short',
+      })
+    : 'Fecha y horario a confirmar';
 
   return (
     <div className="space-y-8">
@@ -158,7 +163,7 @@ export default function MatchViewClient({
               <div className="flex items-center gap-2 mb-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-950/70 border border-red-600 text-red-400 text-xs font-mono font-black uppercase tracking-wider">
                   <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-                  <span>EN VIVO // SEÑAL OFICIAL PPV</span>
+                  <span>EN VIVO // SEÑAL OFICIAL</span>
                 </span>
                 <span className="text-xs font-mono text-zinc-400 capitalize">{matchDate}</span>
               </div>
@@ -215,7 +220,7 @@ export default function MatchViewClient({
               <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
                 <span className="px-3 py-1 rounded-md bg-red-600/90 backdrop-blur-md text-white text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-red-950">
                   <Radio className="w-3 h-3 animate-pulse" />
-                  <span>TRANSMISIÓN EXCLUSIVA PPV</span>
+                  <span>TRANSMISIÓN EN DIRECTO</span>
                 </span>
               </div>
             </div>
@@ -272,12 +277,33 @@ export default function MatchViewClient({
                   'No te pierdas cada detalle de este gran partido. Transmisión multicámara en alta definición con relatos oficiales.'}
               </p>
 
-              {/* Cuenta Regresiva */}
+              {/* Cuenta Regresiva o Estado de Programación */}
               <div className="pt-5 border-t border-white/[0.06]">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-3">
-                  Tiempo Restante para el Kickoff:
-                </span>
-                <CountdownTimer targetDate={match.date} />
+                {isDateConfirmed && match.date ? (
+                  <>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-3">
+                      Tiempo Restante para el Kickoff:
+                    </span>
+                    <CountdownTimer targetDate={match.date} />
+                  </>
+                ) : (
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-amber-500 block mb-2">
+                      ESTADO DE PROGRAMACIÓN:
+                    </span>
+                    <div className="bg-[#121218] border border-amber-500/30 rounded-2xl p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-600/50 flex items-center justify-center text-amber-400 shrink-0">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="font-mono font-black text-sm text-white">FECHA Y HORARIO A DEFINIR</div>
+                        <div className="text-xs text-zinc-400 font-mono mt-0.5">
+                          La programación oficial aún no fue fijada por los clubes.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -300,17 +326,39 @@ export default function MatchViewClient({
                 </div>
               </div>
 
-              <p className="text-xs font-mono text-zinc-400 mb-6 leading-relaxed">
-                Adquiere tu pase al instante con <strong>Mercado Pago</strong> sin necesidad de crear cuenta, o ingresando con tu usuario si ya estás registrado.
-              </p>
+              {isDateConfirmed ? (
+                <>
+                  <p className="text-xs font-mono text-zinc-400 mb-6 leading-relaxed">
+                    Adquiere tu pase al instante con <strong>Mercado Pago</strong> sin necesidad de crear cuenta, o ingresando con tu usuario si ya estás registrado.
+                  </p>
 
-              {/* Botón de Checkout con soporte de invitado */}
-              <CheckoutButton
-                matchId={match.id}
-                isUserLoggedIn={!!currentUserEmail}
-                userEmail={currentUserEmail || undefined}
-                onGuestEmailConfirmed={(email) => setActiveGuestEmail(email)}
-              />
+                  {/* Botón de Checkout con soporte de invitado */}
+                  <CheckoutButton
+                    matchId={match.id}
+                    isUserLoggedIn={!!currentUserEmail}
+                    userEmail={currentUserEmail || undefined}
+                    onGuestEmailConfirmed={(email) => setActiveGuestEmail(email)}
+                  />
+                </>
+              ) : (
+                <div className="space-y-4 mb-2">
+                  <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-600/30 text-xs font-mono text-amber-300 flex items-start gap-2.5">
+                    <Clock className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                    <div>
+                      <span className="font-bold block text-white mb-0.5">Venta no habilitada</span>
+                      Las entradas para este encuentro se pondrán a la venta inmediatamente al confirmarse la fecha y horario oficial.
+                    </div>
+                  </div>
+
+                  <button
+                    disabled
+                    className="w-full py-3.5 px-4 rounded-xl bg-zinc-900 border border-amber-800/40 text-amber-400/80 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-not-allowed"
+                  >
+                    <Clock className="w-4 h-4" />
+                    <span>Fecha a Confirmar — Compra Inhabilitada</span>
+                  </button>
+                </div>
+              )}
 
               {/* Opción de Restaurar Pase para Invitados */}
               {!currentUserEmail && (
