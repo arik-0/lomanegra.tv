@@ -38,6 +38,9 @@ import {
   GoleadorRow,
   FixtureMatch,
   recalculateZoneStandings,
+  getTeamLogo,
+  syncPlayoffQuarterfinals,
+  generateFullRoundRobinFixture,
 } from '@/lib/standingsStore';
 
 interface Match {
@@ -93,6 +96,7 @@ export default function AdminPage() {
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [standingsSavedMsg, setStandingsSavedMsg] = useState(false);
   const [adminGoleadorCategory, setAdminGoleadorCategory] = useState<string>('Todas');
+  const [adminFixtureRounds, setAdminFixtureRounds] = useState<Record<string, string>>({});
 
   // Comprobar autenticación inicial y cargar datos
   useEffect(() => {
@@ -459,10 +463,14 @@ export default function AdminPage() {
   const handleAddTeamToZone = (zoneId: string) => {
     const zone = standings.zones.find((z) => z.id === zoneId);
     if (!zone) return;
+    const newIndex = zone.teams.length + 1;
+    const newTeamName = `Nuevo Club ${newIndex}`;
     const newTeam: TeamStandingsRow = {
       id: `team-${Date.now()}`,
-      pos: zone.teams.length + 1,
-      name: 'Nuevo Equipo',
+      pos: newIndex,
+      name: newTeamName,
+      logoUrl: getTeamLogo(newTeamName),
+      isBlancoYNegro: false,
       pj: 0,
       pg: 0,
       pe: 0,
@@ -471,7 +479,7 @@ export default function AdminPage() {
       gc: 0,
       dif: 0,
       pts: 0,
-      form: ['W', 'D', 'L'],
+      form: ['D'],
       qualified: zone.teams.length < 4,
     };
     const updatedZones = standings.zones.map((z) => {
@@ -480,7 +488,8 @@ export default function AdminPage() {
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   const handleUpdateTeam = (zoneId: string, teamId: string, field: keyof TeamStandingsRow, value: any) => {
@@ -489,6 +498,10 @@ export default function AdminPage() {
         const updatedTeams = z.teams.map((t) => {
           if (t.id === teamId) {
             const updated = { ...t, [field]: value };
+            if (field === 'name') {
+              updated.logoUrl = getTeamLogo(String(value));
+              updated.isBlancoYNegro = String(value).toLowerCase().includes('blanco y negro');
+            }
             if (field === 'gf' || field === 'gc') {
               updated.dif = Number(updated.gf || 0) - Number(updated.gc || 0);
             }
@@ -500,20 +513,44 @@ export default function AdminPage() {
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   const handleDeleteTeam = (zoneId: string, teamId: string) => {
+    const zone = standings.zones.find((z) => z.id === zoneId);
+    const team = zone?.teams.find((t) => t.id === teamId);
+    if (!confirm(`¿Eliminar el equipo "${team?.name || 'seleccionado'}" de ${zone?.name || 'la zona'}?`)) {
+      return;
+    }
+
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
-        return {
-          ...z,
-          teams: z.teams.filter((t) => t.id !== teamId).map((t, idx) => ({ ...t, pos: idx + 1 })),
-        };
+        const remainingTeams = z.teams
+          .filter((t) => t.id !== teamId)
+          .map((t, idx) => ({
+            ...t,
+            pos: idx + 1,
+            qualified: idx < 4,
+          }));
+
+        // Limpiar partidos que involucren al equipo eliminado
+        const cleanedFixtures = (z.fixtures || []).filter(
+          (f) =>
+            f.homeTeamId !== teamId &&
+            f.awayTeamId !== teamId &&
+            f.homeTeamName !== team?.name &&
+            f.awayTeamName !== team?.name
+        );
+
+        const updatedZone = { ...z, teams: remainingTeams, fixtures: cleanedFixtures };
+        return recalculateZoneStandings(updatedZone);
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   // FIXTURES / RESULTADOS DE PARTIDOS POR ZONA
@@ -522,9 +559,13 @@ export default function AdminPage() {
     if (!zone) return;
     const team1 = zone.teams[0]?.name || 'Blanco y Negro';
     const team2 = zone.teams[1]?.name || 'Rival';
+    const roundName =
+      adminFixtureRounds[zoneId] && adminFixtureRounds[zoneId] !== 'Todas'
+        ? adminFixtureRounds[zoneId]
+        : 'Fecha 1';
     const newFix: FixtureMatch = {
       id: `fix-${Date.now()}`,
-      roundName: 'Fecha 1',
+      roundName: roundName,
       homeTeamId: zone.teams[0]?.id || 't1',
       homeTeamName: team1,
       awayTeamId: zone.teams[1]?.id || 't2',
@@ -539,6 +580,33 @@ export default function AdminPage() {
       return z;
     });
     setStandings({ ...standings, zones: updatedZones });
+  };
+
+  const handleGenerateFullFixtures = (zoneId: string) => {
+    const zone = standings.zones.find((z) => z.id === zoneId);
+    if (!zone) return;
+    if (zone.teams.length < 2) {
+      alert('Se requieren al menos 2 equipos para armar el fixture completo.');
+      return;
+    }
+    if (
+      zone.fixtures &&
+      zone.fixtures.length > 0 &&
+      !confirm(`¿Generar el fixture completo (todas las fechas) para ${zone.name}? Los resultados ya cargados se conservarán.`)
+    ) {
+      return;
+    }
+
+    const fullFixtures = generateFullRoundRobinFixture(zone);
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        const updatedZone = { ...z, fixtures: fullFixtures };
+        return recalculateZoneStandings(updatedZone);
+      }
+      return z;
+    });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   const handleUpdateFixture = (
@@ -564,7 +632,8 @@ export default function AdminPage() {
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   const handleDeleteFixture = (zoneId: string, fixId: string) => {
@@ -576,7 +645,8 @@ export default function AdminPage() {
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
   };
 
   const handleRecalculateZone = (zoneId: string) => {
@@ -586,7 +656,13 @@ export default function AdminPage() {
       }
       return z;
     });
-    setStandings({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    setStandings(synced);
+  };
+
+  const handleSyncPlayoffsFromTable = () => {
+    const synced = syncPlayoffQuarterfinals(standings);
+    setStandings(synced);
   };
 
   // PLAY-OFFS
@@ -1035,7 +1111,16 @@ export default function AdminPage() {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleGenerateFullFixtures(zone.id)}
+                            className="px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 text-amber-300 text-[10px] font-bold flex items-center gap-1 transition"
+                            title="Generar todas las fechas del torneo (fixture completo)"
+                          >
+                            <Calendar className="w-3 h-3" />
+                            <span>⚡ Generar Todas las Fechas</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => handleRecalculateZone(zone.id)}
@@ -1043,7 +1128,7 @@ export default function AdminPage() {
                             title="Recalcular tabla desde los resultados de los partidos"
                           >
                             <RefreshCw className="w-3 h-3" />
-                            <span>Recalcular Tabla</span>
+                            <span>Recalcular</span>
                           </button>
                           <button
                             type="button"
@@ -1051,21 +1136,62 @@ export default function AdminPage() {
                             className="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-white text-[10px] font-bold flex items-center gap-1 transition"
                           >
                             <Plus className="w-3 h-3 text-red-400" />
-                            <span>+ Cargar Partido</span>
+                            <span>+ Partido</span>
                           </button>
                         </div>
                       </div>
 
+                      {/* Selector de Fechas (Pills) */}
+                      {zone.fixtures && zone.fixtures.length > 0 && (
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[10px] font-bold">
+                          <span className="text-zinc-500 shrink-0 uppercase tracking-wider text-[9px] mr-1">Filtrar Fecha:</span>
+                          <button
+                            type="button"
+                            onClick={() => setAdminFixtureRounds((prev) => ({ ...prev, [zone.id]: 'Todas' }))}
+                            className={`px-2.5 py-1 rounded-md transition shrink-0 ${
+                              (adminFixtureRounds[zone.id] || 'Todas') === 'Todas'
+                                ? 'bg-red-600 text-white shadow'
+                                : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                            }`}
+                          >
+                            Todas ({zone.fixtures.length})
+                          </button>
+                          {Array.from(new Set(zone.fixtures.map((f) => f.roundName || 'Fecha 1'))).map((r) => {
+                            const count = zone.fixtures!.filter((f) => (f.roundName || 'Fecha 1') === r).length;
+                            const isSelected = (adminFixtureRounds[zone.id] || 'Todas') === r;
+                            return (
+                              <button
+                                key={r}
+                                type="button"
+                                onClick={() => setAdminFixtureRounds((prev) => ({ ...prev, [zone.id]: r }))}
+                                className={`px-2.5 py-1 rounded-md transition shrink-0 ${
+                                  isSelected
+                                    ? 'bg-red-600 text-white shadow'
+                                    : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                }`}
+                              >
+                                {r} ({count})
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       {(!zone.fixtures || zone.fixtures.length === 0) ? (
                         <div className="py-3 text-center text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-lg">
-                          No hay partidos cargados en esta zona. Pulsa "+ Cargar Partido" para ingresar resultados.
+                          No hay partidos cargados en esta zona. Pulsa "⚡ Generar Todas las Fechas" o "+ Partido" para ingresar resultados.
                         </div>
                       ) : (
-                        <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                          {zone.fixtures.map((fix) => (
+                        <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                          {zone.fixtures
+                            .filter((fix) => {
+                              const sel = adminFixtureRounds[zone.id] || 'Todas';
+                              return sel === 'Todas' || (fix.roundName || 'Fecha 1') === sel;
+                            })
+                            .map((fix) => (
                             <div
                               key={fix.id}
-                              className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-[#161722] border border-zinc-800/80 rounded-lg p-2 text-xs"
+                              className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-[#161722] border border-zinc-800/80 rounded-lg p-2 text-xs hover:border-zinc-700 transition"
                             >
                               <div className="sm:col-span-2">
                                 <input
@@ -1077,7 +1203,15 @@ export default function AdminPage() {
                                 />
                               </div>
 
-                              <div className="sm:col-span-4">
+                              <div className="sm:col-span-4 flex items-center gap-1.5">
+                                <div className="w-4 h-4 relative shrink-0">
+                                  <Image
+                                    src={getTeamLogo(fix.homeTeamName)}
+                                    alt={fix.homeTeamName}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
                                 <input
                                   type="text"
                                   value={fix.homeTeamName}
@@ -1100,7 +1234,7 @@ export default function AdminPage() {
                                     )
                                   }
                                   placeholder="0"
-                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none"
+                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none focus:border-red-500"
                                 />
                                 <span className="text-zinc-500 font-bold">-</span>
                                 <input
@@ -1115,11 +1249,19 @@ export default function AdminPage() {
                                     )
                                   }
                                   placeholder="0"
-                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none"
+                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none focus:border-red-500"
                                 />
                               </div>
 
-                              <div className="sm:col-span-3">
+                              <div className="sm:col-span-3 flex items-center gap-1.5">
+                                <div className="w-4 h-4 relative shrink-0">
+                                  <Image
+                                    src={getTeamLogo(fix.awayTeamName)}
+                                    alt={fix.awayTeamName}
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
                                 <input
                                   type="text"
                                   value={fix.awayTeamName}
@@ -1182,12 +1324,22 @@ export default function AdminPage() {
                             <tr key={team.id} className="hover:bg-zinc-800/30">
                               <td className="py-2 px-1 text-center font-bold text-zinc-500">{team.pos}</td>
                               <td className="py-2 px-2">
-                                <input
-                                  type="text"
-                                  value={team.name}
-                                  onChange={(e) => handleUpdateTeam(zone.id, team.id, 'name', e.target.value)}
-                                  className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
-                                />
+                                <div className="flex items-center gap-2">
+                                  <div className="w-5 h-5 relative shrink-0">
+                                    <Image
+                                      src={team.logoUrl || getTeamLogo(team.name)}
+                                      alt={team.name}
+                                      fill
+                                      className="object-contain"
+                                    />
+                                  </div>
+                                  <input
+                                    type="text"
+                                    value={team.name}
+                                    onChange={(e) => handleUpdateTeam(zone.id, team.id, 'name', e.target.value)}
+                                    className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
+                                  />
+                                </div>
                               </td>
                               <td className="py-2 px-1 text-center">
                                 <input
@@ -1278,13 +1430,27 @@ export default function AdminPage() {
 
             {/* MÓDULO 2: PLAY-OFFS (SISTEMA DE LLAVES) */}
             <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-500" />
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                    Cruces de Play-Offs ({standings.playoffs.length} Partidos)
-                  </h3>
+                  <Award className="w-4 h-4 text-amber-500 shrink-0" />
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                      Cruces de Play-Offs ({standings.playoffs.length} Partidos)
+                    </h3>
+                    <div className="text-[10px] text-zinc-400">
+                      Cuartos predefinidos desde tabla (1°A vs 4°B, 2°A vs 3°B, 1°B vs 4°A, 2°B vs 3°A). Semis y Final independientes.
+                    </div>
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={handleSyncPlayoffsFromTable}
+                  className="px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition shrink-0 self-start sm:self-auto"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Sincronizar Cuartos desde Tablas</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

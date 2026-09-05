@@ -236,8 +236,188 @@ export function recalculateZoneStandings(zone: ZoneData): ZoneData {
   };
 }
 
+// Generador automático de fixture completo estilo todos contra todos (Round Robin)
+// Crea todas las fechas al principio del torneo y preserva cualquier resultado ya cargado.
+export function generateFullRoundRobinFixture(
+  zone: ZoneData,
+  existingFixtures?: FixtureMatch[]
+): FixtureMatch[] {
+  let teams = [...zone.teams];
+  if (teams.length < 2) return [];
+
+  const isOdd = teams.length % 2 !== 0;
+  if (isOdd) {
+    teams.push({
+      id: '__libre__',
+      pos: 999,
+      name: 'LIBRE',
+      pj: 0,
+      pg: 0,
+      pe: 0,
+      pp: 0,
+      gf: 0,
+      gc: 0,
+      dif: 0,
+      pts: 0,
+      form: [],
+    });
+  }
+
+  const n = teams.length;
+  const numRounds = n - 1;
+  const half = n / 2;
+  const list = [...teams];
+  const allMatches: FixtureMatch[] = [];
+
+  // Mapear partidos existentes para conservar los goles si ya fueron cargados
+  const existingMap = new Map<string, FixtureMatch>();
+  (existingFixtures || zone.fixtures || []).forEach((f) => {
+    const key1 = `${f.homeTeamName.trim().toLowerCase()}_vs_${f.awayTeamName.trim().toLowerCase()}`;
+    const key2 = `${f.awayTeamName.trim().toLowerCase()}_vs_${f.homeTeamName.trim().toLowerCase()}`;
+    existingMap.set(key1, f);
+    if (!existingMap.has(key2)) {
+      existingMap.set(key2, f);
+    }
+  });
+
+  for (let r = 0; r < numRounds; r++) {
+    const roundNum = r + 1;
+    let matchInRound = 1;
+    for (let i = 0; i < half; i++) {
+      const t1 = list[i];
+      const t2 = list[n - 1 - i];
+
+      if (t1.id === '__libre__' || t2.id === '__libre__') continue;
+
+      let home = t1;
+      let away = t2;
+      // Alternar localía para equilibrar local y visitante
+      if (r % 2 === 1 && i === 0) {
+        home = t2;
+        away = t1;
+      }
+
+      const pairKey = `${home.name.trim().toLowerCase()}_vs_${away.name.trim().toLowerCase()}`;
+      const revKey = `${away.name.trim().toLowerCase()}_vs_${home.name.trim().toLowerCase()}`;
+      const existing = existingMap.get(pairKey) || existingMap.get(revKey);
+
+      let homeGoals: number | null = null;
+      let awayGoals: number | null = null;
+      if (existing && existing.homeGoals !== null && existing.awayGoals !== null) {
+        if (existing.homeTeamName.trim().toLowerCase() === home.name.trim().toLowerCase()) {
+          homeGoals = existing.homeGoals;
+          awayGoals = existing.awayGoals;
+        } else {
+          homeGoals = existing.awayGoals;
+          awayGoals = existing.homeGoals;
+        }
+      }
+
+      allMatches.push({
+        id: existing?.id || `fix-${zone.id}-f${roundNum}-${matchInRound}`,
+        roundName: `Fecha ${roundNum}`,
+        homeTeamId: home.id,
+        homeTeamName: home.name,
+        awayTeamId: away.id,
+        awayTeamName: away.name,
+        homeGoals,
+        awayGoals,
+      });
+      matchInRound++;
+    }
+
+    // Rotación de polígono: mantener list[0] fijo y rotar el resto
+    const last = list.pop()!;
+    list.splice(1, 0, last);
+  }
+
+  return allMatches;
+}
+
+// Sincroniza y predefine los cruces de llave de PLAY-OFFS exclusivamente para los CUARTOS DE FINAL a partir de la tabla.
+// Regla oficial de cruces cruzados:
+// Cuartos 1: 1° Zona A vs 4° Zona B
+// Cuartos 2: 2° Zona A vs 3° Zona B
+// Cuartos 3: 1° Zona B vs 4° Zona A
+// Cuartos 4: 2° Zona B vs 3° Zona A
+// IMPORTANTE: SEMIFINALES Y FINAL QUEDAN INTACTAS (no se sobreescriben).
+export function syncPlayoffQuarterfinals(standings: TournamentStandings): TournamentStandings {
+  if (!standings || !standings.zones || standings.zones.length === 0) return standings;
+
+  const zoneA =
+    standings.zones.find((z) => z.id === 'zona-a' || z.name.toLowerCase().includes('zona a')) ||
+    standings.zones[0];
+  const zoneB =
+    standings.zones.find((z) => z.id === 'zona-b' || z.name.toLowerCase().includes('zona b')) ||
+    standings.zones[1];
+
+  if (!zoneA || !zoneB) return standings;
+
+  const sortedA = [...zoneA.teams].sort((a, b) => a.pos - b.pos);
+  const sortedB = [...zoneB.teams].sort((a, b) => a.pos - b.pos);
+
+  const teamA1 = sortedA[0]?.name || '1° Zona A';
+  const teamA2 = sortedA[1]?.name || '2° Zona A';
+  const teamA3 = sortedA[2]?.name || '3° Zona A';
+  const teamA4 = sortedA[3]?.name || '4° Zona A';
+
+  const teamB1 = sortedB[0]?.name || '1° Zona B';
+  const teamB2 = sortedB[1]?.name || '2° Zona B';
+  const teamB3 = sortedB[2]?.name || '3° Zona B';
+  const teamB4 = sortedB[3]?.name || '4° Zona B';
+
+  const quarterPairings = [
+    { id: 'c1', title: 'Cuartos 1 (1°A vs 4°B)', team1: teamA1, team2: teamB4 },
+    { id: 'c2', title: 'Cuartos 2 (2°A vs 3°B)', team1: teamA2, team2: teamB3 },
+    { id: 'c3', title: 'Cuartos 3 (1°B vs 4°A)', team1: teamB1, team2: teamA4 },
+    { id: 'c4', title: 'Cuartos 4 (2°B vs 3°A)', team1: teamB2, team2: teamA3 },
+  ];
+
+  const currentPlayoffs = standings.playoffs || [];
+  const hasQuarterfinals = currentPlayoffs.some((m) => m.round === 'cuartos');
+  let updatedPlayoffs: PlayoffMatch[];
+
+  if (hasQuarterfinals) {
+    updatedPlayoffs = currentPlayoffs.map((m) => {
+      if (m.round !== 'cuartos') return m; // Semis y final quedan intactas
+      const pairing = quarterPairings.find((p) => p.id === m.id);
+      if (!pairing) return m;
+
+      const teamsChanged = m.team1 !== pairing.team1 || m.team2 !== pairing.team2;
+      return {
+        ...m,
+        title: pairing.title,
+        team1: pairing.team1,
+        team2: pairing.team2,
+        score1: teamsChanged ? null : m.score1,
+        score2: teamsChanged ? null : m.score2,
+        winner: teamsChanged ? undefined : m.winner,
+        status: teamsChanged ? ('programado' as const) : m.status,
+      };
+    });
+  } else {
+    const newCuartos: PlayoffMatch[] = quarterPairings.map((p) => ({
+      id: p.id,
+      round: 'cuartos' as const,
+      title: p.title,
+      team1: p.team1,
+      team2: p.team2,
+      score1: null,
+      score2: null,
+      status: 'programado' as const,
+      dateInfo: 'A confirmar',
+    }));
+    updatedPlayoffs = [...newCuartos, ...currentPlayoffs];
+  }
+
+  return {
+    ...standings,
+    playoffs: updatedPlayoffs,
+  };
+}
+
 // Datos iniciales auténticos para la Liga Regional y Blanco y Negro
-export const defaultStandings: TournamentStandings = {
+const rawDefaultStandings: TournamentStandings = {
   year: '2026',
   torneo: 'primer',
   categoria: 'mayor',
@@ -829,6 +1009,14 @@ export const defaultStandings: TournamentStandings = {
   ],
 };
 
+// Generar todas las fechas del torneo (fixture completo de 9 fechas) desde el inicio
+rawDefaultStandings.zones = rawDefaultStandings.zones.map((z) => ({
+  ...z,
+  fixtures: generateFullRoundRobinFixture(z, z.fixtures),
+}));
+
+export const defaultStandings: TournamentStandings = syncPlayoffQuarterfinals(rawDefaultStandings);
+
 // Almacén en memoria global para el servidor Next.js
 declare global {
   // eslint-disable-next-line no-var
@@ -836,7 +1024,7 @@ declare global {
 }
 
 if (!globalThis.globalStandingsStore) {
-  globalThis.globalStandingsStore = { ...defaultStandings };
+  globalThis.globalStandingsStore = JSON.parse(JSON.stringify(defaultStandings));
 }
 
 export function getStandings(): TournamentStandings {
@@ -844,13 +1032,13 @@ export function getStandings(): TournamentStandings {
 }
 
 export function updateStandings(newStandings: Partial<TournamentStandings>): TournamentStandings {
-  if (!globalThis.globalStandingsStore) {
-    globalThis.globalStandingsStore = { ...defaultStandings };
-  }
-  globalThis.globalStandingsStore = {
-    ...globalThis.globalStandingsStore,
+  const current: TournamentStandings = globalThis.globalStandingsStore || defaultStandings;
+  const merged: TournamentStandings = {
+    ...current,
     ...newStandings,
   };
+  // Sincronizar cuartos automáticamente en el servidor
+  globalThis.globalStandingsStore = syncPlayoffQuarterfinals(merged);
   return globalThis.globalStandingsStore;
 }
 
@@ -858,3 +1046,4 @@ export function resetStandings(): TournamentStandings {
   globalThis.globalStandingsStore = JSON.parse(JSON.stringify(defaultStandings));
   return globalThis.globalStandingsStore!;
 }
+

@@ -44,6 +44,10 @@ export default function PosicionesPage() {
   // Estado para filtro de Goleadores por categoría
   const [selectedGoleadorCategory, setSelectedGoleadorCategory] = useState<string>('Todas');
 
+  // Estado para visualizador de Fixture oficial por Fechas
+  const [selectedPublicRound, setSelectedPublicRound] = useState<string>('Fecha 1');
+  const [selectedPublicZone, setSelectedPublicZone] = useState<string>('todas');
+
   const [selectedYear, setSelectedYear] = useState<string>('2026');
   const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('primer');
   const [selectedCategoria, setSelectedCategoria] = useState<CategoriaType>('mayor');
@@ -101,6 +105,17 @@ export default function PosicionesPage() {
   const cuartosMatches = standings.playoffs.filter((m) => m.round === 'cuartos');
   const semiMatches = standings.playoffs.filter((m) => m.round === 'semifinal');
   const finalMatch = standings.playoffs.find((m) => m.round === 'final');
+
+  // Fechas del torneo ordenadas (Fecha 1 a Fecha 9)
+  const allTournamentRounds = Array.from(
+    new Set(
+      standings.zones.flatMap((z) => (z.fixtures || []).map((f) => f.roundName || 'Fecha 1'))
+    )
+  ).sort((a, b) => {
+    const numA = parseInt(a.replace(/\D/g, '')) || 0;
+    const numB = parseInt(b.replace(/\D/g, '')) || 0;
+    return numA - numB;
+  });
 
   return (
     <main className="min-h-screen bg-[#0d0e12] text-white px-3 py-6 sm:px-6 lg:px-8 font-mono">
@@ -402,6 +417,215 @@ export default function PosicionesPage() {
         </section>
 
         {/* ============================================================================== */}
+        {/* SECCIÓN FIXTURE OFICIAL POR FECHAS (CALENDARIO COMPLETO ESTILO PROMIEDOS)       */}
+        {/* ============================================================================== */}
+        {allTournamentRounds.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-800/70 flex items-center justify-center text-emerald-400">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
+                    <span>Fixture Oficial por Fechas</span>
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">
+                      {allTournamentRounds.length} Fechas
+                    </span>
+                  </h2>
+                  <div className="text-[10px] text-zinc-400">
+                    Cronograma oficial, resultados en vivo y fechas completadas del campeonato
+                  </div>
+                </div>
+              </div>
+
+              {/* Selector de Zona para el Fixture */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#12131a] border border-zinc-800 self-start sm:self-auto text-xs">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPublicZone('todas')}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition text-[11px] ${
+                    selectedPublicZone === 'todas'
+                      ? 'bg-zinc-800 text-white'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Todas las Zonas
+                </button>
+                {standings.zones.map((z) => (
+                  <button
+                    key={z.id}
+                    type="button"
+                    onClick={() => setSelectedPublicZone(z.id)}
+                    className={`px-3 py-1.5 rounded-lg font-bold transition text-[11px] ${
+                      selectedPublicZone === z.id
+                        ? 'bg-red-600 text-white shadow'
+                        : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {z.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Pestañas de Fechas estilo carrusel interactivo */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+              {allTournamentRounds.map((roundName) => {
+                const isSelected = selectedPublicRound === roundName;
+                return (
+                  <button
+                    key={roundName}
+                    type="button"
+                    onClick={() => setSelectedPublicRound(roundName)}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 transition ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-950/60 border border-red-500'
+                        : 'bg-[#12131a] text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800'
+                    }`}
+                  >
+                    {roundName}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Partidos de la Fecha Seleccionada */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {standings.zones
+                .filter((z) => selectedPublicZone === 'todas' || z.id === selectedPublicZone)
+                .map((zone) => {
+                  const matchesInRound = (zone.fixtures || []).filter(
+                    (f) => (f.roundName || 'Fecha 1') === selectedPublicRound
+                  );
+
+                  return (
+                    <div
+                      key={zone.id}
+                      className="bg-[#12131a] border border-zinc-800/90 rounded-2xl p-4 shadow-xl space-y-3"
+                    >
+                      <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
+                        <span className="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                          <Shield className="w-3.5 h-3.5" />
+                          {zone.name} &bull; {selectedPublicRound}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-mono">
+                          {matchesInRound.length} Partidos
+                        </span>
+                      </div>
+
+                      {matchesInRound.length === 0 ? (
+                        <div className="py-6 text-center text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-xl">
+                          No hay partidos programados para {selectedPublicRound} en {zone.name}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {matchesInRound.map((m) => {
+                            const isPlayed =
+                              m.homeGoals !== null &&
+                              m.awayGoals !== null &&
+                              !isNaN(Number(m.homeGoals)) &&
+                              !isNaN(Number(m.awayGoals));
+                            const homeWon = isPlayed && Number(m.homeGoals) > Number(m.awayGoals);
+                            const awayWon = isPlayed && Number(m.awayGoals) > Number(m.homeGoals);
+
+                            return (
+                              <div
+                                key={m.id}
+                                className="bg-[#161722] border border-zinc-800/80 hover:border-zinc-700 rounded-xl p-3 transition space-y-2"
+                              >
+                                <div className="flex items-center justify-between text-[9px] text-zinc-500 font-bold uppercase">
+                                  <span>{selectedPublicRound}</span>
+                                  {isPlayed ? (
+                                    <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded font-black">
+                                      Finalizado
+                                    </span>
+                                  ) : (
+                                    <span className="text-zinc-400 bg-zinc-800/60 border border-zinc-700/60 px-1.5 py-0.5 rounded">
+                                      Programado
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="grid grid-cols-12 items-center gap-2">
+                                  {/* Local */}
+                                  <div className="col-span-5 flex items-center justify-end gap-2 text-right">
+                                    <span
+                                      className={`text-xs truncate ${
+                                        homeWon
+                                          ? 'text-white font-black'
+                                          : m.homeTeamName.toLowerCase().includes('blanco y negro')
+                                          ? 'text-white font-black'
+                                          : 'text-zinc-300 font-medium'
+                                      }`}
+                                    >
+                                      {m.homeTeamName}
+                                    </span>
+                                    <div className="w-5 h-5 relative shrink-0">
+                                      <Image
+                                        src={getTeamLogo(m.homeTeamName)}
+                                        alt={m.homeTeamName}
+                                        fill
+                                        className="object-contain"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Marcador */}
+                                  <div className="col-span-2 flex items-center justify-center font-mono">
+                                    {isPlayed ? (
+                                      <div className="px-2 py-1 rounded bg-black/60 border border-zinc-700 text-xs font-black text-white flex items-center gap-1.5 shadow-inner">
+                                        <span className={homeWon ? 'text-emerald-400' : 'text-white'}>
+                                          {m.homeGoals}
+                                        </span>
+                                        <span className="text-zinc-500">-</span>
+                                        <span className={awayWon ? 'text-emerald-400' : 'text-white'}>
+                                          {m.awayGoals}
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-[10px] font-black uppercase text-zinc-500 px-2 py-1 rounded bg-zinc-900 border border-zinc-800">
+                                        VS
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Visitante */}
+                                  <div className="col-span-5 flex items-center justify-start gap-2 text-left">
+                                    <div className="w-5 h-5 relative shrink-0">
+                                      <Image
+                                        src={getTeamLogo(m.awayTeamName)}
+                                        alt={m.awayTeamName}
+                                        fill
+                                        className="object-contain"
+                                      />
+                                    </div>
+                                    <span
+                                      className={`text-xs truncate ${
+                                        awayWon
+                                          ? 'text-white font-black'
+                                          : m.awayTeamName.toLowerCase().includes('blanco y negro')
+                                          ? 'text-white font-black'
+                                          : 'text-zinc-300 font-medium'
+                                      }`}
+                                    >
+                                      {m.awayTeamName}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          </section>
+        )}
+
+        {/* ============================================================================== */}
         {/* 3. SECCIÓN 2 DEL BOCETO: PLAY OFFS (SISTEMA DE LLAVES / BRACKETS)             */}
         {/* ============================================================================== */}
         <section className="space-y-4">
@@ -415,7 +639,7 @@ export default function PosicionesPage() {
                   Play-Offs // Llaves Eliminatorias
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  Cuartos de final, Semifinales y Gran Final del Torneo
+                  Cuartos de final predefinidos desde la tabla (1°A vs 4°B, 2°A vs 3°B, 1°B vs 4°A, 2°B vs 3°A)
                 </div>
               </div>
             </div>
@@ -434,7 +658,7 @@ export default function PosicionesPage() {
               <div className="space-y-4">
                 <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
                   <span>Cuartos de Final</span>
-                  <span className="text-[9px] text-zinc-500">4 Cruces</span>
+                  <span className="text-[9px] text-emerald-400 font-bold">Cruces por Tabla</span>
                 </div>
 
                 <div className="space-y-3">
@@ -443,9 +667,9 @@ export default function PosicionesPage() {
                       key={m.id}
                       className="bg-[#161722] border border-zinc-800 rounded-xl p-3 shadow-md hover:border-zinc-700 transition"
                     >
-                      <div className="flex items-center justify-between text-[9px] text-zinc-500 font-bold mb-1.5 uppercase">
-                        <span>{m.title}</span>
-                        <span>{m.dateInfo || 'Finalizado'}</span>
+                      <div className="flex items-center justify-between text-[9px] font-bold mb-1.5 uppercase">
+                        <span className="text-amber-400">{m.title}</span>
+                        <span className="text-zinc-500">{m.dateInfo || (m.score1 !== null ? 'Finalizado' : 'A disputarse')}</span>
                       </div>
 
                       {/* Equipo 1 */}
