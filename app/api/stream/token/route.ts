@@ -6,11 +6,9 @@ import { generateStreamToken } from '@/lib/cloudflare';
 
 export async function POST(req: Request) {
   try {
-    const supabase = createServerSupabaseClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const isSupabaseConfigured =
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
     const body = await req.json().catch(() => ({}));
     const { matchId, guestEmail } = body;
@@ -21,6 +19,21 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+
+    if (!isSupabaseConfigured) {
+      const mockSessionId = crypto.randomUUID();
+      return NextResponse.json({
+        token: 'mock_signed_token_' + Date.now(),
+        sessionId: mockSessionId,
+        liveInputUid: 'mock_live_input_byn_01',
+      });
+    }
+
+    const supabase = createServerSupabaseClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     // Resolver ID real si vino como slug
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);

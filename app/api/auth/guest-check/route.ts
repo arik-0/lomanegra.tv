@@ -12,6 +12,17 @@ export async function POST(req: Request) {
       );
     }
 
+    const isSupabaseConfigured =
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+
+    if (!isSupabaseConfigured) {
+      return NextResponse.json(
+        { hasAccess: false, message: 'Modo local.' },
+        { status: 404 }
+      );
+    }
+
     const cleanEmail = email.toLowerCase().trim();
 
     // Resolver ID real si vino como slug

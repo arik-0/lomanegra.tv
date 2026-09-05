@@ -237,6 +237,7 @@ export default async function HomePage() {
                   {approvedMatchIds.has(featuredMatch.id) ? (
                     <Link
                       href={`/partido/${featuredMatch.id}`}
+                      prefetch={true}
                       className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 bg-white hover:bg-zinc-200 text-black"
                     >
                       <PlayCircle className="w-4 h-4 text-red-600" />
@@ -245,6 +246,7 @@ export default async function HomePage() {
                   ) : isFeaturedDateConfirmed ? (
                     <Link
                       href={`/partido/${featuredMatch.id}`}
+                      prefetch={true}
                       className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 bg-white hover:bg-zinc-200 text-black"
                     >
                       <ShoppingCart className="w-4 h-4 text-red-600" />
@@ -329,6 +331,7 @@ export default async function HomePage() {
               <div className="lg:col-span-5">
                 <Link
                   href={`/partido/${featuredMatch.id}`}
+                  prefetch={true}
                   className="block relative rounded-2xl overflow-hidden border border-white/[0.1] hover:border-red-500/60 transition-all duration-300 shadow-2xl group"
                 >
                   <div className="relative w-full aspect-video bg-black flex items-center justify-center p-2">
@@ -452,6 +455,7 @@ export default async function HomePage() {
                       {/* Miniatura compacta (Reducida para dar jerarquía al partido principal) */}
                       <Link
                         href={`/partido/${match.id}`}
+                        prefetch={true}
                         className="relative block w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
                       >
                         {match.image_url ? (
@@ -528,6 +532,7 @@ export default async function HomePage() {
                       {hasAccess ? (
                         <Link
                           href={`/partido/${match.id}`}
+                          prefetch={true}
                           className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 bg-white hover:bg-zinc-200 text-black"
                         >
                           <PlayCircle className="w-3.5 h-3.5 text-red-600" />
@@ -536,6 +541,7 @@ export default async function HomePage() {
                       ) : isDateConfirmed ? (
                         <Link
                           href={`/partido/${match.id}`}
+                          prefetch={true}
                           className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 bg-white hover:bg-zinc-200 text-black"
                         >
                           <ShoppingCart className="w-3.5 h-3.5 text-red-600" />
@@ -544,6 +550,7 @@ export default async function HomePage() {
                       ) : (
                         <Link
                           href={`/partido/${match.id}`}
+                          prefetch={true}
                           className="flex items-center gap-1.5 px-3 py-2 rounded-lg font-mono font-bold text-xs uppercase tracking-wider transition-all duration-200 bg-zinc-900 border border-amber-900/50 text-amber-400 hover:bg-zinc-800"
                         >
                           <Clock className="w-3 h-3" />
