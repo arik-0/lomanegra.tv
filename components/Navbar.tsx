@@ -4,14 +4,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram, Camera } from 'lucide-react';
+import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram, Camera, Menu } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import UserProfileModal from '@/components/UserProfileModal';
+import { useSidebar } from '@/components/AppLayoutWrapper';
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { toggleSidebar } = useSidebar();
   const supabase = createClient();
 
   useEffect(() => {
@@ -63,22 +65,33 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-[#101116]/95 backdrop-blur-md border-b border-zinc-800/80 h-14 flex items-center shadow-[0_4px_24px_rgba(0,0,0,0.45)]">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logotipo Oficial en móviles */}
-        <Link href="/" className="flex items-center gap-2.5 group lg:hidden">
-          <div className="w-9 h-9 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <Image
-              src="/logo-pasion-lomonegra.png"
-              alt="Pasión Lomonegra"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="flex items-baseline font-black tracking-tight text-sm">
-            <span className="text-white">PASIÓN</span>
-            <span className="text-red-500 ml-1">LOMONEGRA</span>
-          </div>
-        </Link>
+        {/* Logotipo Oficial y Menú Hamburguesa en móviles */}
+        <div className="flex items-center gap-2.5 lg:hidden">
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-xl text-zinc-400 hover:text-white bg-[#181920] hover:bg-[#20222a] border border-zinc-800 transition shadow-sm"
+            aria-label="Abrir menú"
+            title="Abrir menú de navegación"
+          >
+            <Menu className="w-4 h-4 text-zinc-300" />
+          </button>
+
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Image
+                src="/logo-pasion-lomonegra.png"
+                alt="Pasión Lomonegra"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <div className="flex items-baseline font-black tracking-tight text-xs sm:text-sm">
+              <span className="text-white">PASIÓN</span>
+              <span className="text-red-500 ml-1">LOMONEGRA</span>
+            </div>
+          </Link>
+        </div>
 
         {/* Enlaces de Cabecera en Desktop */}
         <div className="hidden lg:flex items-center gap-4 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
