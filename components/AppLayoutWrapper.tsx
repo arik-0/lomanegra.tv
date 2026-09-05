@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import BottomNav from '@/components/BottomNav';
+import SupportChat from '@/components/SupportChat';
 
 interface AppLayoutWrapperProps {
   children: React.ReactNode;
@@ -26,6 +27,9 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
       {/* Barra Inferior Fija Táctil en Móviles */}
       <BottomNav onOpenSidebar={() => setSidebarOpen(true)} />
+
+      {/* Chat de Soporte Flotante */}
+      <SupportChat />
     </div>
   );
 }

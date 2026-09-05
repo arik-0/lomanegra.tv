@@ -63,7 +63,7 @@ export default async function HomePage() {
   const defaultFeaturedMatch = {
     id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
     title: 'Blanco y Negro vs I. F. C.',
-    description: 'El clásico regional en vivo con relatos en directo y campo de juego.',
+    description: 'El gran clásico regional en vivo con relatos en directo y campo de juego.',
     date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
     is_date_confirmed: true,
     price: 3500,
@@ -74,31 +74,38 @@ export default async function HomePage() {
 
   const defaultOtherMatches = [
     {
-      id: '07ced47c-9f9a-4bce-a073-2c8e84b3de67',
-      title: 'Boca Juniors vs River Plate',
-      description: 'Superclásico Oficial • Torneo Clausura',
+      id: 'b1a9c001-0000-4000-8000-000000000002',
+      title: 'Blanco y Negro vs Deportivo Sarmiento',
+      description: 'Fútbol Mayor • Fecha Oficial',
       date: null,
       is_date_confirmed: false,
-      price: 4999,
-      cloudflare_live_input_uid: 'mock_live_input_superclasico_01',
-      image_url: '/matches/superclasico.svg',
+      price: 3500,
+      cloudflare_live_input_uid: 'live_input_byn_vs_dep_sarmiento',
+      image_url: '/matches/blanco-y-negro-vs-ifc.png',
       is_active: true,
     },
     {
-      id: 'de261139-f0e7-43d3-bd24-f2f9a7262fdf',
-      title: 'Real Madrid vs Barcelona',
-      description: 'El Clásico de España • Semifinal',
-      date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
-      is_date_confirmed: true,
-      price: 6500,
-      cloudflare_live_input_uid: 'mock_live_input_elclasico_02',
-      image_url: '/matches/elclasico.svg',
+      id: 'b1a9c001-0000-4000-8000-000000000003',
+      title: 'Blanco y Negro vs San Martín (ST)',
+      description: 'Reserva e Inferiores • Fecha a confirmar',
+      date: null,
+      is_date_confirmed: false,
+      price: 3500,
+      cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
+      image_url: '/matches/blanco-y-negro-vs-ifc.png',
       is_active: true,
     },
   ];
 
-  // Identificar el partido estelar (Blanco y Negro vs I. F. C. o el primero)
-  const activeMatches = matches && matches.length > 0 ? matches : [defaultFeaturedMatch, ...defaultOtherMatches];
+  // Filtrar exclusivamente partidos de Pasión Lomonegra (Blanco y Negro o Liga Regional)
+  const validMatches = (matches && matches.length > 0 ? matches : []).filter(
+    (m) =>
+      !m.title.toLowerCase().includes('boca juniors vs river') &&
+      !m.title.toLowerCase().includes('real madrid') &&
+      !m.title.toLowerCase().includes('argentina vs')
+  );
+
+  const activeMatches = validMatches.length > 0 ? validMatches : [defaultFeaturedMatch, ...defaultOtherMatches];
 
   const now = Date.now();
 
@@ -115,7 +122,7 @@ export default async function HomePage() {
   const fallbackTbdMatch = {
     id: 'tbd-next-match',
     title: 'Club Atlético Blanco y Negro vs Rival a Confirmar',
-    description: 'Próxima fecha del Torneo Oficial de Fútbol Mayor. Transmisión exclusiva de Pasión Lomonegra.',
+    description: 'Próxima fecha del Torneo Oficial de Fútbol Mayor.',
     date: null,
     is_date_confirmed: false,
     price: 3500,
@@ -126,10 +133,16 @@ export default async function HomePage() {
 
   const featuredMatch =
     latentMatch ||
-    pendingMatch ||
     activeMatches.find((m) => m.title.toLowerCase().includes('blanco y negro')) ||
+    pendingMatch ||
     activeMatches[0] ||
     fallbackTbdMatch;
+
+  // Sanitizar descripción eliminando textos publicitarios obsoletos o redundantes
+  const cleanDescription = (featuredMatch.description || '')
+    .replace(/transmisi[oó]n exclusiva en 4k ultra hd.*?relatos oficiales\.?/gi, '')
+    .replace(/acceso exclusivo pay-per-view.*?clubes\.?/gi, '')
+    .trim() || 'Transmisión oficial en directo para toda la hinchada lomonegra.';
 
   const otherMatches = activeMatches.filter((m) => m.id !== featuredMatch.id);
 
@@ -215,8 +228,7 @@ export default async function HomePage() {
                     {featuredMatch.title}
                   </h1>
                   <p className="mt-2.5 text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-xl">
-                    {featuredMatch.description ||
-                      'El gran clásico regional transmitido en directo para toda la hinchada.'}
+                    {cleanDescription}
                   </p>
                 </div>
 
@@ -296,26 +308,35 @@ export default async function HomePage() {
                     <div className="w-9 h-9 relative drop-shadow-md">
                       <Image
                         src="/teams/ifc.png"
-                        alt="I. F. C."
+                        alt="Rival"
                         fill
                         className="object-contain"
                       />
                     </div>
                     <span className="font-bold text-xs sm:text-sm text-white tracking-wide">
-                      {featuredMatch.title.includes('vs')
-                        ? featuredMatch.title.split('vs')[1].trim()
-                        : 'I. F. C.'}
+                      {featuredMatch.title.toLowerCase().includes('vs')
+                        ? featuredMatch.title.split(/vs/i)[1].trim()
+                        : 'Rival'}
                     </span>
                   </div>
                 </div>
 
-                {/* Cuenta Regresiva */}
+                {/* Cuenta Regresiva o Estado de Transmisión */}
                 {isFeaturedDateConfirmed && featuredMatch.date ? (
                   <div className="pt-1">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-2">
-                      Inicio de la transmisión:
-                    </span>
-                    <CountdownTimer targetDate={featuredMatch.date} />
+                    {isLiveNow ? (
+                      <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-950/60 border border-red-700/80 text-red-400 text-xs font-mono font-bold">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                        <span>SEÑAL EN TRANSMISIÓN DIRECTA EN EL PLAYER</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block mb-2">
+                          Comienza en:
+                        </span>
+                        <CountdownTimer targetDate={featuredMatch.date} />
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="pt-1">
@@ -327,28 +348,46 @@ export default async function HomePage() {
                 )}
               </div>
 
-              {/* Imagen / Encuadre Oficial del Partido */}
+              {/* Imagen / Encuadre Oficial del Partido (Verde = Miniatura de Cancha) */}
               <div className="lg:col-span-5">
                 <Link
                   href={`/partido/${featuredMatch.id}`}
                   prefetch={true}
-                  className="block relative rounded-2xl overflow-hidden border border-white/[0.1] hover:border-red-500/60 transition-all duration-300 shadow-2xl group"
+                  className="block relative rounded-2xl overflow-hidden border border-emerald-500/30 hover:border-emerald-400/60 transition-all duration-300 shadow-[0_8px_32px_rgba(16,185,129,0.15)] group bg-gradient-to-br from-[#052312] via-[#091a11] to-[#0c0c10]"
                 >
-                  <div className="relative w-full aspect-video bg-black flex items-center justify-center p-2">
+                  <div className="relative w-full aspect-video flex items-center justify-center p-3 overflow-hidden">
+                    {/* Atmósfera verde de cancha de fútbol con líneas de campo sutiles */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.18),transparent_72%)] pointer-events-none" />
+                    <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 h-[1px] bg-emerald-500/10 pointer-events-none" />
+                    <div className="absolute inset-y-6 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border border-emerald-500/15 pointer-events-none" />
+
                     {featuredMatch.image_url ? (
                       <Image
                         src={featuredMatch.image_url}
                         alt={featuredMatch.title}
                         fill
                         priority
-                        className="object-contain transform group-hover:scale-105 transition-transform duration-500"
+                        className="object-contain transform group-hover:scale-105 transition-transform duration-500 relative z-10"
                       />
                     ) : (
-                      <Tv className="w-16 h-16 text-zinc-700" />
+                      <div className="relative z-10 flex flex-col items-center gap-3 text-center px-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 relative drop-shadow-lg">
+                            <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                          </div>
+                          <span className="text-emerald-400 font-mono font-black text-xs">VS</span>
+                          <div className="w-12 h-12 relative drop-shadow-lg">
+                            <Image src="/teams/ifc.png" alt="Rival" fill className="object-contain" />
+                          </div>
+                        </div>
+                        <span className="font-mono font-black text-xs text-white uppercase tracking-wider">
+                          {featuredMatch.title}
+                        </span>
+                      </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity" />
-                    <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur-md border border-white/[0.1] text-white text-[10px] font-mono uppercase font-bold flex items-center gap-1.5 group-hover:bg-red-600 group-hover:border-red-500 transition-colors">
-                      <PlayCircle className="w-3.5 h-3.5 text-red-500 group-hover:text-white" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity z-20 pointer-events-none" />
+                    <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur-md border border-white/[0.1] text-white text-[10px] font-mono uppercase font-bold flex items-center gap-1.5 group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-colors z-30">
+                      <PlayCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
                       <span>Ingresar al Player</span>
                     </div>
                   </div>
@@ -466,8 +505,17 @@ export default async function HomePage() {
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#101016]">
-                            <Tv className="w-10 h-10 text-zinc-700" />
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#052312] via-[#08180e] to-[#0c0c10] p-2 relative overflow-hidden">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15),transparent_75%)] pointer-events-none" />
+                            <div className="relative z-10 flex items-center gap-3">
+                              <div className="w-7 h-7 relative">
+                                <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                              </div>
+                              <span className="text-emerald-400 font-mono font-bold text-[10px]">VS</span>
+                              <div className="w-7 h-7 relative">
+                                <Image src="/teams/ifc.png" alt="Rival" fill className="object-contain" />
+                              </div>
+                            </div>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />

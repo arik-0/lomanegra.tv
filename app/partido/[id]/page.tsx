@@ -116,28 +116,28 @@ export default async function MatchPage({
 
   // Fallback de seguridad inmediato si no se encontró en la DB
   if (!match) {
-    if (params.id === '07ced47c-9f9a-4bce-a073-2c8e84b3de67') {
+    if (params.id === 'b1a9c001-0000-4000-8000-000000000002') {
       match = {
-        id: '07ced47c-9f9a-4bce-a073-2c8e84b3de67',
-        title: 'Boca Juniors vs River Plate',
-        description: 'Superclásico Oficial • Torneo Clausura',
+        id: 'b1a9c001-0000-4000-8000-000000000002',
+        title: 'Blanco y Negro vs Deportivo Sarmiento',
+        description: 'Fútbol Mayor • Fecha Oficial del Torneo Apertura',
         date: null,
         is_date_confirmed: false,
-        price: 4999,
-        cloudflare_live_input_uid: 'mock_live_input_superclasico_01',
-        image_url: '/matches/superclasico.svg',
+        price: 3500,
+        cloudflare_live_input_uid: 'live_input_byn_vs_dep_sarmiento',
+        image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,
       };
-    } else if (params.id === 'de261139-f0e7-43d3-bd24-f2f9a7262fdf') {
+    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000003') {
       match = {
-        id: 'de261139-f0e7-43d3-bd24-f2f9a7262fdf',
-        title: 'Real Madrid vs Barcelona',
-        description: 'El Clásico de España • Semifinal',
-        date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
-        is_date_confirmed: true,
-        price: 6500,
-        cloudflare_live_input_uid: 'mock_live_input_elclasico_02',
-        image_url: '/matches/elclasico.svg',
+        id: 'b1a9c001-0000-4000-8000-000000000003',
+        title: 'Blanco y Negro vs San Martín (ST)',
+        description: 'Reserva e Inferiores • Próxima Fecha',
+        date: null,
+        is_date_confirmed: false,
+        price: 3500,
+        cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
+        image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,
       };
     } else {
