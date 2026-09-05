@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -9,103 +9,52 @@ import {
   Calendar,
   Shield,
   Medal,
-  PlayCircle,
-  ExternalLink,
   ChevronRight,
+  RefreshCw,
+  Flame,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  Award,
 } from 'lucide-react';
-
-type TorneoType = 'primer' | 'segundo';
-type CategoriaType = 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta';
-
-interface TeamRow {
-  pos: number;
-  name: string;
-  isBlancoYNegro?: boolean;
-  pj: number;
-  pg: number;
-  pe: number;
-  pp: number;
-  gf: number;
-  gc: number;
-  dif: number;
-  pts: number;
-  form: ('W' | 'D' | 'L')[];
-}
+import {
+  TournamentStandings,
+  TorneoType,
+  CategoriaType,
+  defaultStandings,
+  TeamStandingsRow,
+  ZoneData,
+  PlayoffMatch,
+  GoleadorRow,
+} from '@/lib/standingsStore';
 
 export default function PosicionesPage() {
-  const [torneo, setTorneo] = useState<TorneoType>('primer');
-  const [categoria, setCategoria] = useState<CategoriaType>('mayor');
+  const [standings, setStandings] = useState<TournamentStandings>(defaultStandings);
+  const [loading, setLoading] = useState(false);
 
-  // Datos representativos oficiales de la Liga Regional de Fútbol
-  const standingsData: Record<TorneoType, Record<CategoriaType, TeamRow[]>> = {
-    primer: {
-      mayor: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 11, pg: 8, pe: 2, pp: 1, gf: 24, gc: 9, dif: 15, pts: 26, form: ['W', 'W', 'D', 'W', 'W'] },
-        { pos: 2, name: 'Deportivo Sarmiento', pj: 11, pg: 7, pe: 3, pp: 1, gf: 21, gc: 10, dif: 11, pts: 24, form: ['W', 'D', 'W', 'W', 'W'] },
-        { pos: 3, name: 'Boca Juniors (Suárez)', pj: 11, pg: 6, pe: 3, pp: 2, gf: 18, gc: 12, dif: 6, pts: 21, form: ['D', 'W', 'W', 'L', 'W'] },
-        { pos: 4, name: 'San Martín (Santa Trinidad)', pj: 11, pg: 5, pe: 4, pp: 2, gf: 16, gc: 11, dif: 5, pts: 19, form: ['W', 'D', 'D', 'W', 'L'] },
-        { pos: 5, name: 'Independiente (San José)', pj: 11, pg: 5, pe: 3, pp: 3, gf: 17, gc: 14, dif: 3, pts: 18, form: ['L', 'W', 'W', 'D', 'W'] },
-        { pos: 6, name: 'El Progreso (Santa María)', pj: 11, pg: 4, pe: 4, pp: 3, gf: 15, gc: 13, dif: 2, pts: 16, form: ['D', 'L', 'W', 'D', 'W'] },
-        { pos: 7, name: 'Racing Club (Carhué)', pj: 11, pg: 4, pe: 3, pp: 4, gf: 14, gc: 15, dif: -1, pts: 15, form: ['W', 'L', 'D', 'L', 'W'] },
-        { pos: 8, name: 'Tiro Federal (Puan)', pj: 11, pg: 3, pe: 4, pp: 4, gf: 12, gc: 15, dif: -3, pts: 13, form: ['L', 'D', 'L', 'W', 'D'] },
-        { pos: 9, name: 'Peñarol (Pigüé)', pj: 11, pg: 3, pe: 2, pp: 6, gf: 11, gc: 18, dif: -7, pts: 11, form: ['L', 'W', 'L', 'L', 'D'] },
-        { pos: 10, name: 'Atlético Huanguelén', pj: 11, pg: 2, pe: 3, pp: 6, gf: 10, gc: 20, dif: -10, pts: 9, form: ['D', 'L', 'L', 'W', 'L'] },
-      ],
-      reserva: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 11, pg: 9, pe: 1, pp: 1, gf: 26, gc: 8, dif: 18, pts: 28, form: ['W', 'W', 'W', 'D', 'W'] },
-        { pos: 2, name: 'Deportivo Sarmiento', pj: 11, pg: 7, pe: 2, pp: 2, gf: 20, gc: 11, dif: 9, pts: 23, form: ['W', 'W', 'L', 'W', 'D'] },
-        { pos: 3, name: 'San Martín (Santa Trinidad)', pj: 11, pg: 6, pe: 3, pp: 2, gf: 18, gc: 13, dif: 5, pts: 21, form: ['W', 'D', 'W', 'W', 'L'] },
-        { pos: 4, name: 'Boca Juniors (Suárez)', pj: 11, pg: 5, pe: 3, pp: 3, gf: 15, gc: 12, dif: 3, pts: 18, form: ['L', 'W', 'D', 'W', 'W'] },
-        { pos: 5, name: 'El Progreso (Santa María)', pj: 11, pg: 4, pe: 2, pp: 5, gf: 13, gc: 16, dif: -3, pts: 14, form: ['W', 'L', 'L', 'D', 'L'] },
-      ],
-      tercera: [
-        { pos: 1, name: 'Deportivo Sarmiento', pj: 9, pg: 7, pe: 1, pp: 1, gf: 19, gc: 7, dif: 12, pts: 22, form: ['W', 'W', 'W', 'D', 'W'] },
-        { pos: 2, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 9, pg: 6, pe: 2, pp: 1, gf: 18, gc: 8, dif: 10, pts: 20, form: ['W', 'W', 'D', 'W', 'W'] },
-        { pos: 3, name: 'Racing Club (Carhué)', pj: 9, pg: 5, pe: 2, pp: 2, gf: 15, gc: 10, dif: 5, pts: 17, form: ['L', 'W', 'W', 'D', 'W'] },
-        { pos: 4, name: 'Boca Juniors (Suárez)', pj: 9, pg: 4, pe: 2, pp: 3, gf: 12, gc: 11, dif: 1, pts: 14, form: ['W', 'L', 'D', 'W', 'L'] },
-      ],
-      cuarta: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 9, pg: 7, pe: 2, pp: 0, gf: 22, gc: 5, dif: 17, pts: 23, form: ['W', 'W', 'W', 'W', 'D'] },
-        { pos: 2, name: 'San Martín (Santa Trinidad)', pj: 9, pg: 6, pe: 1, pp: 2, gf: 17, gc: 9, dif: 8, pts: 19, form: ['W', 'L', 'W', 'W', 'W'] },
-        { pos: 3, name: 'Deportivo Sarmiento', pj: 9, pg: 5, pe: 2, pp: 2, gf: 16, gc: 10, dif: 6, pts: 17, form: ['D', 'W', 'W', 'L', 'W'] },
-        { pos: 4, name: 'Independiente (San José)', pj: 9, pg: 3, pe: 3, pp: 3, gf: 11, gc: 12, dif: -1, pts: 12, form: ['L', 'D', 'W', 'D', 'L'] },
-      ],
-      quinta: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 8, pg: 7, pe: 1, pp: 0, gf: 25, gc: 4, dif: 21, pts: 22, form: ['W', 'W', 'W', 'W', 'W'] },
-        { pos: 2, name: 'Boca Juniors (Suárez)', pj: 8, pg: 6, pe: 0, pp: 2, gf: 19, gc: 8, dif: 11, pts: 18, form: ['W', 'W', 'L', 'W', 'W'] },
-        { pos: 3, name: 'Deportivo Sarmiento', pj: 8, pg: 4, pe: 2, pp: 2, gf: 14, gc: 9, dif: 5, pts: 14, form: ['D', 'L', 'W', 'W', 'D'] },
-        { pos: 4, name: 'El Progreso (Santa María)', pj: 8, pg: 3, pe: 1, pp: 4, gf: 10, gc: 15, dif: -5, pts: 10, form: ['L', 'W', 'L', 'D', 'L'] },
-      ],
-    },
-    segundo: {
-      mayor: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 6, pg: 5, pe: 1, pp: 0, gf: 15, gc: 4, dif: 11, pts: 16, form: ['W', 'W', 'W', 'D', 'W'] },
-        { pos: 2, name: 'San Martín (Santa Trinidad)', pj: 6, pg: 4, pe: 1, pp: 1, gf: 12, gc: 6, dif: 6, pts: 13, form: ['W', 'W', 'D', 'L', 'W'] },
-        { pos: 3, name: 'Deportivo Sarmiento', pj: 6, pg: 3, pe: 3, pp: 0, gf: 10, gc: 5, dif: 5, pts: 12, form: ['D', 'W', 'D', 'W', 'D'] },
-        { pos: 4, name: 'Independiente (San José)', pj: 6, pg: 3, pe: 2, pp: 1, gf: 9, gc: 7, dif: 2, pts: 11, form: ['W', 'D', 'W', 'L', 'D'] },
-        { pos: 5, name: 'Boca Juniors (Suárez)', pj: 6, pg: 2, pe: 2, pp: 2, gf: 8, gc: 8, dif: 0, pts: 8, form: ['L', 'W', 'D', 'D', 'L'] },
-      ],
-      reserva: [
-        { pos: 1, name: 'Deportivo Sarmiento', pj: 6, pg: 4, pe: 2, pp: 0, gf: 13, gc: 5, dif: 8, pts: 14, form: ['W', 'W', 'D', 'W', 'D'] },
-        { pos: 2, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 6, pg: 4, pe: 1, pp: 1, gf: 14, gc: 6, dif: 8, pts: 13, form: ['W', 'L', 'W', 'W', 'D'] },
-        { pos: 3, name: 'San Martín (Santa Trinidad)', pj: 6, pg: 3, pe: 1, pp: 2, gf: 9, gc: 7, dif: 2, pts: 10, form: ['L', 'W', 'D', 'W', 'L'] },
-      ],
-      tercera: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 5, pg: 4, pe: 1, pp: 0, gf: 11, gc: 3, dif: 8, pts: 13, form: ['W', 'W', 'D', 'W', 'W'] },
-        { pos: 2, name: 'Deportivo Sarmiento', pj: 5, pg: 3, pe: 1, pp: 1, gf: 9, gc: 5, dif: 4, pts: 10, form: ['W', 'D', 'L', 'W', 'W'] },
-      ],
-      cuarta: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 5, pg: 4, pe: 1, pp: 0, gf: 13, gc: 2, dif: 11, pts: 13, form: ['W', 'W', 'W', 'D', 'W'] },
-        { pos: 2, name: 'San Martín (Santa Trinidad)', pj: 5, pg: 3, pe: 1, pp: 1, gf: 8, gc: 4, dif: 4, pts: 10, form: ['W', 'L', 'W', 'D', 'W'] },
-      ],
-      quinta: [
-        { pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 5, pg: 5, pe: 0, pp: 0, gf: 16, gc: 1, dif: 15, pts: 15, form: ['W', 'W', 'W', 'W', 'W'] },
-        { pos: 2, name: 'Boca Juniors (Suárez)', pj: 5, pg: 3, pe: 1, pp: 1, gf: 10, gc: 5, dif: 5, pts: 10, form: ['W', 'W', 'D', 'L', 'W'] },
-      ],
-    },
-  };
+  const [selectedYear, setSelectedYear] = useState<string>('2026');
+  const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('primer');
+  const [selectedCategoria, setSelectedCategoria] = useState<CategoriaType>('mayor');
 
-  const currentRows = standingsData[torneo][categoria] || [];
+  useEffect(() => {
+    async function loadStandings() {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/admin/standings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.standings) {
+            setStandings(data.standings);
+          }
+        }
+      } catch (err) {
+        console.error('Error cargando tablas:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStandings();
+  }, []);
 
   const categoryLabels: Record<CategoriaType, string> = {
     mayor: 'Fútbol Mayor',
@@ -115,213 +64,553 @@ export default function PosicionesPage() {
     quinta: 'Quinta División',
   };
 
+  // Cuartos, Semis y Final de los Play-offs
+  const cuartosMatches = standings.playoffs.filter((m) => m.round === 'cuartos');
+  const semiMatches = standings.playoffs.filter((m) => m.round === 'semifinal');
+  const finalMatch = standings.playoffs.find((m) => m.round === 'final');
+
   return (
-    <main className="min-h-screen bg-[#08080a] text-white px-4 py-8 sm:px-6 lg:px-8 font-mono">
+    <main className="min-h-screen bg-[#0d0e12] text-white px-3 py-6 sm:px-6 lg:px-8 font-mono">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Encabezado y Navegación */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
-          <div className="space-y-1">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition mb-2"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Volver a las transmisiones en vivo</span>
-            </Link>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-red-500 font-bold">
-              ESTADÍSTICAS OFICIALES // LIGA REGIONAL
+        {/* ============================================================================== */}
+        {/* 1. CABECERA Y SELECTORES PRINCIPALES (AÑO, TORNEO, CATEGORÍA)                */}
+        {/* ============================================================================== */}
+        <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-5">
+            <div>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition mb-2"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-red-500" />
+                <span>Volver a la transmisión en vivo</span>
+              </Link>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-red-500 font-bold">
+                ESTADÍSTICAS OFICIALES // LIGA REGIONAL
+              </div>
+              <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                <span>Tablas & Play-Offs</span>
+                <span className="text-xs font-mono font-bold px-2.5 py-1 bg-red-950/70 border border-red-800 text-red-400 rounded-md">
+                  PROMIEDOS STYLE
+                </span>
+              </h1>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
-              Tablas de Posiciones
-            </h1>
-            <p className="text-xs text-zinc-400">
-              Seguimiento completo de Club Atlético Blanco y Negro en todas las divisiones.
-            </p>
+
+            {/* Selectores Superiores: AÑO + PRIMERO / SEGUNDO (Según boceto) */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Selector de Año */}
+              <div className="flex items-center gap-1 bg-[#181922] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs">
+                <Calendar className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-zinc-500 text-[10px] uppercase font-bold">Año:</span>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  aria-label="Seleccionar año de torneo"
+                  className="bg-transparent text-white font-bold text-xs focus:outline-none cursor-pointer"
+                >
+                  <option value="2026" className="bg-zinc-900 text-white">2026</option>
+                  <option value="2025" className="bg-zinc-900 text-white">2025</option>
+                </select>
+              </div>
+
+              {/* Selector Primer Torneo vs Segundo Torneo */}
+              <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
+                <button
+                  onClick={() => setSelectedTorneo('primer')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    selectedTorneo === 'primer'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Primero
+                </button>
+                <button
+                  onClick={() => setSelectedTorneo('segundo')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    selectedTorneo === 'segundo'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Segundo
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Selector de Torneo (Primer Torneo vs Segundo Torneo) */}
-          <div className="flex items-center p-1 rounded-2xl bg-[#0c0c10] border border-white/[0.08] w-fit">
-            <button
-              onClick={() => setTorneo('primer')}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                torneo === 'primer'
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-950'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              Primer Torneo
-            </button>
-            <button
-              onClick={() => setTorneo('segundo')}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                torneo === 'segundo'
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-950'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              Segundo Torneo
-            </button>
+          {/* Selector Horizontal de Categorías (Mayor, Reserva, 3ª, 4ª, 5ª) */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {(['mayor', 'reserva', 'tercera', 'cuarta', 'quinta'] as CategoriaType[]).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategoria(cat)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition uppercase tracking-wider border ${
+                  selectedCategoria === cat
+                    ? 'bg-white text-black border-white shadow-md'
+                    : 'bg-[#181922] text-zinc-400 border-zinc-800/80 hover:border-zinc-700 hover:text-white'
+                }`}
+              >
+                {categoryLabels[cat]}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Selector de Categorías (Mayor, Reserva, 3ª, 4ª, 5ª) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {(['mayor', 'reserva', 'tercera', 'cuarta', 'quinta'] as CategoriaType[]).map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setCategoria(cat)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition uppercase tracking-wider border ${
-                categoria === cat
-                  ? 'bg-white text-black border-white shadow-md'
-                  : 'bg-[#0c0c10] text-zinc-400 border-white/[0.06] hover:border-white/[0.2] hover:text-white'
-              }`}
-            >
-              {categoryLabels[cat]}
-            </button>
-          ))}
-        </div>
-
-        {/* Tabla de Posiciones Deportiva Estilo Forg1 */}
-        <div className="bg-[#0c0c10] border border-white/[0.08] rounded-3xl p-4 sm:p-6 shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.06]">
+        {/* ============================================================================== */}
+        {/* 2. SECCIÓN 1 DEL BOCETO: TABLAS (PUEDEN SER POR ZONAS)                       */}
+        {/* ============================================================================== */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
-              <Trophy className="w-5 h-5 text-red-500" />
-              <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-tight">
-                {categoryLabels[categoria]} &bull; {torneo === 'primer' ? 'Primer Torneo' : 'Segundo Torneo'}
-              </h2>
+              <div className="w-8 h-8 rounded-xl bg-red-950/60 border border-red-800/70 flex items-center justify-center text-red-500">
+                <Trophy className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                  Tablas de Posiciones {standings.zones.length > 1 ? '(Por Zonas)' : ''}
+                </h2>
+                <div className="text-[10px] text-zinc-400">
+                  {categoryLabels[selectedCategoria]} &bull; {selectedTorneo === 'primer' ? 'Primer Torneo (Apertura)' : 'Segundo Torneo (Clausura)'} {selectedYear}
+                </div>
+              </div>
             </div>
-            <div className="text-[10px] text-zinc-500 hidden sm:block">
-              Actualizado tras la última fecha disputada
+
+            <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block" />
+              <span>Clasifican a Play-Offs</span>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/[0.06] text-zinc-500 text-[10px] uppercase tracking-wider font-bold">
-                  <th className="py-3 px-3 w-12 text-center">#</th>
-                  <th className="py-3 px-3 min-w-[200px]">Club</th>
-                  <th className="py-3 px-2 text-center w-12">PJ</th>
-                  <th className="py-3 px-2 text-center w-12">PG</th>
-                  <th className="py-3 px-2 text-center w-12">PE</th>
-                  <th className="py-3 px-2 text-center w-12">PP</th>
-                  <th className="py-3 px-2 text-center w-12 hidden md:table-cell">GF</th>
-                  <th className="py-3 px-2 text-center w-12 hidden md:table-cell">GC</th>
-                  <th className="py-3 px-2 text-center w-12">DIF</th>
-                  <th className="py-3 px-3 text-center w-16 text-white font-black">PTS</th>
-                  <th className="py-3 px-3 text-center hidden lg:table-cell w-28">Últimos</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {currentRows.map((row) => (
-                  <tr
-                    key={row.pos}
-                    className={`transition-colors ${
-                      row.isBlancoYNegro
-                        ? 'bg-red-950/25 border-l-4 border-l-red-500 font-bold hover:bg-red-950/40'
-                        : 'hover:bg-white/[0.02]'
-                    }`}
-                  >
-                    {/* Posición */}
-                    <td className="py-3.5 px-3 text-center font-black">
-                      {row.pos <= 2 ? (
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-600/30 text-red-400 border border-red-500/50 text-[11px]">
-                          {row.pos}
-                        </span>
-                      ) : (
-                        <span className="text-zinc-500">{row.pos}</span>
-                      )}
-                    </td>
+          {/* Grid de Tablas por Zonas (Zona A, Zona B, etc.) */}
+          <div className={`grid grid-cols-1 ${standings.zones.length > 1 ? 'lg:grid-cols-2' : ''} gap-6`}>
+            {standings.zones.map((zone) => (
+              <div
+                key={zone.id}
+                className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-4 sm:p-5 shadow-xl overflow-hidden"
+              >
+                {/* Título de Zona */}
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-zinc-800/80">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <h3 className="text-base font-black text-white uppercase tracking-wider">
+                      {zone.name}
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase">
+                    {zone.teams.length} Equipos
+                  </span>
+                </div>
 
-                    {/* Nombre Club */}
-                    <td className="py-3.5 px-3">
-                      <div className="flex items-center gap-2.5">
-                        {row.isBlancoYNegro ? (
-                          <div className="w-6 h-6 relative shrink-0">
-                            <Image
-                              src="/teams/blanco-y-negro.png"
-                              alt="Blanco y Negro"
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-[9px] text-zinc-400 shrink-0">
-                            <Shield className="w-3 h-3" />
-                          </div>
-                        )}
-                        <span
-                          className={`truncate ${
-                            row.isBlancoYNegro ? 'text-white font-black text-sm' : 'text-zinc-300'
+                {/* Tabla Estilo Promiedos.com.ar */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-zinc-800/90 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
+                        <th className="py-2.5 px-2 w-10 text-center">#</th>
+                        <th className="py-2.5 px-2 min-w-[150px]">Equipo</th>
+                        <th className="py-2.5 px-1.5 text-center w-11 text-white font-black">PTS</th>
+                        <th className="py-2.5 px-1.5 text-center w-9">PJ</th>
+                        <th className="py-2.5 px-1.5 text-center w-9">PG</th>
+                        <th className="py-2.5 px-1.5 text-center w-9">PE</th>
+                        <th className="py-2.5 px-1.5 text-center w-9">PP</th>
+                        <th className="py-2.5 px-1.5 text-center w-9 hidden sm:table-cell">GF</th>
+                        <th className="py-2.5 px-1.5 text-center w-9 hidden sm:table-cell">GC</th>
+                        <th className="py-2.5 px-1.5 text-center w-10">DIF</th>
+                        <th className="py-2.5 px-2 text-center w-24 hidden md:table-cell">Forma</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800/50">
+                      {zone.teams.map((team, idx) => (
+                        <tr
+                          key={team.id || idx}
+                          className={`transition-colors ${
+                            team.isBlancoYNegro
+                              ? 'bg-red-950/20 font-bold hover:bg-red-950/35 border-l-4 border-l-red-500'
+                              : 'hover:bg-zinc-800/30'
                           }`}
                         >
-                          {row.name}
-                        </span>
-                        {row.isBlancoYNegro && (
-                          <span className="px-1.5 py-0.5 rounded bg-red-600 text-white text-[8px] font-mono uppercase font-black tracking-wider">
-                            ByN
-                          </span>
-                        )}
-                      </div>
-                    </td>
+                          {/* Posición con barra de clasificación estilo Promiedos */}
+                          <td className="py-2.5 px-2 text-center font-bold relative">
+                            {team.qualified && !team.isBlancoYNegro && (
+                              <span className="absolute left-0 top-1 bottom-1 w-1 bg-emerald-500 rounded-r" />
+                            )}
+                            <span className={team.qualified ? 'text-emerald-400 font-black' : 'text-zinc-500'}>
+                              {team.pos}
+                            </span>
+                          </td>
 
-                    <td className="py-3.5 px-2 text-center text-zinc-400">{row.pj}</td>
-                    <td className="py-3.5 px-2 text-center text-emerald-400">{row.pg}</td>
-                    <td className="py-3.5 px-2 text-center text-zinc-400">{row.pe}</td>
-                    <td className="py-3.5 px-2 text-center text-red-400">{row.pp}</td>
-                    <td className="py-3.5 px-2 text-center text-zinc-500 hidden md:table-cell">{row.gf}</td>
-                    <td className="py-3.5 px-2 text-center text-zinc-500 hidden md:table-cell">{row.gc}</td>
-                    <td className="py-3.5 px-2 text-center font-mono">
-                      <span className={row.dif > 0 ? 'text-emerald-400' : row.dif < 0 ? 'text-red-400' : 'text-zinc-500'}>
-                        {row.dif > 0 ? `+${row.dif}` : row.dif}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-3 text-center text-base font-black text-white font-mono">
-                      {row.pts}
-                    </td>
+                          {/* Escudo y Nombre */}
+                          <td className="py-2.5 px-2">
+                            <div className="flex items-center gap-2">
+                              {team.isBlancoYNegro ? (
+                                <div className="w-5 h-5 relative shrink-0">
+                                  <Image
+                                    src="/teams/blanco-y-negro.png"
+                                    alt="Blanco y Negro"
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              ) : team.name.toLowerCase().includes('i. f. c.') || team.name.toLowerCase().includes('ifc') ? (
+                                <div className="w-5 h-5 relative shrink-0">
+                                  <Image
+                                    src="/teams/ifc.png"
+                                    alt="IFC"
+                                    fill
+                                    className="object-contain"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-4 h-4 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[8px] text-zinc-400 shrink-0">
+                                  <Shield className="w-2.5 h-2.5" />
+                                </div>
+                              )}
+                              <span
+                                className={`truncate ${
+                                  team.isBlancoYNegro
+                                    ? 'text-white font-black text-xs sm:text-sm'
+                                    : 'text-zinc-300 text-xs'
+                                }`}
+                              >
+                                {team.name}
+                              </span>
+                            </div>
+                          </td>
 
-                    {/* Forma últimos partidos */}
-                    <td className="py-3.5 px-3 text-center hidden lg:table-cell">
-                      <div className="flex items-center justify-center gap-1">
-                        {row.form.map((res, idx) => (
-                          <span
-                            key={idx}
-                            className={`w-4 h-4 rounded text-[9px] font-black flex items-center justify-center ${
-                              res === 'W'
-                                ? 'bg-emerald-950 text-emerald-400 border border-emerald-700/60'
-                                : res === 'D'
-                                ? 'bg-zinc-800 text-zinc-300'
-                                : 'bg-red-950 text-red-400 border border-red-700/60'
-                            }`}
-                          >
-                            {res}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          {/* PTS (Destacado Promiedos) */}
+                          <td className="py-2.5 px-1.5 text-center font-mono font-black text-sm text-white bg-white/[0.02]">
+                            {team.pts}
+                          </td>
+
+                          {/* PJ, PG, PE, PP */}
+                          <td className="py-2.5 px-1.5 text-center text-zinc-400">{team.pj}</td>
+                          <td className="py-2.5 px-1.5 text-center text-zinc-400">{team.pg}</td>
+                          <td className="py-2.5 px-1.5 text-center text-zinc-400">{team.pe}</td>
+                          <td className="py-2.5 px-1.5 text-center text-zinc-400">{team.pp}</td>
+
+                          {/* GF, GC */}
+                          <td className="py-2.5 px-1.5 text-center text-zinc-500 hidden sm:table-cell">{team.gf}</td>
+                          <td className="py-2.5 px-1.5 text-center text-zinc-500 hidden sm:table-cell">{team.gc}</td>
+
+                          {/* DIF */}
+                          <td className="py-2.5 px-1.5 text-center font-bold">
+                            <span className={team.dif > 0 ? 'text-emerald-400' : team.dif < 0 ? 'text-red-400' : 'text-zinc-500'}>
+                              {team.dif > 0 ? `+${team.dif}` : team.dif}
+                            </span>
+                          </td>
+
+                          {/* Forma (Últimos 5) */}
+                          <td className="py-2.5 px-2 text-center hidden md:table-cell">
+                            <div className="flex items-center justify-center gap-1">
+                              {(team.form || []).map((f, fIdx) => (
+                                <span
+                                  key={fIdx}
+                                  className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] font-black uppercase text-white ${
+                                    f === 'W'
+                                      ? 'bg-emerald-600'
+                                      : f === 'D'
+                                      ? 'bg-amber-600'
+                                      : 'bg-red-600'
+                                  }`}
+                                  title={f === 'W' ? 'Victoria' : f === 'D' ? 'Empate' : 'Derrota'}
+                                >
+                                  {f === 'W' ? 'G' : f === 'D' ? 'E' : 'P'}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Leyenda al pie */}
+                <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between text-[10px] text-zinc-500">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-sm bg-emerald-500" />
+                    <span>Puestos 1 al 4 clasifican a Play-Offs</span>
+                  </div>
+                  <span>PJ: Partidos Jugados &bull; DIF: Diferencia de Gol</span>
+                </div>
+              </div>
+            ))}
           </div>
+        </section>
 
-          <div className="mt-4 pt-4 border-t border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-[10px] text-zinc-500">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded bg-red-600/60 border border-red-500" />
-                <span>Puestos de Clasificación Directa</span>
-              </span>
+        {/* ============================================================================== */}
+        {/* 3. SECCIÓN 2 DEL BOCETO: PLAY OFFS (SISTEMA DE LLAVES / BRACKETS)             */}
+        {/* ============================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-950/60 border border-amber-800/70 flex items-center justify-center text-amber-500">
+                <Award className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                  Play-Offs // Llaves Eliminatorias
+                </h2>
+                <div className="text-[10px] text-zinc-400">
+                  Cuartos de final, Semifinales y Gran Final del Torneo
+                </div>
+              </div>
             </div>
 
-            <Link
-              href="/"
-              className="text-red-400 hover:text-white transition flex items-center gap-1 font-bold"
-            >
-              <span>Ver próximos partidos en vivo</span>
-              <ChevronRight className="w-3 h-3" />
-            </Link>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-400 text-[10px]">
+                Eliminación Directa
+              </span>
+            </div>
           </div>
-        </div>
+
+          <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-x-auto">
+            {/* Diagrama de Llaves Interactivo */}
+            <div className="min-w-[760px] grid grid-cols-3 gap-6 relative">
+              {/* COLUMNA 1: CUARTOS DE FINAL */}
+              <div className="space-y-4">
+                <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                  <span>Cuartos de Final</span>
+                  <span className="text-[9px] text-zinc-500">4 Cruces</span>
+                </div>
+
+                <div className="space-y-3">
+                  {cuartosMatches.map((m) => (
+                    <div
+                      key={m.id}
+                      className="bg-[#161722] border border-zinc-800 rounded-xl p-3 shadow-md hover:border-zinc-700 transition"
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 font-bold mb-1.5 uppercase">
+                        <span>{m.title}</span>
+                        <span>{m.dateInfo || 'Finalizado'}</span>
+                      </div>
+
+                      {/* Equipo 1 */}
+                      <div className={`flex items-center justify-between py-1 px-1.5 rounded ${m.winner === 1 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                        <span className="text-xs truncate">{m.team1}</span>
+                        <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                          {m.score1 !== null ? m.score1 : '-'}
+                        </span>
+                      </div>
+
+                      {/* Equipo 2 */}
+                      <div className={`flex items-center justify-between py-1 px-1.5 rounded mt-0.5 ${m.winner === 2 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                        <span className="text-xs truncate">{m.team2}</span>
+                        <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                          {m.score2 !== null ? m.score2 : '-'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COLUMNA 2: SEMIFINALES */}
+              <div className="space-y-4 flex flex-col justify-center">
+                <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                  <span>Semifinales</span>
+                  <span className="text-[9px] text-zinc-500">2 Cruces</span>
+                </div>
+
+                <div className="space-y-8 my-auto">
+                  {semiMatches.map((m) => (
+                    <div
+                      key={m.id}
+                      className="bg-[#161722] border border-zinc-800 rounded-xl p-3.5 shadow-lg hover:border-amber-500/40 transition"
+                    >
+                      <div className="flex items-center justify-between text-[9px] text-zinc-500 font-bold mb-1.5 uppercase">
+                        <span>{m.title}</span>
+                        <span>{m.dateInfo || 'En juego'}</span>
+                      </div>
+
+                      {/* Equipo 1 */}
+                      <div className={`flex items-center justify-between py-1 px-1.5 rounded ${m.winner === 1 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                        <span className="text-xs truncate">{m.team1}</span>
+                        <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                          {m.score1 !== null ? m.score1 : '-'}
+                        </span>
+                      </div>
+
+                      {/* Equipo 2 */}
+                      <div className={`flex items-center justify-between py-1 px-1.5 rounded mt-0.5 ${m.winner === 2 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                        <span className="text-xs truncate">{m.team2}</span>
+                        <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                          {m.score2 !== null ? m.score2 : '-'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COLUMNA 3: GRAN FINAL */}
+              <div className="space-y-4 flex flex-col justify-center">
+                <div className="text-xs font-black uppercase tracking-wider text-amber-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                    Gran Final
+                  </span>
+                  <span className="text-[9px] text-red-500 animate-pulse font-black">EN DIRECTO</span>
+                </div>
+
+                <div className="my-auto">
+                  {finalMatch ? (
+                    <div className="bg-gradient-to-br from-amber-950/30 via-[#181924] to-[#12131a] border-2 border-amber-500/60 rounded-2xl p-4 shadow-[0_8px_30px_rgba(245,158,11,0.15)] relative overflow-hidden">
+                      <div className="text-center mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-950/80 border border-amber-700 px-2 py-0.5 rounded-full">
+                          POR EL TÍTULO DE CAMPEÓN
+                        </span>
+                      </div>
+
+                      {/* Equipo 1 */}
+                      <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 relative shrink-0">
+                            <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                          </div>
+                          <span className="text-xs font-black text-white">{finalMatch.team1}</span>
+                        </div>
+                        <span className="text-base font-mono font-black text-amber-400">
+                          {finalMatch.score1 !== null ? finalMatch.score1 : '-'}
+                        </span>
+                      </div>
+
+                      <div className="text-center text-[10px] font-bold text-zinc-500 my-1">
+                        VS
+                      </div>
+
+                      {/* Equipo 2 */}
+                      <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 relative shrink-0">
+                            <Image src="/teams/ifc.png" alt="Rival" fill className="object-contain" />
+                          </div>
+                          <span className="text-xs font-black text-white">{finalMatch.team2}</span>
+                        </div>
+                        <span className="text-base font-mono font-black text-amber-400">
+                          {finalMatch.score2 !== null ? finalMatch.score2 : '-'}
+                        </span>
+                      </div>
+
+                      <div className="text-[10px] text-center text-zinc-400 font-mono bg-zinc-900/80 rounded-lg py-1.5 px-2 border border-zinc-800">
+                        {finalMatch.dateInfo || 'Horario a confirmar'}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-2xl">
+                      Cruces por disputarse
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================================== */}
+        {/* 4. SECCIÓN 3 DEL BOCETO: GOLEADORES DE BLANCO Y NEGRO (SOLO BYN)               */}
+        {/* ============================================================================== */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-red-950/60 border border-red-800/70 flex items-center justify-center text-red-500">
+                <Flame className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
+                  <span>Goleadores de Blanco y Negro</span>
+                  <div className="w-5 h-5 relative shrink-0 inline-block">
+                    <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                  </div>
+                </h2>
+                <div className="text-[10px] text-zinc-400">
+                  Tabla de máximos artilleros del Club Atlético Blanco y Negro
+                </div>
+              </div>
+            </div>
+
+            <span className="text-[10px] text-zinc-500 font-bold hidden sm:inline">
+              Temporada Oficial 2026
+            </span>
+          </div>
+
+          <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-zinc-800/90 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
+                    <th className="py-2.5 px-3 w-12 text-center">#</th>
+                    <th className="py-2.5 px-3 min-w-[200px]">Jugador</th>
+                    <th className="py-2.5 px-3 text-zinc-400">División</th>
+                    <th className="py-2.5 px-3 text-center w-24">Partidos</th>
+                    <th className="py-2.5 px-4 text-center w-24 text-white font-black">Goles</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
+                  {standings.goleadores.map((g, idx) => (
+                    <tr
+                      key={g.id || idx}
+                      className={`hover:bg-zinc-800/30 transition-colors ${
+                        idx === 0
+                          ? 'bg-amber-950/15 border-l-4 border-l-amber-500'
+                          : idx === 1
+                          ? 'bg-zinc-900/40'
+                          : ''
+                      }`}
+                    >
+                      {/* Puesto */}
+                      <td className="py-3 px-3 text-center font-black">
+                        {idx === 0 ? (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/50 text-xs">
+                            🥇
+                          </span>
+                        ) : idx === 1 ? (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-zinc-700/30 text-zinc-300 border border-zinc-600 text-xs">
+                            🥈
+                          </span>
+                        ) : idx === 2 ? (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-900/30 text-amber-600 border border-amber-800 text-xs">
+                            🥉
+                          </span>
+                        ) : (
+                          <span className="text-zinc-500">{g.pos}</span>
+                        )}
+                      </td>
+
+                      {/* Jugador con insignia albinegra */}
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-white border border-black inline-block shrink-0" />
+                          <span className="font-bold text-white text-xs sm:text-sm">
+                            {g.name}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* División */}
+                      <td className="py-3 px-3 text-zinc-400 text-xs">
+                        <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px]">
+                          {g.category}
+                        </span>
+                      </td>
+
+                      {/* Partidos jugados */}
+                      <td className="py-3 px-3 text-center text-zinc-400 font-mono">
+                        {g.matchesPlayed || '-'}
+                      </td>
+
+                      {/* Goles (Destacado) */}
+                      <td className="py-3 px-4 text-center font-mono font-black text-base text-red-400 bg-red-950/10">
+                        {g.goals}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );

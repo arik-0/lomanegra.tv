@@ -39,11 +39,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#08080a]/90 backdrop-blur-xl border-b border-white/[0.07] h-14 flex items-center">
+    <header className="sticky top-0 z-40 bg-[#101116]/95 backdrop-blur-md border-b border-zinc-800/80 h-14 flex items-center shadow-[0_4px_24px_rgba(0,0,0,0.45)]">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logotipo Oficial en móviles */}
-        <Link href="/" className="flex items-center gap-2 group lg:hidden">
-          <div className="w-8 h-8 relative flex items-center justify-center group-hover:scale-105 transition-transform">
+        <Link href="/" className="flex items-center gap-2.5 group lg:hidden">
+          <div className="w-9 h-9 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
             <Image
               src="/logo-pasion-lomonegra.png"
               alt="Pasión Lomonegra"
@@ -60,25 +60,25 @@ export default function Navbar() {
 
         {/* Enlaces de Cabecera en Desktop */}
         <div className="hidden lg:flex items-center gap-4 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-red-950/50 border border-red-800/60 text-red-400">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#181920] border border-red-900/50 text-red-400 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             <span className="font-bold">SEÑAL EN VIVO</span>
           </div>
 
           <Link
             href="/posiciones"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all shadow-sm"
           >
-            <Trophy className="w-3.5 h-3.5 text-amber-500" />
-            <span>Tablas de Posiciones</span>
+            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+            <span>Tablas & Play-Offs</span>
           </Link>
 
-          <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
+          <div className="flex items-center gap-2 pl-2 border-l border-zinc-800">
             <a
               href="https://www.youtube.com/@PasionlomonegraByN"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-white/[0.06] text-zinc-400 hover:text-red-500 transition"
+              className="flex items-center gap-1 p-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800/80 text-zinc-400 hover:text-red-500 transition shadow-sm"
               title="Canal Oficial de YouTube"
             >
               <Youtube className="w-4 h-4" />
@@ -87,7 +87,7 @@ export default function Navbar() {
               href="https://www.instagram.com/pasion_lomonegra?igsi=ejZkcWJlejZ1NXU0"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-white/[0.06] text-zinc-400 hover:text-pink-500 transition"
+              className="flex items-center gap-1 p-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800/80 text-zinc-400 hover:text-pink-500 transition shadow-sm"
               title="Instagram Oficial"
             >
               <Instagram className="w-4 h-4" />
@@ -101,13 +101,13 @@ export default function Navbar() {
             <>
               {user ? (
                 <div className="flex items-center gap-2.5">
-                  <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-zinc-300 bg-[#0c0c10] border border-white/[0.08] px-3 py-1.5 rounded-lg">
+                  <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-zinc-300 bg-[#181920] border border-zinc-800 px-3 py-1.5 rounded-lg shadow-sm">
                     <UserIcon className="w-3.5 h-3.5 text-red-500" />
                     <span className="truncate max-w-[150px]">{user.email}</span>
                   </div>
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-lg bg-[#0c0c10] hover:bg-[#14141c] text-zinc-300 hover:text-white border border-white/[0.08] transition"
+                    className="flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#22242e] text-zinc-300 hover:text-white border border-zinc-800 transition shadow-sm"
                     title="Cerrar sesión"
                   >
                     <LogOut className="w-3.5 h-3.5 text-red-500" />
@@ -118,7 +118,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <Link
                     href="/login"
-                    className="text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg bg-white hover:bg-zinc-200 text-black shadow-[0_2px_12px_rgba(255,255,255,0.12)] transition"
+                    className="text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-lg bg-white hover:bg-zinc-200 text-black shadow-[0_2px_12px_rgba(255,255,255,0.15)] transition"
                   >
                     Iniciar Sesión
                   </Link>

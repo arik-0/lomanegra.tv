@@ -101,25 +101,32 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
     },
   ];
 
+  const handleLinkClick = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      onToggle();
+    }
+  };
+
   return (
     <>
-      {/* Overlay para móviles */}
+      {/* Overlay para móviles con cierre al tocar */}
       {isOpen && (
         <div
           onClick={onToggle}
-          className="fixed inset-0 z-40 bg-black/85 backdrop-blur-sm lg:hidden transition-opacity"
+          aria-label="Cerrar menú"
+          className="fixed inset-0 z-40 bg-black/85 backdrop-blur-sm lg:hidden transition-opacity cursor-pointer"
         />
       )}
 
-      {/* Sidebar Lateral Estilo Forg1 */}
+      {/* Sidebar Lateral Estilo Forg1 / Matte Graphite (Full-width en móvil) */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-[100dvh] w-[270px] bg-[#08080a] border-r border-white/[0.07] flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-[100dvh] w-full lg:w-[270px] bg-[#0f1015] border-r border-zinc-800/80 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Header de Marca */}
-        <div className="p-4 border-b border-white/[0.07] flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
+        <div className="p-4 border-b border-zinc-800/80 flex items-center justify-between bg-[#12131a]">
+          <Link href="/" onClick={handleLinkClick} className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image
                 src="/logo-pasion-lomonegra.png"
@@ -142,16 +149,16 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
           <button
             onClick={onToggle}
-            className="lg:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] transition"
+            className="lg:hidden p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 transition"
             aria-label="Cerrar menú"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Selector de Pestañas Tipo Pill Conectado */}
-        <div className="p-3 border-b border-white/[0.07]">
-          <div className="grid grid-cols-3 p-1 rounded-xl bg-[#0c0c10] border border-white/[0.06] text-[10px] font-mono uppercase tracking-wider">
+        <div className="p-3 border-b border-zinc-800/80 bg-[#12131a]/50">
+          <div className="grid grid-cols-3 p-1 rounded-xl bg-[#161720] border border-zinc-800 text-[10px] font-mono uppercase tracking-wider">
             <button
               onClick={() => setActiveTab('matches')}
               className={`py-1.5 rounded-lg transition-all text-center ${
@@ -203,7 +210,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <Link
                     key={idx}
                     href={`/partido/${m.id}`}
-                    className="block p-3 rounded-xl bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.06] hover:border-red-500/40 transition-all group"
+                    onClick={handleLinkClick}
+                    className="block p-3 rounded-xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition-all group"
                   >
                     <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
                       <span className="text-zinc-400 flex items-center gap-1.5">
@@ -240,7 +248,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
               <Link
                 href="/posiciones"
-                className="group block p-3.5 rounded-xl bg-gradient-to-br from-red-950/50 to-[#0c0c10] border border-red-700/60 hover:border-red-500 transition"
+                onClick={handleLinkClick}
+                className="group block p-3.5 rounded-xl bg-gradient-to-br from-red-950/40 to-[#14151e] border border-red-800/60 hover:border-red-500 transition shadow-sm"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[8px] font-mono font-black uppercase text-red-400 bg-red-900/60 px-1.5 py-0.5 rounded">
@@ -249,10 +258,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-0.5 transition-transform" />
                 </div>
                 <div className="text-xs font-black text-white group-hover:text-red-400 transition-colors mb-1">
-                  Ver Tablas Completas &rarr;
+                  Ver Tablas & Play-Offs &rarr;
                 </div>
                 <div className="text-[10px] text-zinc-400 leading-tight">
-                  Fútbol Mayor, Reserva, 3ª, 4ª y 5ª división (Apertura y Clausura).
+                  Zonas A y B, Llaves eliminatorias y Goleadores de Blanco y Negro.
                 </div>
               </Link>
 
@@ -261,7 +270,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <Link
                     key={idx}
                     href="/posiciones"
-                    className="block p-3 rounded-xl bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.06] hover:border-red-500/40 transition"
+                    onClick={handleLinkClick}
+                    className="block p-3 rounded-xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[8px] font-mono font-bold uppercase text-red-400 bg-red-950/60 border border-red-800/50 px-1.5 py-0.5 rounded">
@@ -301,7 +311,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     href={pl.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group block p-3 rounded-xl bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.06] hover:border-red-500/40 transition-all"
+                    className="group block p-3 rounded-xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition-all"
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[8px] font-mono font-black uppercase text-red-400 bg-red-950/70 border border-red-800/60 px-1.5 py-0.5 rounded">
@@ -318,7 +328,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       {pl.description}
                     </p>
 
-                    <div className="pt-2 border-t border-white/[0.05] flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] font-mono text-zinc-500">
                       <span>{pl.videoCount}</span>
                       <span className="text-red-500 font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
                         Abrir <ChevronRight className="w-3 h-3" />
@@ -332,7 +342,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
           {/* SPONSOR OFICIAL ESTILO FORG1 (Integrado en barra lateral) */}
           <div className="pt-2">
-            <div className="group relative h-14 flex items-center gap-2.5 px-3 overflow-hidden rounded-xl border border-white/[0.07] bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(12,12,16,1)_100%)] transition-[border-color] duration-200 hover:border-red-500/40">
+            <div className="group relative h-14 flex items-center gap-2.5 px-3 overflow-hidden rounded-xl border border-zinc-800/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(20,21,30,1)_100%)] transition-[border-color] duration-200 hover:border-red-500/40">
               <div className="shrink-0 w-8 h-8 rounded-lg bg-red-950/40 border border-red-800/60 flex items-center justify-center text-red-400 font-mono text-xs font-black">
                 VIVO
               </div>
@@ -349,16 +359,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         </div>
 
         {/* Footer del Sidebar con CTA Rápido */}
-        <div className="p-3 border-t border-white/[0.07] bg-[#060608]">
+        <div className="p-3 border-t border-zinc-800/80 bg-[#12131a]">
           <Link
             href="/partido/blanco-y-negro-vs-ifc"
+            onClick={handleLinkClick}
             className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-white text-black hover:bg-zinc-200 text-xs font-black tracking-wider uppercase rounded-xl no-underline transition-colors shadow-[0_4px_16px_rgba(255,255,255,0.1)]"
           >
             <Play className="w-3.5 h-3.5 fill-black" />
             <span>Pase En Vivo</span>
           </Link>
           {/* Redes Sociales Oficiales */}
-          <div className="flex items-center justify-center gap-3 pt-2.5 pb-1 border-b border-white/[0.05]">
+          <div className="flex items-center justify-center gap-3 pt-2.5 pb-1 border-b border-zinc-800/60">
             <a
               href="https://www.youtube.com/@PasionlomonegraByN"
               target="_blank"
@@ -379,11 +390,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </a>
           </div>
 
-          <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mt-2 px-1">
-            <Link href="/posiciones" className="text-zinc-500 hover:text-white transition-colors">
+          <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-2 px-1">
+            <Link href="/posiciones" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
               Tablas
             </Link>
-            <Link href="/admin" className="text-zinc-600 hover:text-red-400 transition-colors">
+            <Link href="/admin" onClick={handleLinkClick} className="text-zinc-500 hover:text-red-400 transition-colors">
               Operaciones
             </Link>
           </div>

@@ -4,12 +4,16 @@ import Link from 'next/link';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import AppLayoutWrapper from '@/components/AppLayoutWrapper';
-import SupportChat from '@/components/SupportChat';
 
 export const metadata: Metadata = {
   title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
   description:
     'Plataforma oficial de transmisiones en vivo de Pasión Lomonegra para ver partidos en directo en alta definición con Cloudflare Stream.',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +27,6 @@ export default function RootLayout({
         <AppLayoutWrapper>
           <Navbar />
           <div className="flex-1">{children}</div>
-          <SupportChat />
 
           {/* Footer Técnico Forg1 */}
           <footer className="border-t border-white/[0.07] bg-[#060608] py-8 text-xs font-mono mb-14 lg:mb-0">

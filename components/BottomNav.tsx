@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Radio, Calendar, Youtube, Ticket, Menu } from 'lucide-react';
+import { Radio, Calendar, Trophy, Ticket, Menu } from 'lucide-react';
 
 interface BottomNavProps {
   onOpenSidebar: () => void;
@@ -12,9 +12,10 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
   const pathname = usePathname();
   const isHome = pathname === '/';
   const isPartido = pathname?.startsWith('/partido/');
+  const isPosiciones = pathname === '/posiciones';
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#08080a]/95 backdrop-blur-xl border-t border-white/[0.07] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_24px_rgba(0,0,0,0.7)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#101116]/95 backdrop-blur-md border-t border-zinc-800/80 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_24px_rgba(0,0,0,0.6)]">
       <div className="grid grid-cols-5 h-14">
         {/* 1. Transmisión En Vivo */}
         <Link
@@ -22,7 +23,7 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
           className={`flex flex-col items-center justify-center gap-1 text-center transition-colors ${
             isHome
               ? 'text-red-500 font-bold'
-              : 'text-zinc-500 hover:text-zinc-300'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           <div className="relative">
@@ -36,23 +37,38 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
 
         {/* 2. Partido Actual / Pase */}
         <Link
-          href="/partido/blanco-y-negro-vs-ifc"
+          href="/partido/0790eca3-cc28-41bb-a4b8-8e2c0c514cdf"
           className={`flex flex-col items-center justify-center gap-1 text-center transition-colors ${
             isPartido
               ? 'text-red-500 font-bold'
-              : 'text-zinc-500 hover:text-zinc-300'
+              : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
           <Ticket className="w-4 h-4" />
           <span className="text-[9px] font-mono uppercase tracking-wider">
-            Pase Digital
+            Pase
           </span>
         </Link>
 
-        {/* 3. Agenda de Partidos */}
+        {/* 3. Tablas de Posiciones y Play-offs */}
+        <Link
+          href="/posiciones"
+          className={`flex flex-col items-center justify-center gap-1 text-center transition-colors ${
+            isPosiciones
+              ? 'text-red-500 font-bold'
+              : 'text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span className="text-[9px] font-mono uppercase tracking-wider">
+            Tablas
+          </span>
+        </Link>
+
+        {/* 4. Agenda */}
         <button
           onClick={onOpenSidebar}
-          className="flex flex-col items-center justify-center gap-1 text-center text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="flex flex-col items-center justify-center gap-1 text-center text-zinc-400 hover:text-zinc-200 transition-colors"
         >
           <Calendar className="w-4 h-4" />
           <span className="text-[9px] font-mono uppercase tracking-wider">
@@ -60,21 +76,10 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
           </span>
         </button>
 
-        {/* 4. Grabaciones YouTube */}
+        {/* 5. Menú Completo (Abre Sidebar Full Width) */}
         <button
           onClick={onOpenSidebar}
-          className="flex flex-col items-center justify-center gap-1 text-center text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <Youtube className="w-4 h-4" />
-          <span className="text-[9px] font-mono uppercase tracking-wider">
-            Videos
-          </span>
-        </button>
-
-        {/* 5. Menú Completo */}
-        <button
-          onClick={onOpenSidebar}
-          className="flex flex-col items-center justify-center gap-1 text-center text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="flex flex-col items-center justify-center gap-1 text-center text-zinc-400 hover:text-zinc-200 transition-colors"
         >
           <Menu className="w-4 h-4" />
           <span className="text-[9px] font-mono uppercase tracking-wider">
