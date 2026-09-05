@@ -36,6 +36,8 @@ import {
   TeamStandingsRow,
   PlayoffMatch,
   GoleadorRow,
+  FixtureMatch,
+  recalculateZoneStandings,
 } from '@/lib/standingsStore';
 
 interface Match {
@@ -90,6 +92,7 @@ export default function AdminPage() {
   const [standings, setStandings] = useState<TournamentStandings>(defaultStandings);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [standingsSavedMsg, setStandingsSavedMsg] = useState(false);
+  const [adminGoleadorCategory, setAdminGoleadorCategory] = useState<string>('Todas');
 
   // Comprobar autenticación inicial y cargar datos
   useEffect(() => {
@@ -513,6 +516,79 @@ export default function AdminPage() {
     setStandings({ ...standings, zones: updatedZones });
   };
 
+  // FIXTURES / RESULTADOS DE PARTIDOS POR ZONA
+  const handleAddFixture = (zoneId: string) => {
+    const zone = standings.zones.find((z) => z.id === zoneId);
+    if (!zone) return;
+    const team1 = zone.teams[0]?.name || 'Blanco y Negro';
+    const team2 = zone.teams[1]?.name || 'Rival';
+    const newFix: FixtureMatch = {
+      id: `fix-${Date.now()}`,
+      roundName: 'Fecha 1',
+      homeTeamId: zone.teams[0]?.id || 't1',
+      homeTeamName: team1,
+      awayTeamId: zone.teams[1]?.id || 't2',
+      awayTeamName: team2,
+      homeGoals: null,
+      awayGoals: null,
+    };
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        return { ...z, fixtures: [...(z.fixtures || []), newFix] };
+      }
+      return z;
+    });
+    setStandings({ ...standings, zones: updatedZones });
+  };
+
+  const handleUpdateFixture = (
+    zoneId: string,
+    fixId: string,
+    field: keyof FixtureMatch,
+    value: any
+  ) => {
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        const updatedFixs = (z.fixtures || []).map((f) => {
+          if (f.id === fixId) {
+            return { ...f, [field]: value };
+          }
+          return f;
+        });
+        const updatedZone = { ...z, fixtures: updatedFixs };
+        // Auto-calcular tabla inmediatamente al registrar goles
+        if (field === 'homeGoals' || field === 'awayGoals') {
+          return recalculateZoneStandings(updatedZone);
+        }
+        return updatedZone;
+      }
+      return z;
+    });
+    setStandings({ ...standings, zones: updatedZones });
+  };
+
+  const handleDeleteFixture = (zoneId: string, fixId: string) => {
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        const updatedFixs = (z.fixtures || []).filter((f) => f.id !== fixId);
+        const updatedZone = { ...z, fixtures: updatedFixs };
+        return recalculateZoneStandings(updatedZone);
+      }
+      return z;
+    });
+    setStandings({ ...standings, zones: updatedZones });
+  };
+
+  const handleRecalculateZone = (zoneId: string) => {
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        return recalculateZoneStandings(z);
+      }
+      return z;
+    });
+    setStandings({ ...standings, zones: updatedZones });
+  };
+
   // PLAY-OFFS
   const handleUpdatePlayoff = (matchId: string, field: keyof PlayoffMatch, value: any) => {
     const updated = standings.playoffs.map((m) => {
@@ -524,15 +600,14 @@ export default function AdminPage() {
     setStandings({ ...standings, playoffs: updated });
   };
 
-  // GOLEADORES BYN
+  // GOLEADORES BYN (SIN PARTIDOS JUGADOS)
   const handleAddGoleador = () => {
     const newGoleador: GoleadorRow = {
       id: `g-${Date.now()}`,
       pos: standings.goleadores.length + 1,
       name: 'Nuevo Jugador ByN',
-      category: 'Fútbol Mayor',
+      category: adminGoleadorCategory === 'Todas' ? 'Fútbol Mayor' : adminGoleadorCategory,
       goals: 1,
-      matchesPlayed: 1,
     };
     setStandings({
       ...standings,
@@ -947,9 +1022,145 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Tabla editable de la zona */}
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
+                    {/* SUB-MÓDULO: PARTIDOS Y RESULTADOS DE LA ZONA (AUTO-CÁLCULO) */}
+                    <div className="bg-[#12131a] border border-zinc-800/80 rounded-xl p-3.5 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
+                        <div>
+                          <div className="text-[11px] font-black uppercase text-amber-400 flex items-center gap-1.5">
+                            <Zap className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Resultados de Partidos (Auto-Cálculo de Tabla)</span>
+                          </div>
+                          <p className="text-[10px] text-zinc-400">
+                            Carga los goles de cada partido: los puntos, partidos jugados y diferencias se calculan automáticamente.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleRecalculateZone(zone.id)}
+                            className="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-300 text-[10px] font-bold flex items-center gap-1 transition"
+                            title="Recalcular tabla desde los resultados de los partidos"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            <span>Recalcular Tabla</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAddFixture(zone.id)}
+                            className="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900/80 border border-red-800/60 text-white text-[10px] font-bold flex items-center gap-1 transition"
+                          >
+                            <Plus className="w-3 h-3 text-red-400" />
+                            <span>+ Cargar Partido</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {(!zone.fixtures || zone.fixtures.length === 0) ? (
+                        <div className="py-3 text-center text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-lg">
+                          No hay partidos cargados en esta zona. Pulsa "+ Cargar Partido" para ingresar resultados.
+                        </div>
+                      ) : (
+                        <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                          {zone.fixtures.map((fix) => (
+                            <div
+                              key={fix.id}
+                              className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-[#161722] border border-zinc-800/80 rounded-lg p-2 text-xs"
+                            >
+                              <div className="sm:col-span-2">
+                                <input
+                                  type="text"
+                                  value={fix.roundName || 'Fecha 1'}
+                                  onChange={(e) => handleUpdateFixture(zone.id, fix.id, 'roundName', e.target.value)}
+                                  placeholder="Fecha"
+                                  className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-[10px] text-zinc-400 focus:outline-none font-bold"
+                                />
+                              </div>
+
+                              <div className="sm:col-span-4">
+                                <input
+                                  type="text"
+                                  value={fix.homeTeamName}
+                                  onChange={(e) => handleUpdateFixture(zone.id, fix.id, 'homeTeamName', e.target.value)}
+                                  placeholder="Equipo Local"
+                                  className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="sm:col-span-2 flex items-center justify-center gap-1 font-mono">
+                                <input
+                                  type="number"
+                                  value={fix.homeGoals !== null ? fix.homeGoals : ''}
+                                  onChange={(e) =>
+                                    handleUpdateFixture(
+                                      zone.id,
+                                      fix.id,
+                                      'homeGoals',
+                                      e.target.value === '' ? null : Number(e.target.value)
+                                    )
+                                  }
+                                  placeholder="0"
+                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none"
+                                />
+                                <span className="text-zinc-500 font-bold">-</span>
+                                <input
+                                  type="number"
+                                  value={fix.awayGoals !== null ? fix.awayGoals : ''}
+                                  onChange={(e) =>
+                                    handleUpdateFixture(
+                                      zone.id,
+                                      fix.id,
+                                      'awayGoals',
+                                      e.target.value === '' ? null : Number(e.target.value)
+                                    )
+                                  }
+                                  placeholder="0"
+                                  className="w-10 text-center bg-[#12131a] border border-zinc-800 rounded py-1 text-xs font-black text-white focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="sm:col-span-3">
+                                <input
+                                  type="text"
+                                  value={fix.awayTeamName}
+                                  onChange={(e) => handleUpdateFixture(zone.id, fix.id, 'awayTeamName', e.target.value)}
+                                  placeholder="Equipo Visitante"
+                                  className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="sm:col-span-1 flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteFixture(zone.id, fix.id)}
+                                  className="text-zinc-600 hover:text-red-400 p-1 transition"
+                                  title="Eliminar partido"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tabla editable de la zona (Preserva edición manual libre) */}
+                    <div className="space-y-2 pt-2 border-t border-zinc-800/80">
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                        <span className="font-bold uppercase text-white flex items-center gap-1.5">
+                          <span>Tabla de Posiciones de la Zona</span>
+                          <span className="text-[9px] bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300 font-normal">
+                            Editable celda por celda
+                          </span>
+                        </span>
+                        <span className="text-[10px] text-zinc-500">
+                          Puedes modificar cualquier casilla manualmente en cualquier momento
+                        </span>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
                         <thead>
                           <tr className="text-zinc-500 text-[10px] uppercase font-bold border-b border-zinc-800">
                             <th className="py-2 px-1 w-8 text-center">#</th>
@@ -1060,7 +1271,8 @@ export default function AdminPage() {
                       </table>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
               </div>
             </div>
 
@@ -1148,23 +1360,49 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* MÓDULO 3: GOLEADORES DE BLANCO Y NEGRO (EXCLUSIVO BYN) */}
+            {/* MÓDULO 3: GOLEADORES DE BLANCO Y NEGRO (DIVIDIDO POR CATEGORÍAS) */}
             <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-red-500" />
-                  <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                    Goleadores de Blanco y Negro ({standings.goleadores.length} Artilleros)
-                  </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-red-500" />
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                      Goleadores de Blanco y Negro ({standings.goleadores.length} Registrados)
+                    </h3>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 mt-0.5">
+                    Artilleros oficiales agrupados por división. Sin registro de partidos jugados.
+                  </p>
                 </div>
 
-                <button
-                  onClick={handleAddGoleador}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#181922] hover:bg-zinc-800 border border-zinc-800 text-white rounded-xl text-xs font-bold transition"
-                >
-                  <Plus className="w-3.5 h-3.5 text-red-500" />
-                  <span>Añadir Goleador ByN</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Selector de categoría en el admin */}
+                  <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
+                    {['Todas', 'Fútbol Mayor', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setAdminGoleadorCategory(cat)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition ${
+                          adminGoleadorCategory === cat
+                            ? 'bg-red-600 text-white shadow-md'
+                            : 'text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        {cat.replace(' División', '')}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddGoleador}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-red-950/60 hover:bg-red-900/80 border border-red-800/70 text-white rounded-xl text-xs font-bold transition shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-red-400" />
+                    <span>Añadir Goleador</span>
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -1173,58 +1411,61 @@ export default function AdminPage() {
                     <tr className="text-zinc-500 text-[10px] uppercase font-bold border-b border-zinc-800">
                       <th className="py-2 px-2 w-10 text-center">#</th>
                       <th className="py-2 px-3 min-w-[200px]">Jugador de Blanco y Negro</th>
-                      <th className="py-2 px-3 w-40">División</th>
-                      <th className="py-2 px-3 text-center w-24">Partidos</th>
-                      <th className="py-2 px-3 text-center w-24">Goles</th>
+                      <th className="py-2 px-3 w-48">División / Categoría</th>
+                      <th className="py-2 px-3 text-center w-28 text-white font-black bg-zinc-800/30">Goles</th>
                       <th className="py-2 px-2 text-center w-10"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/40">
-                    {standings.goleadores.map((g) => (
-                      <tr key={g.id} className="hover:bg-zinc-800/30">
-                        <td className="py-2.5 px-2 text-center font-bold text-zinc-500">{g.pos}</td>
-                        <td className="py-2.5 px-3">
-                          <input
-                            type="text"
-                            value={g.name}
-                            onChange={(e) => handleUpdateGoleador(g.id, 'name', e.target.value)}
-                            className="w-full bg-[#12131a] border border-zinc-800 rounded px-2.5 py-1 text-xs text-white font-bold focus:outline-none"
-                          />
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <input
-                            type="text"
-                            value={g.category}
-                            onChange={(e) => handleUpdateGoleador(g.id, 'category', e.target.value)}
-                            className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
-                          />
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <input
-                            type="number"
-                            value={g.matchesPlayed || 0}
-                            onChange={(e) => handleUpdateGoleador(g.id, 'matchesPlayed', Number(e.target.value))}
-                            className="w-16 text-center bg-[#12131a] border border-zinc-800 rounded px-1 py-1 text-xs text-zinc-300 focus:outline-none"
-                          />
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <input
-                            type="number"
-                            value={g.goals}
-                            onChange={(e) => handleUpdateGoleador(g.id, 'goals', Number(e.target.value))}
-                            className="w-16 text-center bg-[#12131a] border border-zinc-800 rounded px-1 py-1 text-xs font-black text-red-400 focus:outline-none"
-                          />
-                        </td>
-                        <td className="py-2.5 px-2 text-center">
-                          <button
-                            onClick={() => handleDeleteGoleador(g.id)}
-                            className="text-zinc-600 hover:text-red-400 transition"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {standings.goleadores
+                      .filter((g) => {
+                        if (adminGoleadorCategory === 'Todas') return true;
+                        return g.category.toLowerCase().includes(adminGoleadorCategory.toLowerCase());
+                      })
+                      .map((g, idx) => (
+                        <tr key={g.id} className="hover:bg-zinc-800/30">
+                          <td className="py-2.5 px-2 text-center font-bold text-zinc-500">{idx + 1}</td>
+                          <td className="py-2.5 px-3">
+                            <input
+                              type="text"
+                              value={g.name}
+                              onChange={(e) => handleUpdateGoleador(g.id, 'name', e.target.value)}
+                              className="w-full bg-[#12131a] border border-zinc-800 rounded px-2.5 py-1 text-xs text-white font-bold focus:outline-none"
+                            />
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <select
+                              value={g.category}
+                              onChange={(e) => handleUpdateGoleador(g.id, 'category', e.target.value)}
+                              className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none"
+                            >
+                              <option value="Fútbol Mayor">Fútbol Mayor</option>
+                              <option value="Reserva">Reserva</option>
+                              <option value="Tercera División">Tercera División</option>
+                              <option value="Cuarta División">Cuarta División</option>
+                              <option value="Quinta División">Quinta División</option>
+                            </select>
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            <input
+                              type="number"
+                              value={g.goals}
+                              onChange={(e) => handleUpdateGoleador(g.id, 'goals', Number(e.target.value))}
+                              className="w-16 text-center bg-[#12131a] border border-zinc-800 rounded px-1 py-1 text-xs font-black text-red-400 focus:outline-none"
+                            />
+                          </td>
+                          <td className="py-2.5 px-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteGoleador(g.id)}
+                              className="text-zinc-600 hover:text-red-400 transition"
+                              title="Eliminar artillero"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>

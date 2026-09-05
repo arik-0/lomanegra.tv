@@ -21,10 +21,22 @@ export interface TeamStandingsRow {
   qualified?: boolean; // Clasificado a Play-Offs (barra verde Promiedos)
 }
 
+export interface FixtureMatch {
+  id: string;
+  roundName?: string; // ej: "Fecha 1", "Fecha 2", etc.
+  homeTeamId: string;
+  homeTeamName: string;
+  awayTeamId: string;
+  awayTeamName: string;
+  homeGoals: number | null;
+  awayGoals: number | null;
+}
+
 export interface ZoneData {
   id: string;
   name: string; // ej: "Zona A", "Zona B"
   teams: TeamStandingsRow[];
+  fixtures?: FixtureMatch[];
 }
 
 export interface PlayoffMatch {
@@ -48,7 +60,6 @@ export interface GoleadorRow {
   name: string;
   category: string;
   goals: number;
-  matchesPlayed?: number;
 }
 
 export interface TournamentStandings {
@@ -58,6 +69,128 @@ export interface TournamentStandings {
   zones: ZoneData[];
   playoffs: PlayoffMatch[];
   goleadores: GoleadorRow[];
+}
+
+// Función que recalcula automáticamente la tabla de posiciones a partir de los partidos cargados,
+// preservando al mismo tiempo la capacidad de edición manual en cualquier momento.
+export function recalculateZoneStandings(zone: ZoneData): ZoneData {
+  const fixtures = (zone.fixtures || []).filter(
+    (f) => f.homeGoals !== null && f.awayGoals !== null && !isNaN(Number(f.homeGoals)) && !isNaN(Number(f.awayGoals))
+  );
+
+  if (fixtures.length === 0) {
+    return zone;
+  }
+
+  const statsMap: Record<
+    string,
+    {
+      team: TeamStandingsRow;
+      pj: number;
+      pg: number;
+      pe: number;
+      pp: number;
+      gf: number;
+      gc: number;
+      dif: number;
+      pts: number;
+      form: ('W' | 'D' | 'L')[];
+    }
+  > = {};
+
+  zone.teams.forEach((t) => {
+    statsMap[t.name.trim().toLowerCase()] = {
+      team: { ...t },
+      pj: 0,
+      pg: 0,
+      pe: 0,
+      pp: 0,
+      gf: 0,
+      gc: 0,
+      dif: 0,
+      pts: 0,
+      form: [],
+    };
+  });
+
+  fixtures.forEach((fix) => {
+    const homeKey = fix.homeTeamName.trim().toLowerCase();
+    const awayKey = fix.awayTeamName.trim().toLowerCase();
+    const hg = Number(fix.homeGoals);
+    const ag = Number(fix.awayGoals);
+
+    if (statsMap[homeKey]) {
+      const h = statsMap[homeKey];
+      h.pj += 1;
+      h.gf += hg;
+      h.gc += ag;
+      if (hg > ag) {
+        h.pg += 1;
+        h.pts += 3;
+        h.form.push('W');
+      } else if (hg === ag) {
+        h.pe += 1;
+        h.pts += 1;
+        h.form.push('D');
+      } else {
+        h.pp += 1;
+        h.form.push('L');
+      }
+    }
+
+    if (statsMap[awayKey]) {
+      const a = statsMap[awayKey];
+      a.pj += 1;
+      a.gf += ag;
+      a.gc += hg;
+      if (ag > hg) {
+        a.pg += 1;
+        a.pts += 3;
+        a.form.push('W');
+      } else if (ag === hg) {
+        a.pe += 1;
+        a.pts += 1;
+        a.form.push('D');
+      } else {
+        a.pp += 1;
+        a.form.push('L');
+      }
+    }
+  });
+
+  const updatedTeams: TeamStandingsRow[] = Object.values(statsMap).map((entry) => {
+    const dif = entry.gf - entry.gc;
+    return {
+      ...entry.team,
+      pj: entry.pj,
+      pg: entry.pg,
+      pe: entry.pe,
+      pp: entry.pp,
+      gf: entry.gf,
+      gc: entry.gc,
+      dif: dif,
+      pts: entry.pts,
+      form: entry.form.length > 0 ? entry.form.slice(-5) : entry.team.form,
+    };
+  });
+
+  updatedTeams.sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    if (b.dif !== a.dif) return b.dif - a.dif;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    return b.pg - a.pg;
+  });
+
+  const finalizedTeams = updatedTeams.map((t, idx) => ({
+    ...t,
+    pos: idx + 1,
+    qualified: idx < 4,
+  }));
+
+  return {
+    ...zone,
+    teams: finalizedTeams,
+  };
 }
 
 // Datos iniciales auténticos para la Liga Regional y Blanco y Negro
@@ -162,6 +295,48 @@ export const defaultStandings: TournamentStandings = {
           qualified: false,
         },
       ],
+      fixtures: [
+        {
+          id: 'fix-a-1',
+          roundName: 'Fecha 1',
+          homeTeamId: 'byn',
+          homeTeamName: 'Blanco y Negro',
+          awayTeamId: 'boca-suarez',
+          awayTeamName: 'Boca Juniors (Suárez)',
+          homeGoals: 3,
+          awayGoals: 1,
+        },
+        {
+          id: 'fix-a-2',
+          roundName: 'Fecha 1',
+          homeTeamId: 'sarmiento',
+          homeTeamName: 'Deportivo Sarmiento',
+          awayTeamId: 'tiro-puan',
+          awayTeamName: 'Tiro Federal (Puan)',
+          homeGoals: 2,
+          awayGoals: 0,
+        },
+        {
+          id: 'fix-a-3',
+          roundName: 'Fecha 1',
+          homeTeamId: 'san-martin',
+          homeTeamName: 'San Martín (Santa Trinidad)',
+          awayTeamId: 'penarol-pigue',
+          awayTeamName: 'Peñarol (Pigüé)',
+          homeGoals: 1,
+          awayGoals: 1,
+        },
+        {
+          id: 'fix-a-4',
+          roundName: 'Fecha 2',
+          homeTeamId: 'penarol-pigue',
+          homeTeamName: 'Peñarol (Pigüé)',
+          awayTeamId: 'byn',
+          awayTeamName: 'Blanco y Negro',
+          homeGoals: 0,
+          awayGoals: 2,
+        },
+      ],
     },
     {
       id: 'zona-b',
@@ -258,6 +433,38 @@ export const defaultStandings: TournamentStandings = {
           qualified: false,
         },
       ],
+      fixtures: [
+        {
+          id: 'fix-b-1',
+          roundName: 'Fecha 1',
+          homeTeamId: 'ifc',
+          homeTeamName: 'I. F. C.',
+          awayTeamId: 'racing-carhue',
+          awayTeamName: 'Racing Club (Carhué)',
+          homeGoals: 2,
+          awayGoals: 1,
+        },
+        {
+          id: 'fix-b-2',
+          roundName: 'Fecha 1',
+          homeTeamId: 'el-progreso',
+          homeTeamName: 'El Progreso (Santa María)',
+          awayTeamId: 'independiente-sj',
+          awayTeamName: 'Independiente (San José)',
+          homeGoals: 1,
+          awayGoals: 1,
+        },
+        {
+          id: 'fix-b-3',
+          roundName: 'Fecha 1',
+          homeTeamId: 'club-sarmiento',
+          homeTeamName: 'Club Sarmiento (Pigüé)',
+          awayTeamId: 'huanguelen',
+          awayTeamName: 'Atlético Huanguelén',
+          homeGoals: 2,
+          awayGoals: 0,
+        },
+      ],
     },
   ],
   playoffs: [
@@ -345,15 +552,15 @@ export const defaultStandings: TournamentStandings = {
       dateInfo: 'Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra',
     },
   ],
-  // Goleadores EXCLUSIVOS del Club Atlético Blanco y Negro
+  // Goleadores EXCLUSIVOS del Club Atlético Blanco y Negro divididos por categoría (sin partidos jugados)
   goleadores: [
+    // Fútbol Mayor
     {
       id: 'g1',
       pos: 1,
       name: 'Gonzalo Cendra',
       category: 'Fútbol Mayor',
       goals: 9,
-      matchesPlayed: 10,
     },
     {
       id: 'g2',
@@ -361,39 +568,80 @@ export const defaultStandings: TournamentStandings = {
       name: 'Facundo Sánchez',
       category: 'Fútbol Mayor',
       goals: 7,
-      matchesPlayed: 9,
     },
     {
       id: 'g3',
       pos: 3,
-      name: 'Lucas Balvidares',
-      category: 'Reserva',
-      goals: 6,
-      matchesPlayed: 8,
-    },
-    {
-      id: 'g4',
-      pos: 4,
       name: 'Joaquín Kraft',
       category: 'Fútbol Mayor',
       goals: 5,
-      matchesPlayed: 10,
+    },
+    // Reserva
+    {
+      id: 'g4',
+      pos: 1,
+      name: 'Lucas Balvidares',
+      category: 'Reserva',
+      goals: 6,
     },
     {
       id: 'g5',
-      pos: 5,
-      name: 'Tomás Graff',
-      category: 'Tercera División',
+      pos: 2,
+      name: 'Benjamín Schtreimbuger',
+      category: 'Reserva',
       goals: 4,
-      matchesPlayed: 7,
     },
     {
       id: 'g6',
-      pos: 6,
+      pos: 3,
+      name: 'Santiago Echeverría',
+      category: 'Reserva',
+      goals: 3,
+    },
+    // Tercera División
+    {
+      id: 'g7',
+      pos: 1,
+      name: 'Tomás Graff',
+      category: 'Tercera División',
+      goals: 5,
+    },
+    {
+      id: 'g8',
+      pos: 2,
+      name: 'Mateo Rohwein',
+      category: 'Tercera División',
+      goals: 3,
+    },
+    // Cuarta División
+    {
+      id: 'g9',
+      pos: 1,
       name: 'Ignacio Weimann',
       category: 'Cuarta División',
       goals: 4,
-      matchesPlayed: 6,
+    },
+    {
+      id: 'g10',
+      pos: 2,
+      name: 'Bautista Graff',
+      category: 'Cuarta División',
+      goals: 3,
+    },
+    // Quinta División
+    {
+      id: 'g11',
+      pos: 1,
+      name: 'Thiago Meier',
+      category: 'Quinta División',
+      goals: 5,
+    },
+    {
+      id: 'g12',
+      pos: 2,
+      name: 'Valentín Schmidt',
+      category: 'Quinta División',
+      goals: 4,
     },
   ],
 };
