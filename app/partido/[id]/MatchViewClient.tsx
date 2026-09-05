@@ -57,15 +57,32 @@ export default function MatchViewClient({
     text: string;
   } | null>(null);
 
-  // Al cargar, verificar si hay un email guardado en localStorage para invitados
+  // Al cargar, verificar si hay aprobación local previa o retorno exitoso de pasarela
   useEffect(() => {
+    const isLocallyApproved =
+      localStorage.getItem(`lomonegrotv_approved_${match.id}`) === 'true';
+
+    if (isLocallyApproved || paymentStatus === 'success') {
+      setHasPaid(true);
+      localStorage.setItem(`lomonegrotv_approved_${match.id}`, 'true');
+      const email =
+        queryGuestEmail ||
+        localStorage.getItem('lomonegrotv_guest_email') ||
+        'invitado@pasionlomonegra.com';
+      setActiveGuestEmail(email);
+      return;
+    }
+
     if (!serverHasPaid && !currentUserEmail) {
-      const emailToCheck = queryGuestEmail || localStorage.getItem('lomonegrotv_guest_email') || localStorage.getItem('lomanegratv_guest_email');
+      const emailToCheck =
+        queryGuestEmail ||
+        localStorage.getItem('lomonegrotv_guest_email') ||
+        localStorage.getItem('lomanegratv_guest_email');
       if (emailToCheck) {
         verifyGuestEmail(emailToCheck);
       }
     }
-  }, [serverHasPaid, currentUserEmail, queryGuestEmail]);
+  }, [match.id, serverHasPaid, currentUserEmail, queryGuestEmail, paymentStatus]);
 
   const verifyGuestEmail = async (email: string) => {
     try {
@@ -429,7 +446,13 @@ export default function MatchViewClient({
               )}
 
               {/* Botón de Desarrollo para simular pase */}
-              <SimulatePurchaseButton matchId={match.id} />
+              <SimulatePurchaseButton
+                matchId={match.id}
+                onSimulated={(email) => {
+                  setHasPaid(true);
+                  setActiveGuestEmail(email);
+                }}
+              />
             </div>
 
             {/* Garantías de Seguridad */}
