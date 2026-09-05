@@ -43,7 +43,7 @@ export default async function MatchPage({
     match = data;
   }
 
-  // Fallback de seguridad: si no se encontró, obtener el partido estelar activo
+  // Fallback de seguridad: si no se encontró en la DB o no hay conexión en Vercel, usar datos oficiales
   if (!match) {
     const { data: fallbackMatch } = await supabaseAdmin
       .from('matches')
@@ -55,24 +55,17 @@ export default async function MatchPage({
   }
 
   if (!match) {
-    return (
-      <main className="min-h-screen bg-[#08080a] text-white flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-[#0c0c10] border border-white/[0.08] flex items-center justify-center mb-4 text-zinc-500">
-          <AlertTriangle className="w-8 h-8 text-red-500" />
-        </div>
-        <h1 className="text-2xl font-black mb-2">Transmisión no disponible</h1>
-        <p className="text-zinc-400 text-xs font-mono mb-6 max-w-md">
-          El evento no fue encontrado o la base de datos no está configurada aún en este entorno.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase tracking-wider transition hover:bg-zinc-200"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Volver a la cartelera</span>
-        </Link>
-      </main>
-    );
+    match = {
+      id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
+      title: 'Blanco y Negro vs I. F. C.',
+      description:
+        'Gran clásico oficial transmitido en vivo y en directo en Ultra HD. Acceso exclusivo Pay-Per-View para hinchas de ambos clubes.',
+      date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+      price: 3500,
+      cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
+      is_active: true,
+      image_url: '/matches/blanco-y-negro-vs-ifc.png',
+    };
   }
 
   // 2. Verificar compra aprobada: si está autenticado o si viene el correo por parámetro

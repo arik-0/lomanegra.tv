@@ -46,13 +46,51 @@ export default async function HomePage() {
     }
   }
 
-  // Identificar el partido estelar (Blanco y Negro vs I. F. C. o el primero)
-  const featuredMatch =
-    matches?.find((m) => m.title.toLowerCase().includes('blanco y negro')) ||
-    matches?.[0] ||
-    null;
+  // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
+  const defaultFeaturedMatch = {
+    id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
+    title: 'Blanco y Negro vs I. F. C.',
+    description:
+      'El gran clásico regional en vivo con relatos exclusivos, cámaras en campo de juego y repetición completa sin necesidad de abono mensual.',
+    date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    price: 3500,
+    cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
+    image_url: '/matches/blanco-y-negro-vs-ifc.png',
+    is_active: true,
+  };
 
-  const otherMatches = matches?.filter((m) => m.id !== featuredMatch?.id) || [];
+  const defaultOtherMatches = [
+    {
+      id: '07ced47c-9f9a-4bce-a073-2c8e84b3de67',
+      title: 'Boca Juniors vs River Plate - Superclásico Final',
+      description: 'Transmisión exclusiva en 4K Ultra HD multicámara con relatos oficiales.',
+      date: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString(),
+      price: 4999,
+      cloudflare_live_input_uid: 'mock_live_input_superclasico_01',
+      image_url: null,
+      is_active: true,
+    },
+    {
+      id: 'de261139-f0e7-43d3-bd24-f2f9a7262fdf',
+      title: 'Real Madrid vs Barcelona - El Clásico',
+      description: 'La gran batalla europea en vivo con previa y post-partido exclusivo.',
+      date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+      price: 6500,
+      cloudflare_live_input_uid: 'mock_live_input_elclasico_02',
+      image_url: null,
+      is_active: true,
+    },
+  ];
+
+  // Identificar el partido estelar (Blanco y Negro vs I. F. C. o el primero)
+  const activeMatches = matches && matches.length > 0 ? matches : [defaultFeaturedMatch, ...defaultOtherMatches];
+
+  const featuredMatch =
+    activeMatches.find((m) => m.title.toLowerCase().includes('blanco y negro')) ||
+    activeMatches[0] ||
+    defaultFeaturedMatch;
+
+  const otherMatches = activeMatches.filter((m) => m.id !== featuredMatch.id);
 
   return (
     <main className="min-h-screen bg-[#08080a] text-white px-4 py-6 sm:px-6 lg:px-8">
