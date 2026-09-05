@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         items: [
           {
             id: match.id,
-            title: `Lomonegrotv: ${match.title}`,
+            title: `Pasión Lomonegra: ${match.title}`,
             description: match.description || 'Acceso a transmisión en vivo HD',
             quantity: 1,
             unit_price: Number(match.price),

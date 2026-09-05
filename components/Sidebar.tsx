@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       teams: '16 clubes',
     },
     {
-      name: 'Copa Ciudad Lomonegrotv',
+      name: 'Copa Ciudad Pasión Lomonegra',
       category: 'Torneo Eliminatorio',
       status: 'PRÓXIMAMENTE',
       teams: '8 clubes',
@@ -131,8 +131,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </div>
             <div>
               <div className="flex items-baseline font-black tracking-tight leading-none text-base">
-                <span className="text-white">LOMONEGRO</span>
-                <span className="text-red-500 font-mono text-[10px] ml-1 tracking-normal font-bold">
+                <span className="text-white">PASIÓN</span>
+                <span className="text-red-500 ml-1">LOMONEGRA</span>
+                <span className="text-zinc-500 font-mono text-[9px] ml-1 font-bold">
                   .TV
                 </span>
               </div>
@@ -338,7 +339,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <span>Pase En Vivo</span>
           </Link>
           <div className="text-center text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mt-2">
-            Lomonegrotv &bull; Stream HD
+            Pasión Lomonegra &bull; Stream HD
           </div>
         </div>
       </aside>

@@ -54,8 +54,9 @@ export default function Navbar() {
             />
           </div>
           <div className="flex items-baseline font-black tracking-tight text-sm">
-            <span className="text-white">LOMONEGRO</span>
-            <span className="text-red-500 font-mono text-[9px] ml-1 font-bold">.TV</span>
+            <span className="text-white">PASIÓN</span>
+            <span className="text-red-500 ml-1">LOMONEGRA</span>
+            <span className="text-zinc-500 font-mono text-[8px] ml-1 font-bold">.TV</span>
           </div>
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/60 text-red-400 text-[8px] font-mono uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
@@ -70,7 +71,7 @@ export default function Navbar() {
             <span className="font-bold">SEÑAL EN VIVO</span>
           </div>
           <span className="text-zinc-700">//</span>
-          <span className="text-white font-bold">CANAL 01 PPV</span>
+          <span className="text-white font-bold">PASIÓN LOMONEGRA PPV</span>
           <span className="text-zinc-700">//</span>
           <span className="text-zinc-400">1080P ULTRA HD 60FPS</span>
         </div>

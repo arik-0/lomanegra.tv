@@ -1,6 +1,6 @@
-# ⚽ Lomonegrotv - Plataforma Pay-Per-View
+# ⚽ Pasión Lomonegra - Plataforma Pay-Per-View
 
-Plataforma oficial de alta concurrencia de **Lomonegrotv** para transmisión de partidos en vivo bajo la modalidad Pay-Per-View (PPV), desarrollada con **Next.js (App Router)**, **Supabase**, **Cloudflare Stream** y **Mercado Pago**.
+Plataforma oficial de alta concurrencia de **Pasión Lomonegra** para transmisión de partidos en vivo bajo la modalidad Pay-Per-View (PPV), desarrollada con **Next.js (App Router)**, **Supabase**, **Cloudflare Stream** y **Mercado Pago**.
 
 ---
 
