@@ -109,6 +109,14 @@ export default function Navbar() {
           </Link>
 
           <Link
+            href="/videos"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all shadow-sm"
+          >
+            <Youtube className="w-3.5 h-3.5 text-red-500" />
+            <span>Videos</span>
+          </Link>
+
+          <Link
             href="/galeria"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all shadow-sm"
           >

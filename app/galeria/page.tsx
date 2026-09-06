@@ -173,7 +173,7 @@ export default function GaleriaPage() {
                 <span>COBERTURA FOTOGRÁFICA // CLUB ATLÉTICO BLANCO Y NEGRO</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight flex items-center gap-3 mt-1">
-                <span>Galería Oficial Albinegra</span>
+                <span>Galería de Pasión Lomonegra</span>
                 <span className="text-[10px] font-mono font-bold px-2.5 py-1 bg-red-950/80 border border-red-700 text-red-400 rounded-md">
                   HD ARCHIVO
                 </span>

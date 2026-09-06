@@ -172,6 +172,8 @@ export default function MatchViewClient({
             <StreamPlayerWrapper
               matchId={match.id}
               guestEmail={activeGuestEmail || undefined}
+              matchTitle={match.title}
+              matchDate={matchDate}
             />
           </div>
 

@@ -834,7 +834,7 @@ export default function AdminPage() {
                 }`}
               >
                 <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                <span>Tablas Promiedos</span>
+                <span>Tablas & Zonas</span>
               </button>
             </div>
 
@@ -1406,7 +1406,7 @@ export default function AdminPage() {
                                   checked={team.qualified}
                                   onChange={(e) => handleUpdateTeam(zone.id, team.id, 'qualified', e.target.checked)}
                                   className="accent-emerald-500 cursor-pointer"
-                                  title="Clasifica a Playoffs (barra verde Promiedos)"
+                                  title="Clasifica a Playoffs (barra verde oficial)"
                                 />
                               </td>
                               <td className="py-2 px-1 text-center">

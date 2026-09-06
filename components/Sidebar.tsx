@@ -370,7 +370,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 </h4>
                 <p className="text-[10px] text-zinc-400 flex items-center gap-1 mt-0.5">
                   <Trophy className="w-3 h-3 text-emerald-400" />
-                  <span>Datos oficiales Promiedos en vivo</span>
+                  <span>Datos oficiales en vivo</span>
                 </p>
               </Link>
             </div>
@@ -387,6 +387,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               </div>
 
               <div className="space-y-2">
+                <Link
+                  href="/videos"
+                  onClick={handleLinkClick}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-red-950/60 hover:brightness-110 transition group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Youtube className="w-4 h-4 text-white" />
+                    <span>Galería de Playlists</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
                 {youtubePlaylists.map((pl) => (
                   <a
                     key={pl.id}
@@ -473,15 +484,21 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </a>
           </div>
 
-          <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-2 px-1">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono uppercase tracking-[0.15em] text-zinc-500 mt-2 px-1">
             <Link href="/posiciones" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
               Tablas
+            </Link>
+            <Link href="/videos" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors font-bold text-red-400">
+              Videos
             </Link>
             <Link href="/galeria" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
               Galería
             </Link>
+            <Link href="/terminos" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
+              Términos
+            </Link>
             <Link href="/admin" onClick={handleLinkClick} className="text-zinc-500 hover:text-red-400 transition-colors">
-              Operaciones
+              Admin
             </Link>
           </div>
         </div>

@@ -121,7 +121,7 @@ export default function PosicionesPage() {
     <main className="min-h-screen bg-[#0d0e12] text-white px-3 py-6 sm:px-6 lg:px-8 font-mono">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* ============================================================================== */}
-        {/* SELECTOR MAESTRO: LIGA REGIONAL (BYN) VS BONUS PRIMERA DIVISIÓN AFA (PROMIEDOS) */}
+        {/* SELECTOR MAESTRO: LIGA DEPORTIVA DEL SUR (BYN) VS BONUS PRIMERA DIVISIÓN AFA  */}
         {/* ============================================================================== */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 rounded-2xl bg-[#12131a] border border-zinc-800 shadow-xl">
           <div className="flex flex-wrap items-center gap-2">
@@ -134,7 +134,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Shield className="w-4 h-4" />
-              <span>Liga Regional (Blanco y Negro)</span>
+              <span>Liga Deportiva del Sur (Blanco y Negro)</span>
             </button>
 
             <button
@@ -146,7 +146,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Trophy className="w-4 h-4" />
-              <span>★ Bonus: Primera División AFA (Promiedos Oficial)</span>
+              <span>★ Bonus: Primera División AFA (Estadísticas Oficiales)</span>
             </button>
           </div>
 
@@ -172,12 +172,12 @@ export default function PosicionesPage() {
                 <span>Volver a la transmisión en vivo</span>
               </Link>
               <div className="text-[10px] uppercase tracking-[0.25em] text-red-500 font-bold">
-                ESTADÍSTICAS OFICIALES // LIGA REGIONAL
+                ESTADÍSTICAS OFICIALES // LIGA DEPORTIVA DEL SUR
               </div>
               <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                 <span>Tablas & Play-Offs</span>
                 <span className="text-xs font-mono font-bold px-2.5 py-1 bg-red-950/70 border border-red-800 text-red-400 rounded-md">
-                  PROMIEDOS STYLE
+                  OFICIAL 2026
                 </span>
               </h1>
             </div>
@@ -962,7 +962,7 @@ export default function PosicionesPage() {
               <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                 <span>{promiedosData?.tournament || 'Torneo Clausura'} 2026</span>
                 <span className="text-[10px] font-mono font-bold px-2.5 py-1 bg-emerald-950/80 border border-emerald-600 text-emerald-300 rounded-md">
-                  PROMIEDOS EN DIRECTO
+                  AFA EN DIRECTO
                 </span>
               </h1>
             </div>
@@ -1002,7 +1002,7 @@ export default function PosicionesPage() {
             </div>
 
             <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
-              Fuente: Promiedos.com.ar • AFA Oficial
+              Fuente: AFA Oficial • Tablas de Primera División
             </span>
           </div>
         </div>
@@ -1011,7 +1011,7 @@ export default function PosicionesPage() {
         {promiedosLoading && !promiedosData ? (
           <div className="p-12 text-center bg-[#12131a] border border-zinc-800 rounded-3xl">
             <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mx-auto mb-3" />
-            <p className="text-zinc-400 text-xs">Cargando datos en vivo desde Promiedos.com.ar...</p>
+            <p className="text-zinc-400 text-xs">Cargando estadísticas oficiales en vivo...</p>
           </div>
         ) : (
           (promiedosData?.tables || [])

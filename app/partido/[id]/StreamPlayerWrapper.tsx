@@ -2,16 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import StreamPlayer from '@/components/StreamPlayer';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import StreamPlaceholder from '@/components/StreamPlaceholder';
+import { Loader2 } from 'lucide-react';
 
 interface StreamPlayerWrapperProps {
   matchId: string;
   guestEmail?: string;
+  matchTitle?: string;
+  matchDate?: string;
 }
 
 export default function StreamPlayerWrapper({
   matchId,
   guestEmail,
+  matchTitle,
+  matchDate,
 }: StreamPlayerWrapperProps) {
   const [streamData, setStreamData] = useState<{
     token: string;
@@ -55,32 +60,24 @@ export default function StreamPlayerWrapper({
     return (
       <div className="w-full aspect-video bg-black flex flex-col items-center justify-center rounded-2xl border border-zinc-800 shadow-2xl">
         <Loader2 className="w-12 h-12 animate-spin text-red-600 mb-4" />
-        <p className="text-sm font-bold text-white tracking-wide">
+        <p className="text-sm font-bold text-white tracking-wide font-mono">
           Estableciendo conexión encriptada...
         </p>
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="text-xs text-zinc-500 mt-1 font-mono">
           Verificando pase y firmando token RSA-256 de Cloudflare Stream
         </p>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !streamData) {
     return (
-      <div className="w-full aspect-video bg-zinc-900/90 flex flex-col items-center justify-center rounded-2xl border border-red-800/80 p-8 text-center shadow-2xl">
-        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h3 className="text-lg font-black text-white mb-2">
-          No se pudo iniciar la transmisión
-        </h3>
-        <p className="text-xs text-zinc-400 max-w-md mb-6">{error}</p>
-        <button
-          onClick={fetchToken}
-          className="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          <span>Reintentar Conexión</span>
-        </button>
-      </div>
+      <StreamPlaceholder
+        matchTitle={matchTitle}
+        matchDate={matchDate}
+        onRetry={fetchToken}
+        isRetrying={loading}
+      />
     );
   }
 
