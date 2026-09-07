@@ -53,6 +53,7 @@ interface Match {
   cloudflare_live_input_uid: string;
   image_url: string | null;
   is_active: boolean;
+  is_live?: boolean;
 }
 
 export default function AdminPage() {
@@ -86,12 +87,14 @@ export default function AdminPage() {
   const [formPrice, setFormPrice] = useState(3500);
   const [formStreamUid, setFormStreamUid] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
+  const [formIsLive, setFormIsLive] = useState(false);
   const [formSaveLoading, setFormSaveLoading] = useState(false);
   const [saveMatchError, setSaveMatchError] = useState('');
 
   // ==========================================
-  // ESTADO: TABLAS PROMIEDOS & TORNEOS
+  // ESTADO: TABLAS & TORNEOS (APERTURA / CLAUSURA)
   // ==========================================
+  const [adminTorneo, setAdminTorneo] = useState<'apertura' | 'clausura'>('apertura');
   const [standings, setStandings] = useState<TournamentStandings>(defaultStandings);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [standingsSavedMsg, setStandingsSavedMsg] = useState(false);
@@ -110,27 +113,21 @@ export default function AdminPage() {
     fetchStandings();
   }, []);
 
-  const handleLogin = async (e?: React.FormEvent, directPassword?: string) => {
+  const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (!password.trim()) {
+      setLoginError('Por favor ingresa la contraseña de administrador.');
+      return;
+    }
     setLoginLoading(true);
     setLoginError('');
 
-    const targetPassword = directPassword !== undefined ? directPassword : password;
-
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: targetPassword,
-          quickAccess: directPassword === 'lomonegro2026',
-        }),
-        signal: controller.signal,
+        body: JSON.stringify({ password }),
       });
-      clearTimeout(timeoutId);
 
       const data = await res.json();
       if (res.ok) {
@@ -141,20 +138,10 @@ export default function AdminPage() {
         fetchMatches();
         fetchStandings();
       } else {
-        setLoginError(data.error || 'Clave no válida');
+        setLoginError(data.error || 'Credenciales no autorizadas.');
       }
     } catch {
-      // Si dio timeout o error de red, pero es una clave válida, entrar
-      if (targetPassword === 'lomonegro2026' || targetPassword === 'admin' || directPassword) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('admin_session_auth', 'true');
-        }
-        setIsAuthenticated(true);
-        fetchMatches();
-        fetchStandings();
-      } else {
-        setLoginError('Tiempo de espera agotado. Usa el botón de Acceso Rápido.');
-      }
+      setLoginError('Error de red al conectar con el servidor.');
     } finally {
       setLoginLoading(false);
     }
@@ -268,6 +255,7 @@ export default function AdminPage() {
       setFormPrice(match.price);
       setFormStreamUid(match.cloudflare_live_input_uid);
       setFormImageUrl(match.image_url || '');
+      setFormIsLive(Boolean(match.is_live));
     } else {
       setEditingMatch(null);
       setFormTitle('Blanco y Negro vs ');
@@ -279,6 +267,7 @@ export default function AdminPage() {
       setFormPrice(3500);
       setFormStreamUid('live_input_byn');
       setFormImageUrl('/matches/blanco-y-negro-vs-ifc.png');
+      setFormIsLive(false);
     }
     setIsMatchModalOpen(true);
   };
@@ -300,6 +289,7 @@ export default function AdminPage() {
         price: Number(formPrice) || 3500,
         cloudflare_live_input_uid: formStreamUid.trim() || 'live_input_byn',
         image_url: formImageUrl.trim() || '/matches/blanco-y-negro-vs-ifc.png',
+        is_live: formIsLive,
       };
 
       let res: Response;
@@ -364,10 +354,11 @@ export default function AdminPage() {
   // -------------------------------------------------------------
   // ACCIONES TABLAS PROMIEDOS
   // -------------------------------------------------------------
-  const fetchStandings = async () => {
+  const fetchStandings = async (torneoTarget?: 'apertura' | 'clausura') => {
     setStandingsLoading(true);
     try {
-      const res = await fetch('/api/admin/standings');
+      const target = torneoTarget || adminTorneo;
+      const res = await fetch(`/api/admin/standings?torneo=${target}`);
       if (res.ok) {
         const data = await res.json();
         if (data.standings) {
@@ -381,13 +372,18 @@ export default function AdminPage() {
     }
   };
 
+  const handleSwitchAdminTorneo = (target: 'apertura' | 'clausura') => {
+    setAdminTorneo(target);
+    fetchStandings(target);
+  };
+
   const handleSaveStandings = async () => {
     setStandingsLoading(true);
     try {
-      const res = await fetch('/api/admin/standings', {
+      const res = await fetch(`/api/admin/standings?torneo=${adminTorneo}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(standings),
+        body: JSON.stringify({ ...standings, torneo: adminTorneo }),
       });
       if (res.ok) {
         setStandingsSavedMsg(true);
@@ -401,10 +397,10 @@ export default function AdminPage() {
   };
 
   const handleResetStandings = async () => {
-    if (!confirm('¿Restablecer las tablas y playoffs a los valores oficiales iniciales?')) return;
+    if (!confirm(`¿Restablecer las tablas del Torneo ${adminTorneo === 'apertura' ? 'Apertura' : 'Clausura'} a los valores iniciales?`)) return;
     setStandingsLoading(true);
     try {
-      const res = await fetch('/api/admin/standings', { method: 'DELETE' });
+      const res = await fetch(`/api/admin/standings?torneo=${adminTorneo}`, { method: 'DELETE' });
       if (res.ok) {
         const data = await res.json();
         if (data.standings) setStandings(data.standings);
@@ -758,24 +754,8 @@ export default function AdminPage() {
               {loginLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <span>Ingresar al Dashboard</span>}
             </button>
 
-            <div className="relative flex items-center justify-center my-3">
-              <div className="border-t border-zinc-800/80 w-full"></div>
-              <span className="bg-[#12131a] px-3 text-[10px] text-zinc-500 font-bold uppercase tracking-wider">o acceso rápido</span>
-              <div className="border-t border-zinc-800/80 w-full"></div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleLogin(undefined, 'lomonegro2026')}
-              disabled={loginLoading}
-              className="w-full py-3 bg-[#181922] hover:bg-zinc-800 border border-zinc-700/70 hover:border-zinc-500 text-zinc-200 rounded-xl font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span>Acceder como Operador (1 Clic)</span>
-            </button>
-
-            <p className="text-[11px] text-zinc-500 text-center pt-1">
-              Clave de acceso: <span className="text-zinc-300 font-mono font-bold">lomonegro2026</span> o <span className="text-zinc-300 font-mono font-bold">admin</span>
+            <p className="text-[11px] text-zinc-500 text-center pt-2">
+              Autenticación protegida con encriptación PBKDF2 SHA-512.
             </p>
           </form>
 
@@ -960,6 +940,20 @@ export default function AdminPage() {
                         <span className="font-bold text-white font-mono">${m.price} ARS</span>
                       </div>
 
+                      <div className="flex items-center gap-1.5 text-[10px]">
+                        {m.is_live ? (
+                          <span className="px-2 py-0.5 rounded font-black uppercase bg-red-950/80 border border-red-700 text-red-400 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                            <span>En Vivo</span>
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5 text-zinc-500" />
+                            <span>En Espera (Placeholder)</span>
+                          </span>
+                        )}
+                      </div>
+
                       <h3 className="text-sm font-black text-white leading-snug">{m.title}</h3>
                       <p className="text-xs text-zinc-400 line-clamp-2">{m.description || 'Sin descripción'}</p>
 
@@ -1016,9 +1010,35 @@ export default function AdminPage() {
                     Editor de Tablas, Zonas, Llaves y Goleadores
                   </h2>
                   <div className="text-[10px] text-zinc-400">
-                    Los cambios guardados se reflejan inmediatamente en la página pública /posiciones.
+                    Edición independiente para Torneo Apertura y Torneo Clausura. Se refleja en /posiciones.
                   </div>
                 </div>
+              </div>
+
+              {/* Selector de Torneo Activo en Administración */}
+              <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => handleSwitchAdminTorneo('apertura')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    adminTorneo === 'apertura'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Torneo Apertura
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchAdminTorneo('clausura')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    adminTorneo === 'clausura'
+                      ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Torneo Clausura
+                </button>
               </div>
 
               <div className="flex items-center gap-2.5">
@@ -1731,15 +1751,53 @@ export default function AdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Stream UID (Cloudflare)</label>
+                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">URL o UID de Transmisión</label>
                     <input
                       type="text"
                       value={formStreamUid}
                       onChange={(e) => setFormStreamUid(e.target.value)}
-                      placeholder="live_input_uid..."
+                      placeholder="live_input_uid o https://..."
                       className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                     />
                   </div>
+                </div>
+
+                {/* Control de Transmisión: Placeholder vs En Vivo */}
+                <div className="bg-[#181922] border border-zinc-800/90 rounded-2xl p-3.5 space-y-2">
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    Estado de la Señal de Transmisión
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormIsLive(false)}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
+                        !formIsLive
+                          ? 'bg-amber-950/60 border-amber-600 text-amber-300 shadow-sm'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <Clock className="w-4 h-4" />
+                      <span>En Espera (Placeholder)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormIsLive(true)}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
+                        formIsLive
+                          ? 'bg-red-950/60 border-red-600 text-red-400 shadow-sm'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <Radio className="w-4 h-4 text-red-500 animate-pulse" />
+                      <span>Transmitiendo En Vivo</span>
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-zinc-500">
+                    {!formIsLive
+                      ? 'Los compradores verán el Placeholder oficial con radar de espera, fecha y escudo ByN.'
+                      : 'La señal en directo está activa y se emitirá en el reproductor a los compradores.'}
+                  </p>
                 </div>
 
                 <div>

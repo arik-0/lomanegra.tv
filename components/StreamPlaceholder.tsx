@@ -1,13 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { RefreshCw, Volume2, ShieldCheck, Tv, Wifi } from 'lucide-react';
+import { RefreshCw, Volume2, ShieldCheck, Tv, Wifi, PlayCircle } from 'lucide-react';
 
 interface StreamPlaceholderProps {
   matchTitle?: string;
   matchDate?: string;
   onRetry?: () => void;
   isRetrying?: boolean;
+  onTogglePreview?: () => void;
 }
 
 export default function StreamPlaceholder({
@@ -15,6 +16,7 @@ export default function StreamPlaceholder({
   matchDate,
   onRetry,
   isRetrying = false,
+  onTogglePreview,
 }: StreamPlaceholderProps) {
   return (
     <div className="w-full aspect-video bg-gradient-to-br from-[#06070a] via-[#0d0e14] to-[#08090f] relative overflow-hidden rounded-2xl border border-zinc-800 shadow-[0_12px_48px_rgba(0,0,0,0.85)] flex flex-col justify-between p-4 sm:p-6 font-mono select-none">
@@ -83,8 +85,8 @@ export default function StreamPlaceholder({
           </p>
         )}
 
-        {onRetry && (
-          <div className="mt-4">
+        <div className="mt-4 flex items-center justify-center gap-2.5 flex-wrap">
+          {onRetry && (
             <button
               onClick={onRetry}
               disabled={isRetrying}
@@ -93,8 +95,19 @@ export default function StreamPlaceholder({
               <RefreshCw className={`w-3.5 h-3.5 ${isRetrying ? 'animate-spin' : ''}`} />
               <span>{isRetrying ? 'Comprobando señal...' : 'Comprobar Emisión en Vivo'}</span>
             </button>
-          </div>
-        )}
+          )}
+
+          {onTogglePreview && (
+            <button
+              onClick={onTogglePreview}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-300 hover:text-white text-xs font-bold transition active:scale-95 cursor-pointer"
+              title="Previsualizar reproductor de video de prueba"
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Modo Prueba</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Barra inferior técnica */}

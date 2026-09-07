@@ -18,7 +18,7 @@ export default function SponsorsTicker() {
     { name: 'BBVA', category: 'Banca Oficial', isPrimary: false, logo: '/sponsors/bbva.svg' },
     { name: 'FLYBONDI', category: 'Conectividad Oficial', isPrimary: false, logo: '/sponsors/flybondi.svg' },
     { name: 'NALDO', category: 'Auspicio Comercial', isPrimary: false },
-    { name: 'MUNICIPALIDAD DE CORONEL SUÁREZ', category: 'Apoyo Institucional', isPrimary: false },
+    { name: 'GOBIERNO REGIONAL', category: 'Apoyo Institucional', isPrimary: false },
     { name: 'COOP. ELÉCTRICA SAN JOSÉ', category: 'Auspicio Regional', isPrimary: false },
   ];
 

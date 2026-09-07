@@ -12,28 +12,37 @@ interface StreamPlayerWrapperProps {
   matchDate?: string;
 }
 
+interface StreamResponse {
+  token: string | null;
+  sessionId: string;
+  isLive?: boolean;
+  status?: 'live' | 'waiting';
+  matchTitle?: string;
+  matchDate?: string;
+}
+
 export default function StreamPlayerWrapper({
   matchId,
   guestEmail,
   matchTitle,
   matchDate,
 }: StreamPlayerWrapperProps) {
-  const [streamData, setStreamData] = useState<{
-    token: string;
-    sessionId: string;
-  } | null>(null);
+  const [streamData, setStreamData] = useState<StreamResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewMode, setPreviewMode] = useState(false);
 
-  const fetchToken = async () => {
+  const fetchToken = async (overridePreview?: boolean) => {
     try {
       setLoading(true);
       setError(null);
 
+      const activePreview = overridePreview !== undefined ? overridePreview : previewMode;
+
       const res = await fetch('/api/stream/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matchId, guestEmail }),
+        body: JSON.stringify({ matchId, guestEmail, previewMode: activePreview }),
       });
 
       const data = await res.json();
@@ -54,38 +63,56 @@ export default function StreamPlayerWrapper({
 
   useEffect(() => {
     fetchToken();
-  }, [matchId, guestEmail]);
+  }, [matchId, guestEmail, previewMode]);
 
   if (loading) {
     return (
-      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center rounded-2xl border border-zinc-800 shadow-2xl">
-        <Loader2 className="w-12 h-12 animate-spin text-red-600 mb-4" />
-        <p className="text-sm font-bold text-white tracking-wide font-mono">
+      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center rounded-2xl border border-zinc-800 shadow-2xl font-mono">
+        <Loader2 className="w-10 h-10 animate-spin text-red-600 mb-3" />
+        <p className="text-sm font-bold text-white tracking-wide">
           Estableciendo conexión encriptada...
         </p>
-        <p className="text-xs text-zinc-500 mt-1 font-mono">
-          Verificando pase y firmando token RSA-256 de Cloudflare Stream
+        <p className="text-xs text-zinc-500 mt-1">
+          Comprobando señal de transmisión oficial de Pasión Lomonegra TV
         </p>
       </div>
     );
   }
 
-  if (error || !streamData) {
+  // Si no hay transmisión activa o está en espera, mostrar el StreamPlaceholder interactivo
+  const shouldShowPlaceholder =
+    error ||
+    !streamData ||
+    streamData.status === 'waiting' ||
+    !streamData.isLive ||
+    !streamData.token;
+
+  if (shouldShowPlaceholder) {
     return (
       <StreamPlaceholder
-        matchTitle={matchTitle}
-        matchDate={matchDate}
-        onRetry={fetchToken}
+        matchTitle={matchTitle || streamData?.matchTitle}
+        matchDate={matchDate || streamData?.matchDate}
+        onRetry={() => fetchToken(false)}
         isRetrying={loading}
+        onTogglePreview={() => {
+          setPreviewMode(true);
+          fetchToken(true);
+        }}
       />
     );
   }
 
-  return streamData ? (
+  return (
     <StreamPlayer 
-      token={streamData.token} 
+      token={streamData.token!} 
       sessionId={streamData.sessionId} 
       guestEmail={guestEmail}
+      matchTitle={matchTitle || streamData.matchTitle}
+      matchDate={matchDate || streamData.matchDate}
+      onBackToPlaceholder={() => {
+        setPreviewMode(false);
+        fetchToken(false);
+      }}
     />
-  ) : null;
+  );
 }

@@ -10,6 +10,7 @@ export interface MatchData {
   cloudflare_live_input_uid: string;
   image_url: string | null;
   is_active: boolean;
+  is_live?: boolean; // false = En Espera (muestra Placeholder), true = Transmitiendo En Vivo
 }
 
 // Partidos base con estado inicial

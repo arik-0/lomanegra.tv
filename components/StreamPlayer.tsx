@@ -2,16 +2,28 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { Stream } from '@cloudflare/stream-react';
-import { Lock, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Lock, RefreshCw, ShieldAlert, ArrowLeft } from 'lucide-react';
+import StreamPlaceholder from '@/components/StreamPlaceholder';
 
 interface StreamPlayerProps {
   token: string;
   sessionId: string;
   guestEmail?: string;
+  matchTitle?: string;
+  matchDate?: string;
+  onBackToPlaceholder?: () => void;
 }
 
-export default function StreamPlayer({ token, sessionId, guestEmail }: StreamPlayerProps) {
+export default function StreamPlayer({
+  token,
+  sessionId,
+  guestEmail,
+  matchTitle,
+  matchDate,
+  onBackToPlaceholder,
+}: StreamPlayerProps) {
   const [concurrencyError, setConcurrencyError] = useState<string | null>(null);
+  const [playbackError, setPlaybackError] = useState(false);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -46,10 +58,10 @@ export default function StreamPlayer({ token, sessionId, guestEmail }: StreamPla
     };
   }, [sessionId]);
 
-  // Pantalla de bloqueo por sesión concurrente (Paleta Negro / Blanco / Rojo)
+  // Pantalla de bloqueo por sesión concurrente
   if (concurrencyError) {
     return (
-      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 text-center rounded-2xl border-2 border-red-600/70 shadow-2xl shadow-red-950/50 animate-fade-in">
+      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center p-6 text-center rounded-2xl border-2 border-red-600/70 shadow-2xl shadow-red-950/50 animate-fade-in font-mono">
         <div className="w-20 h-20 rounded-full bg-red-950/60 border border-red-600/50 flex items-center justify-center mb-5">
           <Lock className="w-10 h-10 text-red-500 animate-pulse" />
         </div>
@@ -72,21 +84,45 @@ export default function StreamPlayer({ token, sessionId, guestEmail }: StreamPla
     );
   }
 
-  const isDemo = token.startsWith('http');
+  // Si ocurre un error cargando el video, mostrar automáticamente el StreamPlaceholder
+  if (playbackError) {
+    return (
+      <StreamPlaceholder
+        matchTitle={matchTitle}
+        matchDate={matchDate}
+        onRetry={() => setPlaybackError(false)}
+      />
+    );
+  }
+
+  const isDirectUrl = token.startsWith('http');
 
   return (
-    <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative group">
-      {isDemo ? (
+    <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative group font-mono">
+      {isDirectUrl ? (
         <>
-          <div className="absolute top-4 left-4 z-20 px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60">
-            <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-            <span>MODO DE PRUEBA (SIN CLOUDFLARE)</span>
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
+            <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60">
+              <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+              <span>MODO DE PRUEBA (SEÑAL DEMO)</span>
+            </div>
+
+            {onBackToPlaceholder && (
+              <button
+                onClick={onBackToPlaceholder}
+                className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                <span>Pantalla de Espera</span>
+              </button>
+            )}
           </div>
           <video
             controls
             autoPlay
             playsInline
             src={token}
+            onError={() => setPlaybackError(true)}
             className="w-full h-full object-contain"
           />
         </>
@@ -95,6 +131,7 @@ export default function StreamPlayer({ token, sessionId, guestEmail }: StreamPla
           controls
           src={token}
           autoplay
+          onError={() => setPlaybackError(true)}
           className="w-full h-full object-contain"
         />
       )}

@@ -49,7 +49,7 @@ export default function PosicionesPage() {
   const [selectedPublicZone, setSelectedPublicZone] = useState<string>('todas');
 
   const [selectedYear, setSelectedYear] = useState<string>('2026');
-  const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('primer');
+  const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('apertura');
   const [selectedCategoria, setSelectedCategoria] = useState<CategoriaType>('mayor');
 
   const fetchPromiedos = async () => {
@@ -77,7 +77,7 @@ export default function PosicionesPage() {
     async function loadStandings() {
       setLoading(true);
       try {
-        const res = await fetch('/api/admin/standings');
+        const res = await fetch(`/api/admin/standings?torneo=${selectedTorneo}`);
         if (res.ok) {
           const data = await res.json();
           if (data.standings) {
@@ -91,7 +91,7 @@ export default function PosicionesPage() {
       }
     }
     loadStandings();
-  }, []);
+  }, [selectedTorneo]);
 
   const categoryLabels: Record<CategoriaType, string> = {
     mayor: 'Fútbol Mayor',
@@ -199,27 +199,27 @@ export default function PosicionesPage() {
                 </select>
               </div>
 
-              {/* Selector Primer Torneo vs Segundo Torneo */}
+              {/* Selector Torneo Apertura vs Torneo Clausura */}
               <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
                 <button
-                  onClick={() => setSelectedTorneo('primer')}
+                  onClick={() => setSelectedTorneo('apertura')}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
-                    selectedTorneo === 'primer'
+                    selectedTorneo === 'apertura' || selectedTorneo === 'primer'
                       ? 'bg-red-600 text-white shadow-md shadow-red-950'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
-                  Primero
+                  Apertura
                 </button>
                 <button
-                  onClick={() => setSelectedTorneo('segundo')}
+                  onClick={() => setSelectedTorneo('clausura')}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
-                    selectedTorneo === 'segundo'
+                    selectedTorneo === 'clausura' || selectedTorneo === 'segundo'
                       ? 'bg-red-600 text-white shadow-md shadow-red-950'
                       : 'text-zinc-400 hover:text-white'
                   }`}
                 >
-                  Segundo
+                  Clausura
                 </button>
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function PosicionesPage() {
                   Tablas de Posiciones {standings.zones.length > 1 ? '(Por Zonas)' : ''}
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  {categoryLabels[selectedCategoria]} &bull; {selectedTorneo === 'primer' ? 'Primer Torneo (Apertura)' : 'Segundo Torneo (Clausura)'} {selectedYear}
+                  {categoryLabels[selectedCategoria]} &bull; {selectedTorneo === 'clausura' || selectedTorneo === 'segundo' ? 'Torneo Clausura' : 'Torneo Apertura'} {selectedYear}
                 </div>
               </div>
             </div>

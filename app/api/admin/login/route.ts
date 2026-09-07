@@ -1,34 +1,26 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-
-const VALID_PASSWORDS = new Set([
-  (process.env.ADMIN_SECRET_KEY || 'lomonegro2026').trim().toLowerCase(),
-  'lomonegro2026',
-  'pasionlomonegra',
-  'admin',
-  'admin123',
-  'lomanegra',
-  'blancoynegro',
-  '123456',
-  'operador',
-]);
+import { verifyPassword, getAdminPasswordHash } from '@/lib/adminAuth';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const rawPassword = (body.password || '').toString().trim().toLowerCase();
+    const rawPassword = (body.password || '').toString().trim();
 
-    // Permitir si coincide con alguna de las contraseñas válidas o si viene con flag de operador
-    const isAuthorized =
-      body.quickAccess === true ||
-      VALID_PASSWORDS.has(rawPassword) ||
-      (process.env.ADMIN_SECRET_KEY && rawPassword === process.env.ADMIN_SECRET_KEY.trim().toLowerCase());
+    if (!rawPassword) {
+      return NextResponse.json(
+        { error: 'Debe ingresar la contraseña de administrador.' },
+        { status: 400 }
+      );
+    }
+
+    const adminHash = getAdminPasswordHash();
+    const isAuthorized = verifyPassword(rawPassword, adminHash);
 
     if (!isAuthorized) {
       return NextResponse.json(
         { 
-          error: 'Clave de operador incorrecta. Usa: lomonegro2026 o admin',
-          hint: 'Puedes usar "lomonegro2026" o pulsar el botón de Acceso Rápido.'
+          error: 'Credenciales inválidas. Acceso restringido al operador autorizado.'
         },
         { status: 401 }
       );

@@ -82,6 +82,7 @@ export async function POST(req: Request) {
       cloudflare_live_input_uid: body.cloudflare_live_input_uid || 'live_input_byn',
       image_url: body.image_url || '/matches/blanco-y-negro-vs-ifc.png',
       is_active: body.is_active !== undefined ? Boolean(body.is_active) : true,
+      is_live: body.is_live !== undefined ? Boolean(body.is_live) : false,
     };
 
     // Guardar inmediatamente en memoria
@@ -130,6 +131,7 @@ export async function PATCH(req: Request) {
     if (updates.cloudflare_live_input_uid) payload.cloudflare_live_input_uid = updates.cloudflare_live_input_uid;
     if (updates.image_url !== undefined) payload.image_url = updates.image_url;
     if (updates.is_active !== undefined) payload.is_active = updates.is_active;
+    if (updates.is_live !== undefined) payload.is_live = updates.is_live;
 
     const isDateConfirmed = updates.is_date_confirmed !== undefined ? Boolean(updates.is_date_confirmed) : undefined;
     if (isDateConfirmed !== undefined || updates.description !== undefined) {

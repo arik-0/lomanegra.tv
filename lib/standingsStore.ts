@@ -1,7 +1,7 @@
 // Almacén central de datos deportivos estilo Promiedos.com.ar
 // Soporta División en 2 o más Zonas, Llaves de Play-offs y Goleadores de Blanco y Negro
 
-export type TorneoType = 'primer' | 'segundo';
+export type TorneoType = 'apertura' | 'clausura' | 'primer' | 'segundo';
 export type CategoriaType = 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta';
 
 export interface TeamStandingsRow {
@@ -419,7 +419,7 @@ export function syncPlayoffQuarterfinals(standings: TournamentStandings): Tourna
 // Datos iniciales auténticos para la Liga Regional y Blanco y Negro
 const rawDefaultStandings: TournamentStandings = {
   year: '2026',
-  torneo: 'primer',
+  torneo: 'apertura',
   categoria: 'mayor',
   zones: [
     {
@@ -1009,41 +1009,121 @@ const rawDefaultStandings: TournamentStandings = {
   ],
 };
 
-// Generar todas las fechas del torneo (fixture completo de 9 fechas) desde el inicio
+// Generar todas las fechas del torneo Apertura (fixture completo de 9 fechas) desde el inicio
 rawDefaultStandings.zones = rawDefaultStandings.zones.map((z) => ({
   ...z,
   fixtures: generateFullRoundRobinFixture(z, z.fixtures),
 }));
 
-export const defaultStandings: TournamentStandings = syncPlayoffQuarterfinals(rawDefaultStandings);
+export const defaultAperturaStandings: TournamentStandings = syncPlayoffQuarterfinals(rawDefaultStandings);
 
-// Almacén en memoria global para el servidor Next.js
+// Estructura oficial limpia para el Torneo Clausura (equipos invertidos en localía para la segunda mitad del año)
+const rawClausuraStandings: TournamentStandings = {
+  ...JSON.parse(JSON.stringify(rawDefaultStandings)),
+  torneo: 'clausura',
+};
+
+rawClausuraStandings.zones = rawClausuraStandings.zones.map((z) => ({
+  ...z,
+  teams: z.teams.map((t, idx) => ({
+    ...t,
+    pj: 0,
+    pg: 0,
+    pe: 0,
+    pp: 0,
+    gf: 0,
+    gc: 0,
+    dif: 0,
+    pts: 0,
+    pos: idx + 1,
+    form: [],
+    qualified: idx < 4,
+  })),
+  fixtures: (z.fixtures || []).map((f) => ({
+    ...f,
+    homeTeamId: f.awayTeamId,
+    homeTeamName: f.awayTeamName,
+    awayTeamId: f.homeTeamId,
+    awayTeamName: f.homeTeamName,
+    homeGoals: null,
+    awayGoals: null,
+  })),
+}));
+
+rawClausuraStandings.playoffs = rawClausuraStandings.playoffs.map((p) => ({
+  ...p,
+  score1: null,
+  score2: null,
+  penalties1: null,
+  penalties2: null,
+  winner: undefined,
+  status: 'programado',
+}));
+
+export const defaultClausuraStandings: TournamentStandings = syncPlayoffQuarterfinals(rawClausuraStandings);
+export const defaultStandings: TournamentStandings = defaultAperturaStandings;
+
+// Almacén en memoria global para el servidor Next.js con soporte Apertura / Clausura
 declare global {
   // eslint-disable-next-line no-var
-  var globalStandingsStore: TournamentStandings | undefined;
+  var globalTournamentsStore: {
+    apertura: TournamentStandings;
+    clausura: TournamentStandings;
+  } | undefined;
 }
 
-if (!globalThis.globalStandingsStore) {
-  globalThis.globalStandingsStore = JSON.parse(JSON.stringify(defaultStandings));
+export function normalizeTorneoKey(torneo?: string): 'apertura' | 'clausura' {
+  if (!torneo) return 'apertura';
+  const clean = torneo.toLowerCase().trim();
+  if (clean === 'clausura' || clean === 'segundo') return 'clausura';
+  return 'apertura';
 }
 
-export function getStandings(): TournamentStandings {
-  return globalThis.globalStandingsStore || defaultStandings;
+function initGlobalStore() {
+  if (!globalThis.globalTournamentsStore) {
+    globalThis.globalTournamentsStore = {
+      apertura: JSON.parse(JSON.stringify(defaultAperturaStandings)),
+      clausura: JSON.parse(JSON.stringify(defaultClausuraStandings)),
+    };
+  }
 }
 
-export function updateStandings(newStandings: Partial<TournamentStandings>): TournamentStandings {
-  const current: TournamentStandings = globalThis.globalStandingsStore || defaultStandings;
+initGlobalStore();
+
+export function getStandings(torneo?: TorneoType | string): TournamentStandings {
+  initGlobalStore();
+  const key = normalizeTorneoKey(torneo);
+  return globalThis.globalTournamentsStore![key] || globalThis.globalTournamentsStore!.apertura;
+}
+
+export function updateStandings(
+  newStandings: Partial<TournamentStandings>,
+  torneoOverride?: TorneoType | string
+): TournamentStandings {
+  initGlobalStore();
+  const key = normalizeTorneoKey(torneoOverride || newStandings.torneo);
+  const current = globalThis.globalTournamentsStore![key];
+
   const merged: TournamentStandings = {
     ...current,
     ...newStandings,
+    torneo: key,
   };
-  // Sincronizar cuartos automáticamente en el servidor
-  globalThis.globalStandingsStore = syncPlayoffQuarterfinals(merged);
-  return globalThis.globalStandingsStore;
+
+  const synced = syncPlayoffQuarterfinals(merged);
+  globalThis.globalTournamentsStore![key] = synced;
+  return synced;
 }
 
-export function resetStandings(): TournamentStandings {
-  globalThis.globalStandingsStore = JSON.parse(JSON.stringify(defaultStandings));
-  return globalThis.globalStandingsStore!;
+export function resetStandings(torneo?: TorneoType | string): TournamentStandings {
+  initGlobalStore();
+  const key = normalizeTorneoKey(torneo);
+  if (key === 'clausura') {
+    globalThis.globalTournamentsStore!.clausura = JSON.parse(JSON.stringify(defaultClausuraStandings));
+    return globalThis.globalTournamentsStore!.clausura;
+  } else {
+    globalThis.globalTournamentsStore!.apertura = JSON.parse(JSON.stringify(defaultAperturaStandings));
+    return globalThis.globalTournamentsStore!.apertura;
+  }
 }
 
