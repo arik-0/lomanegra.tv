@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getStoredMatches } from '@/lib/adminStore';
 import MatchViewClient from './MatchViewClient';
 import { ArrowLeft } from 'lucide-react';
+import { sanitizeRegionalText } from '@/lib/sanitize';
 
 export const revalidate = 0;
 
@@ -186,7 +187,11 @@ export default async function MatchPage({
 
         {/* Vista interactiva del partido (reproductor o compra con/sin cuenta) */}
         <MatchViewClient
-          match={match}
+          match={{
+            ...match,
+            title: sanitizeRegionalText(match.title),
+            description: sanitizeRegionalText(match.description),
+          }}
           serverHasPaid={serverHasPaid}
           currentUserEmail={user?.email || null}
           paymentStatus={searchParams?.payment}

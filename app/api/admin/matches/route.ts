@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getStoredMatches, addStoredMatch, updateStoredMatch, deleteStoredMatch, MatchData } from '@/lib/adminStore';
 import crypto from 'crypto';
+import { sanitizeRegionalText } from '@/lib/sanitize';
 
 // Utilidad para evitar cuelgues o timeouts con la base de datos
 async function withTimeout<T>(promise: PromiseLike<T>, ms = 2500): Promise<T | null> {
@@ -33,18 +34,29 @@ export async function GET() {
           (m.date && new Date(m.date).getFullYear() >= 2099);
         return {
           ...m,
+          title: sanitizeRegionalText(m.title),
           is_date_confirmed: !isTbd,
           date: isTbd ? null : m.date,
-          description: (m.description || '').replace('[A CONFIRMAR]', '').trim(),
+          description: sanitizeRegionalText((m.description || '').replace('[A CONFIRMAR]', '').trim()),
         };
       });
       return NextResponse.json({ matches: normalized, source: 'database' });
     }
 
     // Retornar partidos del almacén en memoria
-    return NextResponse.json({ matches: getStoredMatches(), source: 'memory' });
+    const memMatches = getStoredMatches().map((m) => ({
+      ...m,
+      title: sanitizeRegionalText(m.title),
+      description: sanitizeRegionalText(m.description),
+    }));
+    return NextResponse.json({ matches: memMatches, source: 'memory' });
   } catch (error: any) {
-    return NextResponse.json({ matches: getStoredMatches(), source: 'fallback' });
+    const memMatches = getStoredMatches().map((m) => ({
+      ...m,
+      title: sanitizeRegionalText(m.title),
+      description: sanitizeRegionalText(m.description),
+    }));
+    return NextResponse.json({ matches: memMatches, source: 'fallback' });
   }
 }
 
@@ -67,14 +79,14 @@ export async function POST(req: Request) {
       matchDate = '2099-12-31T23:59:59.000Z';
     }
 
-    const cleanDesc = (body.description || 'Fútbol Mayor • Torneo Oficial')
-      .replace('[A CONFIRMAR]', '')
-      .trim();
+    const cleanTitle = sanitizeRegionalText(body.title || 'Blanco y Negro vs Rival');
+    const rawDesc = sanitizeRegionalText(body.description || 'Fútbol Mayor • Torneo Oficial');
+    const cleanDesc = rawDesc.replace('[A CONFIRMAR]', '').trim();
     const dbDescription = !isDateConfirmed ? `[A CONFIRMAR] ${cleanDesc}` : cleanDesc;
 
     const newMatch: MatchData = {
       id: matchId,
-      title: body.title || 'Blanco y Negro vs Rival',
+      title: cleanTitle,
       description: cleanDesc,
       date: isDateConfirmed ? matchDate : null,
       is_date_confirmed: isDateConfirmed,
@@ -121,6 +133,9 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'ID requerido.' }, { status: 400 });
     }
 
+    if (updates.title) updates.title = sanitizeRegionalText(updates.title);
+    if (updates.description) updates.description = sanitizeRegionalText(updates.description);
+
     // Actualizar en el almacén de memoria primero
     const updated = updateStoredMatch(id, updates);
 
@@ -135,7 +150,7 @@ export async function PATCH(req: Request) {
 
     const isDateConfirmed = updates.is_date_confirmed !== undefined ? Boolean(updates.is_date_confirmed) : undefined;
     if (isDateConfirmed !== undefined || updates.description !== undefined) {
-      const desc = updates.description || updated?.description || '';
+      const desc = sanitizeRegionalText(updates.description || updated?.description || '');
       const cleanDesc = desc.replace('[A CONFIRMAR]', '').trim();
       payload.description = isDateConfirmed === false ? `[A CONFIRMAR] ${cleanDesc}` : cleanDesc;
     }

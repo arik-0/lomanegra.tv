@@ -7,6 +7,8 @@ import CheckoutButton from './CheckoutButton';
 import SimulatePurchaseButton from './SimulatePurchaseButton';
 import CountdownTimer from '@/components/CountdownTimer';
 import SponsorsStrip from '@/components/SponsorsStrip';
+import { getTeamLogo } from '@/lib/standingsStore';
+import { sanitizeRegionalText } from '@/lib/sanitize';
 import {
   Calendar,
   Radio,
@@ -186,9 +188,9 @@ export default function MatchViewClient({
                 </span>
                 <span className="text-xs font-mono text-zinc-400 capitalize">{matchDate}</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{match.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{sanitizeRegionalText(match.title)}</h1>
               <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-2xl leading-relaxed font-mono">
-                {match.description}
+                {sanitizeRegionalText(match.description)}
               </p>
             </div>
 
@@ -278,21 +280,29 @@ export default function MatchViewClient({
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 relative drop-shadow">
                       <Image
-                        src="/teams/ifc.png"
-                        alt="I. F. C."
+                        src={getTeamLogo(
+                          match.title.toLowerCase().includes('vs')
+                            ? match.title.split(/vs/i)[1].trim()
+                            : 'ifc'
+                        )}
+                        alt={match.title.toLowerCase().includes('vs')
+                          ? match.title.split(/vs/i)[1].trim()
+                          : 'Rival'}
                         fill
                         className="object-contain"
                       />
                     </div>
                     <span className="font-bold text-xs sm:text-sm text-white">
-                      I. F. C.
+                      {match.title.toLowerCase().includes('vs')
+                        ? match.title.split(/vs/i)[1].trim()
+                        : 'Rival'}
                     </span>
                   </div>
                 </div>
               )}
 
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-mono">
-                {match.description ||
+                {sanitizeRegionalText(match.description) ||
                   'No te pierdas cada detalle de este gran partido. Transmisión multicámara en alta definición con relatos oficiales.'}
               </p>
 

@@ -7,6 +7,8 @@ import { getStoredMatches } from '@/lib/adminStore';
 import { MatchHeroBadge, MatchHeroCountdown } from '@/components/MatchHeroStatus';
 import SponsorsStrip from '@/components/SponsorsStrip';
 import SponsorsTicker from '@/components/SponsorsTicker';
+import { getTeamLogo } from '@/lib/standingsStore';
+import { sanitizeRegionalText } from '@/lib/sanitize';
 import {
   Calendar,
   PlayCircle,
@@ -67,9 +69,10 @@ export default async function HomePage() {
             (m.date && new Date(m.date).getFullYear() >= 2099);
           return {
             ...m,
+            title: sanitizeRegionalText(m.title),
             is_date_confirmed: !isTbd,
             date: isTbd ? null : m.date,
-            description: (m.description || '').replace('[A CONFIRMAR]', '').trim(),
+            description: sanitizeRegionalText((m.description || '').replace('[A CONFIRMAR]', '').trim()),
           };
         });
       }
@@ -152,7 +155,11 @@ export default async function HomePage() {
   ];
 
   // Combinar partidos de Supabase con los del almacén de administración
-  const adminMatches = getStoredMatches();
+  const adminMatches = getStoredMatches().map((m) => ({
+    ...m,
+    title: sanitizeRegionalText(m.title),
+    description: sanitizeRegionalText(m.description),
+  }));
   const allCandidates = [...(matches || []), ...adminMatches];
   const seenIds = new Set<string>();
   const combinedMatches = allCandidates.filter((m) => {
@@ -320,8 +327,14 @@ export default async function HomePage() {
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 relative drop-shadow-md">
                       <Image
-                        src="/teams/ifc.png"
-                        alt="Rival"
+                        src={getTeamLogo(
+                          featuredMatch.title.toLowerCase().includes('vs')
+                            ? featuredMatch.title.split(/vs/i)[1].trim()
+                            : 'ifc'
+                        )}
+                        alt={featuredMatch.title.toLowerCase().includes('vs')
+                          ? featuredMatch.title.split(/vs/i)[1].trim()
+                          : 'Rival'}
                         fill
                         className="object-contain"
                       />
