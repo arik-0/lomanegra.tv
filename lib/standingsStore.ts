@@ -1,8 +1,9 @@
-// Almacén central de datos deportivos estilo Promiedos.com.ar
-// Soporta División en 2 o más Zonas, Llaves de Play-offs y Goleadores de Blanco y Negro
+// Almacén central de datos deportivos de la Liga Deportiva del Sur
+// Soporta División en Zonas, Llaves de Play-offs (16avos, 8vos, Cuartos, Semis, Final) y Goleadores
 
 export type TorneoType = 'apertura' | 'clausura' | 'primer' | 'segundo';
 export type CategoriaType = 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta';
+export type PlayoffRound = '16avos' | '8vos' | 'cuartos' | 'semifinal' | 'final';
 
 export interface TeamStandingsRow {
   id: string;
@@ -19,12 +20,14 @@ export interface TeamStandingsRow {
   dif: number;
   pts: number;
   form: ('W' | 'D' | 'L')[];
-  qualified?: boolean; // Clasificado a Play-Offs (barra verde Promiedos)
+  qualified?: boolean;
 }
 
 // Mapeo exhaustivo de escudos y equipos reales presentes en la carpeta public/teams/
 export const TEAM_LOGOS: Record<string, string> = {
   'blanco y negro': '/teams/Blanco y Negro.png',
+  'byd': '/teams/Blanco y Negro.png',
+  'byn': '/teams/Blanco y Negro.png',
   'san martín': '/teams/San Martin.png',
   'san martin': '/teams/San Martin.png',
   'firmat fbc': '/teams/Firmat FBC.png',
@@ -40,8 +43,15 @@ export const TEAM_LOGOS: Record<string, string> = {
   'eduardo hertz': '/teams/Eduardo Hertz.png',
   'fredriksson': '/teams/Fredriksson.png',
   'hughes': '/teams/Hughes.png',
-  'independiente de bigand': '/teams/Independiente de Bigan.png',
-  'independiente de bigan': '/teams/Independiente de Bigan.png',
+  'independiente de bigand': '/teams/ifc.png',
+  'independiente de bigan': '/teams/ifc.png',
+  'independiente fútbol club': '/teams/ifc.png',
+  'independiente futbol club': '/teams/ifc.png',
+  'independiente': '/teams/ifc.png',
+  'i. f. c.': '/teams/ifc.png',
+  'i.f.c.': '/teams/ifc.png',
+  'ifc': '/teams/ifc.png',
+  'i f c': '/teams/ifc.png',
   'ítalo argentino': '/teams/Italo Argentino.png',
   'italo argentino': '/teams/Italo Argentino.png',
   'los andes': '/teams/Los Andes.png',
@@ -56,6 +66,25 @@ export const TEAM_LOGOS: Record<string, string> = {
 export function getTeamLogo(teamName: string): string {
   if (!teamName) return '/teams/Blanco y Negro.png';
   const clean = teamName.toLowerCase().trim();
+  const normalized = clean.replace(/\./g, '').replace(/\s+/g, ' ').trim();
+
+  // Mapeo directo para I. F. C. (Independiente)
+  if (
+    normalized === 'ifc' ||
+    normalized === 'i f c' ||
+    clean.includes('ifc') ||
+    clean.includes('i. f. c') ||
+    clean.includes('i.f.c') ||
+    clean.includes('independiente')
+  ) {
+    return '/teams/ifc.png';
+  }
+
+  // Mapeo directo para Blanco y Negro / ByD
+  if (clean.includes('blanco y negro') || clean === 'byd' || clean === 'byn') {
+    return '/teams/Blanco y Negro.png';
+  }
+
   for (const [key, path] of Object.entries(TEAM_LOGOS)) {
     if (clean === key || clean.includes(key) || key.includes(clean)) {
       return path;
@@ -84,8 +113,10 @@ export interface ZoneData {
 
 export interface PlayoffMatch {
   id: string;
-  round: 'cuartos' | 'semifinal' | 'final';
-  title: string; // ej: "Cuartos 1", "Semifinal A", "Gran Final"
+  round: PlayoffRound;
+  title: string; // ej: "16avos 1", "8vos 1", "Cuartos 1", "Semifinal A", "Gran Final"
+  seed1?: string; // Expresión de casillero ej: "1ero A", "1A", "1° Zona A"
+  seed2?: string; // Expresión de casillero ej: "2do B", "4to B", "8vo B"
   team1: string;
   team2: string;
   score1: number | null;
@@ -334,87 +365,145 @@ export function generateFullRoundRobinFixture(
   return allMatches;
 }
 
-// Sincroniza y predefine los cruces de llave de PLAY-OFFS exclusivamente para los CUARTOS DE FINAL a partir de la tabla.
-// Regla oficial de cruces cruzados:
-// Cuartos 1: 1° Zona A vs 4° Zona B
-// Cuartos 2: 2° Zona A vs 3° Zona B
-// Cuartos 3: 1° Zona B vs 4° Zona A
-// Cuartos 4: 2° Zona B vs 3° Zona A
-// IMPORTANTE: SEMIFINALES Y FINAL QUEDAN INTACTAS (no se sobreescriben).
-export function syncPlayoffQuarterfinals(standings: TournamentStandings): TournamentStandings {
+// Resuelve dinámicamente el equipo que ocupa la posición especificada en una zona
+// Admite expresiones de casillero flexibles: "1ero A", "1A", "1° A", "2do B", "4to B", "8vo A", "16vo B", etc.
+export function resolvePlayoffSeed(expression?: string, zones?: ZoneData[]): string | null {
+  if (!expression || typeof expression !== 'string' || !zones || zones.length === 0) return null;
+  const clean = expression.trim().toLowerCase();
+  if (!clean) return null;
+
+  // Extraer número de posición
+  let pos: number | null = null;
+  const numMatch = clean.match(/(\d+)/);
+  if (numMatch) {
+    pos = parseInt(numMatch[1], 10);
+  } else if (clean.includes('primer') || clean.includes('1ero') || clean.includes('1ro')) {
+    pos = 1;
+  } else if (clean.includes('segund') || clean.includes('2do')) {
+    pos = 2;
+  } else if (clean.includes('tercer') || clean.includes('3ro') || clean.includes('3er')) {
+    pos = 3;
+  } else if (clean.includes('cuart') || clean.includes('4to')) {
+    pos = 4;
+  } else if (clean.includes('quint') || clean.includes('5to')) {
+    pos = 5;
+  } else if (clean.includes('sext') || clean.includes('6to')) {
+    pos = 6;
+  } else if (clean.includes('septim') || clean.includes('7mo')) {
+    pos = 7;
+  } else if (clean.includes('octav') || clean.includes('8vo')) {
+    pos = 8;
+  } else if (clean.includes('dieciseis') || clean.includes('16vo')) {
+    pos = 16;
+  }
+
+  if (!pos || pos < 1) return null;
+
+  // Extraer identificador de zona (ej: "A", "B", "C", etc.)
+  let zoneIdent: string | null = null;
+  const zoneNamedMatch = clean.match(/zona\s*([a-z0-9]+)/i);
+  if (zoneNamedMatch) {
+    zoneIdent = zoneNamedMatch[1].toLowerCase();
+  } else {
+    const letterMatch = clean.match(/[0-9a-z°º\s]+([a-z])$/i) || clean.match(/([a-z])$/i);
+    if (letterMatch) {
+      zoneIdent = letterMatch[1].toLowerCase();
+    }
+  }
+
+  if (!zoneIdent) return null;
+
+  const targetZone = zones.find((z) => {
+    const zName = z.name.toLowerCase();
+    const zId = z.id.toLowerCase();
+    return (
+      zId === `zona-${zoneIdent}` ||
+      zId === zoneIdent ||
+      zName.includes(`zona ${zoneIdent}`) ||
+      zName.endsWith(` ${zoneIdent}`) ||
+      zName === zoneIdent
+    );
+  });
+
+  if (!targetZone || !targetZone.teams || targetZone.teams.length === 0) return null;
+
+  const sorted = [...targetZone.teams].sort((a, b) => {
+    if (a.pos && b.pos) return a.pos - b.pos;
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    if (b.dif !== a.dif) return b.dif - a.dif;
+    return b.gf - a.gf;
+  });
+
+  const team = sorted[pos - 1];
+  return team ? team.name : null;
+}
+
+// Sincroniza dinámicamente los cruces de PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final)
+// a partir de los casilleros de semillas (seed1 / seed2) y las tablas de posiciones de las zonas.
+export function syncPlayoffMatches(standings: TournamentStandings): TournamentStandings {
   if (!standings || !standings.zones || standings.zones.length === 0) return standings;
 
-  const zoneA =
-    standings.zones.find((z) => z.id === 'zona-a' || z.name.toLowerCase().includes('zona a')) ||
-    standings.zones[0];
-  const zoneB =
-    standings.zones.find((z) => z.id === 'zona-b' || z.name.toLowerCase().includes('zona b')) ||
-    standings.zones[1];
-
-  if (!zoneA || !zoneB) return standings;
-
-  const sortedA = [...zoneA.teams].sort((a, b) => a.pos - b.pos);
-  const sortedB = [...zoneB.teams].sort((a, b) => a.pos - b.pos);
-
-  const teamA1 = sortedA[0]?.name || '1° Zona A';
-  const teamA2 = sortedA[1]?.name || '2° Zona A';
-  const teamA3 = sortedA[2]?.name || '3° Zona A';
-  const teamA4 = sortedA[3]?.name || '4° Zona A';
-
-  const teamB1 = sortedB[0]?.name || '1° Zona B';
-  const teamB2 = sortedB[1]?.name || '2° Zona B';
-  const teamB3 = sortedB[2]?.name || '3° Zona B';
-  const teamB4 = sortedB[3]?.name || '4° Zona B';
-
-  const quarterPairings = [
-    { id: 'c1', title: 'Cuartos 1 (1°A vs 4°B)', team1: teamA1, team2: teamB4 },
-    { id: 'c2', title: 'Cuartos 2 (2°A vs 3°B)', team1: teamA2, team2: teamB3 },
-    { id: 'c3', title: 'Cuartos 3 (1°B vs 4°A)', team1: teamB1, team2: teamA4 },
-    { id: 'c4', title: 'Cuartos 4 (2°B vs 3°A)', team1: teamB2, team2: teamA3 },
-  ];
-
   const currentPlayoffs = standings.playoffs || [];
-  const hasQuarterfinals = currentPlayoffs.some((m) => m.round === 'cuartos');
-  let updatedPlayoffs: PlayoffMatch[];
 
-  if (hasQuarterfinals) {
-    updatedPlayoffs = currentPlayoffs.map((m) => {
-      if (m.round !== 'cuartos') return m; // Semis y final quedan intactas
-      const pairing = quarterPairings.find((p) => p.id === m.id);
-      if (!pairing) return m;
+  // Si no hay cuartos definidos por defecto, proveer los cruces reglamentarios estándar
+  const defaultCuartosSeeds: Record<string, { seed1: string; seed2: string; title: string }> = {
+    c1: { seed1: '1ero A', seed2: '4to B', title: 'Cuartos 1 (1°A vs 4°B)' },
+    c2: { seed1: '2do A', seed2: '3ro B', title: 'Cuartos 2 (2°A vs 3°B)' },
+    c3: { seed1: '1ero B', seed2: '4to A', title: 'Cuartos 3 (1°B vs 4°A)' },
+    c4: { seed1: '2do B', seed2: '3ro A', title: 'Cuartos 4 (2°B vs 3°A)' },
+  };
 
-      const teamsChanged = m.team1 !== pairing.team1 || m.team2 !== pairing.team2;
-      return {
-        ...m,
-        title: pairing.title,
-        team1: pairing.team1,
-        team2: pairing.team2,
-        score1: teamsChanged ? null : m.score1,
-        score2: teamsChanged ? null : m.score2,
-        winner: teamsChanged ? undefined : m.winner,
-        status: teamsChanged ? ('programado' as const) : m.status,
-      };
-    });
-  } else {
-    const newCuartos: PlayoffMatch[] = quarterPairings.map((p) => ({
-      id: p.id,
-      round: 'cuartos' as const,
-      title: p.title,
-      team1: p.team1,
-      team2: p.team2,
-      score1: null,
-      score2: null,
-      status: 'programado' as const,
-      dateInfo: 'A confirmar',
-    }));
-    updatedPlayoffs = [...newCuartos, ...currentPlayoffs];
-  }
+  const updatedPlayoffs = currentPlayoffs.map((m) => {
+    // Si no tiene semillas asignadas y es un cuarto estándar, asignarlas
+    let seed1 = m.seed1;
+    let seed2 = m.seed2;
+    let title = m.title;
+
+    if (!seed1 && !seed2 && defaultCuartosSeeds[m.id]) {
+      seed1 = defaultCuartosSeeds[m.id].seed1;
+      seed2 = defaultCuartosSeeds[m.id].seed2;
+      title = defaultCuartosSeeds[m.id].title;
+    }
+
+    let team1 = m.team1;
+    let team2 = m.team2;
+
+    if (seed1) {
+      const resolved = resolvePlayoffSeed(seed1, standings.zones);
+      if (resolved) team1 = resolved;
+    }
+
+    if (seed2) {
+      const resolved = resolvePlayoffSeed(seed2, standings.zones);
+      if (resolved) team2 = resolved;
+    }
+
+    const teamsChanged = team1 !== m.team1 || team2 !== m.team2;
+
+    return {
+      ...m,
+      title,
+      seed1,
+      seed2,
+      team1,
+      team2,
+      score1: teamsChanged ? null : m.score1,
+      score2: teamsChanged ? null : m.score2,
+      penalties1: teamsChanged ? null : m.penalties1,
+      penalties2: teamsChanged ? null : m.penalties2,
+      winner: teamsChanged ? undefined : m.winner,
+      status: teamsChanged ? ('programado' as const) : m.status,
+    };
+  });
 
   return {
     ...standings,
     playoffs: updatedPlayoffs,
   };
 }
+
+// Alias para compatibilidad hacia atrás
+export const syncPlayoffQuarterfinals = syncPlayoffMatches;
 
 // Datos iniciales auténticos para la Liga Regional y Blanco y Negro
 const rawDefaultStandings: TournamentStandings = {
@@ -427,164 +516,163 @@ const rawDefaultStandings: TournamentStandings = {
       name: 'Zona A',
       teams: [
         {
-          id: 'byn',
-          pos: 1,
-          name: 'Blanco y Negro',
-          logoUrl: '/teams/Blanco y Negro.png',
-          isBlancoYNegro: true,
-          pj: 10,
-          pg: 8,
-          pe: 1,
-          pp: 1,
-          gf: 23,
-          gc: 7,
-          dif: 16,
-          pts: 25,
-          form: ['W', 'W', 'W', 'D', 'W'],
-          qualified: true,
-        },
-        {
           id: 'san-martin',
-          pos: 2,
+          pos: 1,
           name: 'San Martín',
           logoUrl: '/teams/San Martin.png',
-          pj: 10,
-          pg: 7,
-          pe: 2,
-          pp: 1,
-          gf: 20,
-          gc: 9,
-          dif: 11,
-          pts: 23,
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
           form: ['W', 'D', 'W', 'W', 'W'],
           qualified: true,
         },
         {
-          id: 'firmat-fbc',
-          pos: 3,
-          name: 'Firmat FBC',
-          logoUrl: '/teams/Firmat FBC.png',
-          pj: 10,
-          pg: 6,
-          pe: 2,
-          pp: 2,
-          gf: 17,
-          gc: 10,
-          dif: 7,
-          pts: 20,
-          form: ['D', 'W', 'W', 'L', 'W'],
+          id: 'eduardo-hertz',
+          pos: 2,
+          name: 'Eduardo Hertz',
+          logoUrl: '/teams/Eduardo Hertz.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['L', 'L', 'D', 'L', 'L'],
           qualified: true,
         },
         {
           id: 'argentino-firmat',
-          pos: 4,
+          pos: 3,
           name: 'Argentino de Firmat',
           logoUrl: '/teams/Argentino de Firmat.png',
-          pj: 10,
-          pg: 5,
-          pe: 2,
-          pp: 3,
-          gf: 15,
-          gc: 11,
-          dif: 4,
-          pts: 17,
-          form: ['W', 'D', 'D', 'W', 'L'],
+          pj: 1,
+          pg: 0,
+          pe: 0,
+          pp: 1,
+          gf: 0,
+          gc: 2,
+          dif: -2,
+          pts: 0,
+          form: ['L'],
           qualified: true,
         },
         {
-          id: 'atletico-acebal',
+          id: 'los-andes',
+          pos: 4,
+          name: 'Los Andes',
+          logoUrl: '/teams/Los Andes.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
+          qualified: true,
+        },
+        {
+          id: 'sportivo-bombal',
           pos: 5,
-          name: 'Atlético Acebal',
-          logoUrl: '/teams/Atletico Acebal.png',
-          pj: 10,
-          pg: 4,
-          pe: 3,
-          pp: 3,
-          gf: 13,
-          gc: 12,
-          dif: 1,
-          pts: 15,
-          form: ['L', 'D', 'W', 'W', 'D'],
+          name: 'Sportivo Bombal',
+          logoUrl: '/teams/Sportivo Bombal.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'atletico-paz',
+          id: 'italo-argentino',
           pos: 6,
-          name: 'Atlético Paz',
-          logoUrl: '/teams/Atletico Paz.png',
-          pj: 10,
-          pg: 3,
-          pe: 3,
-          pp: 4,
-          gf: 12,
-          gc: 14,
-          dif: -2,
-          pts: 12,
-          form: ['L', 'W', 'L', 'D', 'D'],
+          name: 'Ítalo Argentino',
+          logoUrl: '/teams/Italo Argentino.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'bernardino-rivadavia',
+          id: 'sporting-bigand',
           pos: 7,
-          name: 'Bernardino Rivadavia',
-          logoUrl: '/teams/Bernardino Rivadavia.png',
-          pj: 10,
-          pg: 3,
-          pe: 2,
-          pp: 5,
-          gf: 11,
-          gc: 15,
-          dif: -4,
-          pts: 11,
-          form: ['W', 'L', 'L', 'D', 'L'],
+          name: 'Sporting de Bigand',
+          logoUrl: '/teams/Sporting de Bigan.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'bombal-juniors',
+          id: 'miguel-torres',
           pos: 8,
-          name: 'Bombal Juniors',
-          logoUrl: '/teams/Bombal Juniors.png',
-          pj: 10,
-          pg: 2,
-          pe: 3,
-          pp: 5,
-          gf: 9,
-          gc: 16,
-          dif: -7,
-          pts: 9,
-          form: ['L', 'D', 'L', 'L', 'W'],
+          name: 'Miguel Torres',
+          logoUrl: '/teams/Miguel Torres.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'carreras',
+          id: 'olimpia-st',
           pos: 9,
-          name: 'Carreras',
-          logoUrl: '/teams/Carreras.png',
-          pj: 10,
-          pg: 2,
-          pe: 1,
-          pp: 7,
-          gf: 8,
-          gc: 19,
-          dif: -11,
-          pts: 7,
-          form: ['L', 'L', 'W', 'L', 'L'],
+          name: 'Olimpia de Santa Teresa',
+          logoUrl: '/teams/Olimpia de Santa Teresa.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'eduardo-hertz',
+          id: 'fredriksson',
           pos: 10,
-          name: 'Eduardo Hertz',
-          logoUrl: '/teams/Eduardo Hertz.png',
-          pj: 10,
-          pg: 1,
-          pe: 2,
-          pp: 7,
-          gf: 6,
-          gc: 21,
-          dif: -15,
-          pts: 5,
-          form: ['L', 'L', 'D', 'L', 'L'],
+          name: 'Fredriksson',
+          logoUrl: '/teams/Fredriksson.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
       ],
@@ -592,42 +680,12 @@ const rawDefaultStandings: TournamentStandings = {
         {
           id: 'fix-a-1',
           roundName: 'Fecha 1',
-          homeTeamId: 'byn',
-          homeTeamName: 'Blanco y Negro',
-          awayTeamId: 'san-martin',
-          awayTeamName: 'San Martín',
-          homeGoals: 3,
-          awayGoals: 1,
-        },
-        {
-          id: 'fix-a-2',
-          roundName: 'Fecha 1',
-          homeTeamId: 'firmat-fbc',
-          homeTeamName: 'Firmat FBC',
+          homeTeamId: 'san-martin',
+          homeTeamName: 'San Martín',
           awayTeamId: 'argentino-firmat',
           awayTeamName: 'Argentino de Firmat',
           homeGoals: 2,
           awayGoals: 0,
-        },
-        {
-          id: 'fix-a-3',
-          roundName: 'Fecha 1',
-          homeTeamId: 'atletico-acebal',
-          homeTeamName: 'Atlético Acebal',
-          awayTeamId: 'atletico-paz',
-          awayTeamName: 'Atlético Paz',
-          homeGoals: 1,
-          awayGoals: 1,
-        },
-        {
-          id: 'fix-a-4',
-          roundName: 'Fecha 2',
-          homeTeamId: 'bernardino-rivadavia',
-          homeTeamName: 'Bernardino Rivadavia',
-          awayTeamId: 'byn',
-          awayTeamName: 'Blanco y Negro',
-          homeGoals: 0,
-          awayGoals: 2,
         },
       ],
     },
@@ -640,159 +698,160 @@ const rawDefaultStandings: TournamentStandings = {
           pos: 1,
           name: 'Hughes',
           logoUrl: '/teams/Hughes.png',
-          pj: 10,
-          pg: 7,
-          pe: 2,
-          pp: 1,
-          gf: 21,
-          gc: 8,
-          dif: 13,
-          pts: 23,
-          form: ['W', 'W', 'D', 'W', 'W'],
+          pj: 1,
+          pg: 1,
+          pe: 0,
+          pp: 0,
+          gf: 2,
+          gc: 1,
+          dif: 1,
+          pts: 3,
+          form: ['W'],
+          qualified: true,
+        },
+        {
+          id: 'nuevo-alberdi',
+          pos: 2,
+          name: 'Nuevo Alberdi',
+          logoUrl: '/teams/Nuevo Alberdi.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D', 'W', 'L', 'L', 'D'],
           qualified: true,
         },
         {
           id: 'independiente-bigand',
-          pos: 2,
+          pos: 3,
           name: 'Independiente de Bigand',
           logoUrl: '/teams/Independiente de Bigan.png',
-          pj: 10,
-          pg: 6,
-          pe: 2,
-          pp: 2,
-          gf: 18,
-          gc: 10,
-          dif: 8,
-          pts: 20,
-          form: ['W', 'L', 'W', 'W', 'D'],
-          qualified: true,
-        },
-        {
-          id: 'italo-argentino',
-          pos: 3,
-          name: 'Ítalo Argentino',
-          logoUrl: '/teams/Italo Argentino.png',
-          pj: 10,
-          pg: 5,
-          pe: 3,
-          pp: 2,
-          gf: 15,
-          gc: 11,
-          dif: 4,
-          pts: 18,
-          form: ['D', 'W', 'W', 'D', 'L'],
-          qualified: true,
-        },
-        {
-          id: 'los-andes',
-          pos: 4,
-          name: 'Los Andes',
-          logoUrl: '/teams/Los Andes.png',
-          pj: 10,
-          pg: 4,
-          pe: 3,
-          pp: 3,
-          gf: 14,
-          gc: 12,
-          dif: 2,
-          pts: 15,
-          form: ['L', 'W', 'D', 'W', 'W'],
-          qualified: true,
-        },
-        {
-          id: 'miguel-torres',
-          pos: 5,
-          name: 'Miguel Torres',
-          logoUrl: '/teams/Miguel Torres.png',
-          pj: 10,
-          pg: 4,
-          pe: 2,
-          pp: 4,
-          gf: 13,
-          gc: 14,
+          pj: 1,
+          pg: 0,
+          pe: 0,
+          pp: 1,
+          gf: 1,
+          gc: 2,
           dif: -1,
-          pts: 14,
-          form: ['W', 'L', 'W', 'D', 'L'],
+          pts: 0,
+          form: ['L'],
+          qualified: true,
+        },
+        {
+          id: 'byn',
+          pos: 4,
+          name: 'Blanco y Negro',
+          logoUrl: '/teams/Blanco y Negro.png',
+          isBlancoYNegro: true,
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
+          qualified: true,
+        },
+        {
+          id: 'carreras',
+          pos: 5,
+          name: 'Carreras',
+          logoUrl: '/teams/Carreras.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'nuevo-alberdi',
+          id: 'firmat-fbc',
           pos: 6,
-          name: 'Nuevo Alberdi',
-          logoUrl: '/teams/Nuevo Alberdi.png',
-          pj: 10,
-          pg: 3,
-          pe: 3,
-          pp: 4,
-          gf: 12,
-          gc: 15,
-          dif: -3,
-          pts: 12,
-          form: ['D', 'W', 'L', 'L', 'D'],
+          name: 'Firmat FBC',
+          logoUrl: '/teams/Firmat FBC.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'olimpia-st',
+          id: 'atletico-acebal',
           pos: 7,
-          name: 'Olimpia de Santa Teresa',
-          logoUrl: '/teams/Olimpia de Santa Teresa.png',
-          pj: 10,
-          pg: 3,
-          pe: 2,
-          pp: 5,
-          gf: 11,
-          gc: 16,
-          dif: -5,
-          pts: 11,
-          form: ['W', 'L', 'L', 'D', 'W'],
+          name: 'Atlético Acebal',
+          logoUrl: '/teams/Atletico Acebal.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'sporting-bigand',
+          id: 'atletico-paz',
           pos: 8,
-          name: 'Sporting de Bigand',
-          logoUrl: '/teams/Sporting de Bigan.png',
-          pj: 10,
-          pg: 2,
-          pe: 3,
-          pp: 5,
-          gf: 10,
-          gc: 16,
-          dif: -6,
-          pts: 9,
-          form: ['L', 'D', 'W', 'L', 'L'],
+          name: 'Atlético Paz',
+          logoUrl: '/teams/Atletico Paz.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'sportivo-bombal',
+          id: 'bombal-juniors',
           pos: 9,
-          name: 'Sportivo Bombal',
-          logoUrl: '/teams/Sportivo Bombal.png',
-          pj: 10,
-          pg: 2,
-          pe: 2,
-          pp: 6,
-          gf: 9,
-          gc: 18,
-          dif: -9,
-          pts: 8,
-          form: ['L', 'L', 'D', 'W', 'L'],
+          name: 'Bombal Juniors',
+          logoUrl: '/teams/Bombal Juniors.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
         {
-          id: 'fredriksson',
+          id: 'bernardino-rivadavia',
           pos: 10,
-          name: 'Fredriksson',
-          logoUrl: '/teams/Fredriksson.png',
-          pj: 10,
-          pg: 1,
-          pe: 2,
-          pp: 7,
-          gf: 7,
-          gc: 21,
-          dif: -14,
-          pts: 5,
-          form: ['L', 'L', 'D', 'L', 'L'],
+          name: 'Bernardino Rivadavia',
+          logoUrl: '/teams/Bernardino Rivadavia.png',
+          pj: 0,
+          pg: 0,
+          pe: 0,
+          pp: 0,
+          gf: 0,
+          gc: 0,
+          dif: 0,
+          pts: 0,
+          form: ['D'],
           qualified: false,
         },
       ],
@@ -806,26 +865,6 @@ const rawDefaultStandings: TournamentStandings = {
           awayTeamName: 'Independiente de Bigand',
           homeGoals: 2,
           awayGoals: 1,
-        },
-        {
-          id: 'fix-b-2',
-          roundName: 'Fecha 1',
-          homeTeamId: 'italo-argentino',
-          homeTeamName: 'Ítalo Argentino',
-          awayTeamId: 'los-andes',
-          awayTeamName: 'Los Andes',
-          homeGoals: 1,
-          awayGoals: 1,
-        },
-        {
-          id: 'fix-b-3',
-          roundName: 'Fecha 1',
-          homeTeamId: 'miguel-torres',
-          homeTeamName: 'Miguel Torres',
-          awayTeamId: 'nuevo-alberdi',
-          awayTeamName: 'Nuevo Alberdi',
-          homeGoals: 2,
-          awayGoals: 0,
         },
       ],
     },
@@ -1079,51 +1118,5 @@ export function normalizeTorneoKey(torneo?: string): 'apertura' | 'clausura' {
   return 'apertura';
 }
 
-function initGlobalStore() {
-  if (!globalThis.globalTournamentsStore) {
-    globalThis.globalTournamentsStore = {
-      apertura: JSON.parse(JSON.stringify(defaultAperturaStandings)),
-      clausura: JSON.parse(JSON.stringify(defaultClausuraStandings)),
-    };
-  }
-}
 
-initGlobalStore();
-
-export function getStandings(torneo?: TorneoType | string): TournamentStandings {
-  initGlobalStore();
-  const key = normalizeTorneoKey(torneo);
-  return globalThis.globalTournamentsStore![key] || globalThis.globalTournamentsStore!.apertura;
-}
-
-export function updateStandings(
-  newStandings: Partial<TournamentStandings>,
-  torneoOverride?: TorneoType | string
-): TournamentStandings {
-  initGlobalStore();
-  const key = normalizeTorneoKey(torneoOverride || newStandings.torneo);
-  const current = globalThis.globalTournamentsStore![key];
-
-  const merged: TournamentStandings = {
-    ...current,
-    ...newStandings,
-    torneo: key,
-  };
-
-  const synced = syncPlayoffQuarterfinals(merged);
-  globalThis.globalTournamentsStore![key] = synced;
-  return synced;
-}
-
-export function resetStandings(torneo?: TorneoType | string): TournamentStandings {
-  initGlobalStore();
-  const key = normalizeTorneoKey(torneo);
-  if (key === 'clausura') {
-    globalThis.globalTournamentsStore!.clausura = JSON.parse(JSON.stringify(defaultClausuraStandings));
-    return globalThis.globalTournamentsStore!.clausura;
-  } else {
-    globalThis.globalTournamentsStore!.apertura = JSON.parse(JSON.stringify(defaultAperturaStandings));
-    return globalThis.globalTournamentsStore!.apertura;
-  }
-}
 

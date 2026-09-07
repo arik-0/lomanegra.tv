@@ -61,7 +61,47 @@ export default async function MatchPage({
           const { data } = isUUID
             ? await supabaseAdmin.from('matches').select('*').eq('id', params.id).maybeSingle()
             : await supabaseAdmin.from('matches').select('*').ilike('title', '%blanco y negro%').maybeSingle();
-          return { data };
+
+          if (!data || data.title?.startsWith('__SYSTEM_')) {
+            return { data: null };
+          }
+
+          const rawDesc = data.description || '';
+          const isTbd =
+            rawDesc.includes('[A CONFIRMAR]') ||
+            (data.date && new Date(data.date).getFullYear() >= 2099);
+
+          let league = data.league || 'Liga Deportiva del Sur';
+          let category = data.category || 'Fútbol Mayor';
+          let is_live = data.is_live !== undefined ? Boolean(data.is_live) : false;
+
+          const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
+          if (metaMatch) {
+            try {
+              const parsed = JSON.parse(metaMatch[1]);
+              if (parsed.league) league = parsed.league;
+              if (parsed.category) category = parsed.category;
+              if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
+            } catch {}
+          }
+
+          const cleanDesc = rawDesc
+            .replace(/\[META:\{.*?\}\]/g, '')
+            .replace('[A CONFIRMAR]', '')
+            .trim();
+
+          return {
+            data: {
+              ...data,
+              title: sanitizeRegionalText(data.title),
+              is_date_confirmed: !isTbd,
+              date: isTbd ? null : data.date,
+              description: sanitizeRegionalText(cleanDesc),
+              league: sanitizeRegionalText(league),
+              category: sanitizeRegionalText(category),
+              is_live,
+            },
+          };
         } catch {
           return { data: null };
         }

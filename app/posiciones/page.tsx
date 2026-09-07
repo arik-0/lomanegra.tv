@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -40,6 +40,8 @@ export default function PosicionesPage() {
   const [promiedosData, setPromiedosData] = useState<any>(null);
   const [promiedosLoading, setPromiedosLoading] = useState(false);
   const [promiedosGroup, setPromiedosGroup] = useState<string>('Grupo A');
+  const [afaSubTab, setAfaSubTab] = useState<'zonas' | 'anual' | 'promedios'>('zonas');
+  const [regionalTableTab, setRegionalTableTab] = useState<'zonas' | 'anual' | 'promedios'>('zonas');
 
   // Estado para filtro de Goleadores por categoría
   const [selectedGoleadorCategory, setSelectedGoleadorCategory] = useState<string>('Todas');
@@ -94,14 +96,80 @@ export default function PosicionesPage() {
   }, [selectedTorneo]);
 
   const categoryLabels: Record<CategoriaType, string> = {
-    mayor: 'Fútbol Mayor',
+    mayor: 'Primera División',
     reserva: 'Reserva',
     tercera: 'Tercera División',
     cuarta: 'Cuarta División',
     quinta: 'Quinta División',
   };
 
-  // Cuartos, Semis y Final de los Play-offs
+  // Unificación de todos los equipos de la liga para Tabla Anual y Promedios
+  const allTeamsAnnual = useMemo(() => {
+    const teamsMap = new Map<string, TeamStandingsRow & { zoneName: string }>();
+
+    for (const zone of standings.zones) {
+      for (const team of zone.teams) {
+        const existing = teamsMap.get(team.name);
+        if (existing) {
+          existing.pts += team.pts;
+          existing.pj += team.pj;
+          existing.pg += team.pg;
+          existing.pe += team.pe;
+          existing.pp += team.pp;
+          existing.gf += team.gf;
+          existing.gc += team.gc;
+          existing.dif = existing.gf - existing.gc;
+        } else {
+          teamsMap.set(team.name, {
+            ...team,
+            zoneName: zone.name,
+          });
+        }
+      }
+    }
+
+    const list = Array.from(teamsMap.values());
+    list.sort((a, b) => {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      if (b.dif !== a.dif) return b.dif - a.dif;
+      if (b.gf !== a.gf) return b.gf - a.gf;
+      if (a.pj !== b.pj) return a.pj - b.pj;
+      return a.name.localeCompare(b.name);
+    });
+
+    return list.map((t, idx) => ({
+      ...t,
+      pos: idx + 1,
+      qualified: idx < 8,
+    }));
+  }, [standings.zones]);
+
+  const allTeamsPromedios = useMemo(() => {
+    const list = allTeamsAnnual.map((t) => {
+      const promedio = t.pj > 0 ? t.pts / t.pj : 0;
+      return {
+        ...t,
+        promedio: promedio.toFixed(3),
+        promedioNum: promedio,
+      };
+    });
+
+    list.sort((a, b) => {
+      if (b.promedioNum !== a.promedioNum) return b.promedioNum - a.promedioNum;
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      if (b.dif !== a.dif) return b.dif - a.dif;
+      return a.name.localeCompare(b.name);
+    });
+
+    return list.map((t, idx) => ({
+      ...t,
+      pos: idx + 1,
+    }));
+  }, [allTeamsAnnual]);
+
+  // Llaves de Play-offs: 16avos, 8vos, Cuartos, Semis y Final
+  const dieciseisMatches = standings.playoffs.filter((m) => m.round === '16avos');
+  const octavosMatches = standings.playoffs.filter((m) => m.round === '8vos');
   const cuartosMatches = standings.playoffs.filter((m) => m.round === 'cuartos');
   const semiMatches = standings.playoffs.filter((m) => m.round === 'semifinal');
   const finalMatch = standings.playoffs.find((m) => m.round === 'final');
@@ -121,7 +189,7 @@ export default function PosicionesPage() {
     <main className="min-h-screen bg-[#0d0e12] text-white px-3 py-6 sm:px-6 lg:px-8 font-mono">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* ============================================================================== */}
-        {/* SELECTOR MAESTRO: LIGA DEPORTIVA DEL SUR (BYN) VS BONUS PRIMERA DIVISIÓN AFA  */}
+        {/* SELECTOR MAESTRO: LIGA DEPORTIVA DEL SUR (BYD) VS BONUS PRIMERA DIVISIÓN AFA   */}
         {/* ============================================================================== */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 rounded-2xl bg-[#12131a] border border-zinc-800 shadow-xl">
           <div className="flex flex-wrap items-center gap-2">
@@ -134,7 +202,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Shield className="w-4 h-4" />
-              <span>Liga Deportiva del Sur (Blanco y Negro)</span>
+              <span>Liga Deportiva del Sur (ByD)</span>
             </button>
 
             <button
@@ -146,7 +214,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Trophy className="w-4 h-4" />
-              <span>★ Bonus: Primera División AFA (Estadísticas Oficiales)</span>
+              <span>★ Bonus: Primera División AFA</span>
             </button>
           </div>
 
@@ -172,7 +240,7 @@ export default function PosicionesPage() {
                 <span>Volver a la transmisión en vivo</span>
               </Link>
               <div className="text-[10px] uppercase tracking-[0.25em] text-red-500 font-bold">
-                ESTADÍSTICAS OFICIALES // LIGA DEPORTIVA DEL SUR
+                LIGA DEPORTIVA DEL SUR // BYD
               </div>
               <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                 <span>Tablas & Play-Offs</span>
@@ -246,6 +314,9 @@ export default function PosicionesPage() {
         {/* ============================================================================== */}
         {/* 2. SECCIÓN 1 DEL BOCETO: TABLAS (PUEDEN SER POR ZONAS)                       */}
         {/* ============================================================================== */}
+        {/* ============================================================================== */}
+        {/* 2. SECCIÓN 1 DEL BOCETO: TABLAS (PUEDEN SER POR ZONAS)                       */}
+        {/* ============================================================================== */}
         <section className="space-y-6">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2.5">
@@ -312,13 +383,13 @@ export default function PosicionesPage() {
                           key={team.id || idx}
                           className={`transition-colors ${
                             team.isBlancoYNegro
-                              ? 'bg-red-950/20 font-bold hover:bg-red-950/35 border-l-4 border-l-red-500'
+                              ? 'bg-red-950/25 font-bold hover:bg-red-950/40'
                               : 'hover:bg-zinc-800/30'
                           }`}
                         >
                           {/* Posición con barra de clasificación estilo Promiedos */}
                           <td className="py-2.5 px-2 text-center font-bold relative">
-                            {team.qualified && !team.isBlancoYNegro && (
+                            {team.qualified && (
                               <span className="absolute left-0 top-1 bottom-1 w-1 bg-emerald-500 rounded-r" />
                             )}
                             <span className={team.qualified ? 'text-emerald-400 font-black' : 'text-zinc-500'}>
@@ -653,7 +724,121 @@ export default function PosicionesPage() {
 
           <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-x-auto">
             {/* Diagrama de Llaves Interactivo */}
-            <div className="min-w-[760px] grid grid-cols-3 gap-6 relative">
+            <div className={`min-w-[760px] grid ${
+              dieciseisMatches.length > 0
+                ? 'grid-cols-5'
+                : octavosMatches.length > 0
+                ? 'grid-cols-4'
+                : 'grid-cols-3'
+            } gap-6 relative`}>
+              {/* COLUMNA 16AVOS DE FINAL (SI EXISTEN) */}
+              {dieciseisMatches.length > 0 && (
+                <div className="space-y-4">
+                  <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                    <span>16avos de Final</span>
+                    <span className="text-[9px] text-emerald-400 font-bold">{dieciseisMatches.length} Cruces</span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {dieciseisMatches.map((m) => (
+                      <div
+                        key={m.id}
+                        className="bg-[#161722] border border-zinc-800 rounded-xl p-3 shadow-md hover:border-zinc-700 transition"
+                      >
+                        <div className="flex items-center justify-between text-[9px] font-bold mb-1.5 uppercase">
+                          <span className="text-amber-400">{m.title}</span>
+                          <span className="text-zinc-500">{m.dateInfo || (m.score1 !== null ? 'Finalizado' : 'A disputarse')}</span>
+                        </div>
+
+                        {/* Equipo 1 */}
+                        <div className={`flex items-center justify-between py-1 px-1.5 rounded ${m.winner === 1 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                          <div className="flex items-center gap-1.5 truncate">
+                            {getTeamLogo(m.team1) && (
+                              <div className="w-4 h-4 relative shrink-0">
+                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                              </div>
+                            )}
+                            <span className="text-xs truncate">{m.team1}</span>
+                          </div>
+                          <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                            {m.score1 !== null ? m.score1 : '-'}
+                          </span>
+                        </div>
+
+                        {/* Equipo 2 */}
+                        <div className={`flex items-center justify-between py-1 px-1.5 rounded mt-0.5 ${m.winner === 2 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                          <div className="flex items-center gap-1.5 truncate">
+                            {getTeamLogo(m.team2) && (
+                              <div className="w-4 h-4 relative shrink-0">
+                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                              </div>
+                            )}
+                            <span className="text-xs truncate">{m.team2}</span>
+                          </div>
+                          <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                            {m.score2 !== null ? m.score2 : '-'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* COLUMNA OCTAVOS DE FINAL (SI EXISTEN) */}
+              {octavosMatches.length > 0 && (
+                <div className="space-y-4">
+                  <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                    <span>Octavos de Final</span>
+                    <span className="text-[9px] text-emerald-400 font-bold">{octavosMatches.length} Cruces</span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {octavosMatches.map((m) => (
+                      <div
+                        key={m.id}
+                        className="bg-[#161722] border border-zinc-800 rounded-xl p-3 shadow-md hover:border-zinc-700 transition"
+                      >
+                        <div className="flex items-center justify-between text-[9px] font-bold mb-1.5 uppercase">
+                          <span className="text-amber-400">{m.title}</span>
+                          <span className="text-zinc-500">{m.dateInfo || (m.score1 !== null ? 'Finalizado' : 'A disputarse')}</span>
+                        </div>
+
+                        {/* Equipo 1 */}
+                        <div className={`flex items-center justify-between py-1 px-1.5 rounded ${m.winner === 1 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                          <div className="flex items-center gap-1.5 truncate">
+                            {getTeamLogo(m.team1) && (
+                              <div className="w-4 h-4 relative shrink-0">
+                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                              </div>
+                            )}
+                            <span className="text-xs truncate">{m.team1}</span>
+                          </div>
+                          <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                            {m.score1 !== null ? m.score1 : '-'}
+                          </span>
+                        </div>
+
+                        {/* Equipo 2 */}
+                        <div className={`flex items-center justify-between py-1 px-1.5 rounded mt-0.5 ${m.winner === 2 ? 'bg-zinc-800/70 font-black text-white' : 'text-zinc-400'}`}>
+                          <div className="flex items-center gap-1.5 truncate">
+                            {getTeamLogo(m.team2) && (
+                              <div className="w-4 h-4 relative shrink-0">
+                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                              </div>
+                            )}
+                            <span className="text-xs truncate">{m.team2}</span>
+                          </div>
+                          <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
+                            {m.score2 !== null ? m.score2 : '-'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* COLUMNA 1: CUARTOS DE FINAL */}
               <div className="space-y-4">
                 <div className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
@@ -978,17 +1163,21 @@ export default function PosicionesPage() {
               </button>
 
               <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
-                {['Grupo A', 'Grupo B'].map((grp) => (
+                {[
+                  { id: 'zonas', label: 'Zonas A y B' },
+                  { id: 'anual', label: 'Tabla Anual' },
+                  { id: 'promedios', label: 'Promedios' },
+                ].map((t) => (
                   <button
-                    key={grp}
-                    onClick={() => setPromiedosGroup(grp)}
+                    key={t.id}
+                    onClick={() => setAfaSubTab(t.id as any)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
-                      promiedosGroup === grp
+                      afaSubTab === t.id
                         ? 'bg-emerald-500 text-black font-black shadow-md'
                         : 'text-zinc-400 hover:text-white'
                     }`}
                   >
-                    {grp}
+                    {t.label}
                   </button>
                 ))}
               </div>
@@ -998,34 +1187,155 @@ export default function PosicionesPage() {
           <div className="flex items-center justify-between text-xs text-zinc-400">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />
-              <span className="text-[11px]">Puestos 1° al 8°: Clasifican a Octavos de Final</span>
+              <span className="text-[11px]">
+                {afaSubTab === 'zonas'
+                  ? 'Puestos 1° al 8° de cada zona: Clasifican a Octavos de Final'
+                  : afaSubTab === 'anual'
+                  ? 'Tabla General Acumulada del Año 2026 (Copas Internacionales)'
+                  : 'Tabla de Coeficientes y Permanencia'}
+              </span>
             </div>
 
             <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
-              Fuente: AFA Oficial • Tablas de Primera División
+              Fuente: AFA Oficial • Primera División
             </span>
           </div>
         </div>
 
-        {/* Tablas de Grupo A y Grupo B */}
+        {/* CONTENIDO SEGÚN SUBTAB AFA */}
         {promiedosLoading && !promiedosData ? (
           <div className="p-12 text-center bg-[#12131a] border border-zinc-800 rounded-3xl">
             <RefreshCw className="w-8 h-8 text-emerald-400 animate-spin mx-auto mb-3" />
-            <p className="text-zinc-400 text-xs">Cargando estadísticas oficiales en vivo...</p>
+            <p className="text-zinc-400 text-xs">Cargando estadísticas en vivo...</p>
           </div>
         ) : (
-          (promiedosData?.tables || [])
-            .filter((tbl: any) => !promiedosGroup || tbl.name === promiedosGroup)
-            .map((tbl: any) => (
-              <div key={tbl.name} className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl space-y-4">
+          <>
+            {/* SUBTAB 1: ZONAS A Y B APILADAS UNA ARRIBA DE LA OTRA */}
+            {afaSubTab === 'zonas' && (
+              <div className="space-y-6">
+                {(promiedosData?.tables || []).map((tbl: any) => (
+                  <div key={tbl.name} className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl space-y-4">
+                    <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-emerald-500" />
+                        <h2 className="text-lg font-black text-white uppercase tracking-wider">
+                          {tbl.name} • {promiedosData?.league || 'Primera División'}
+                        </h2>
+                      </div>
+                      <span className="text-[10px] text-zinc-500 font-mono">15 Equipos</span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs font-mono">
+                        <thead>
+                          <tr className="border-b border-zinc-800/90 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
+                            <th className="py-2.5 px-2 w-10 text-center">#</th>
+                            <th className="py-2.5 px-3 min-w-[200px]">Equipo</th>
+                            <th className="py-2.5 px-2 text-center w-12 text-white font-black bg-zinc-800/40">PTS</th>
+                            <th className="py-2.5 px-2 text-center w-10">J</th>
+                            <th className="py-2.5 px-2 text-center w-10">G</th>
+                            <th className="py-2.5 px-2 text-center w-10">E</th>
+                            <th className="py-2.5 px-2 text-center w-10">P</th>
+                            <th className="py-2.5 px-2 text-center w-12">GF</th>
+                            <th className="py-2.5 px-2 text-center w-12">GC</th>
+                            <th className="py-2.5 px-2 text-center w-12 font-bold">+/-</th>
+                            <th className="py-2.5 px-3 text-center min-w-[110px]">Últimas</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800/40">
+                          {(tbl.rows || []).map((row: any) => (
+                            <tr
+                              key={row.teamId || row.teamName}
+                              className={`hover:bg-zinc-800/40 transition-colors ${
+                                row.pos <= 8 ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-transparent'
+                              }`}
+                            >
+                              <td className="py-2.5 px-2 text-center font-bold text-zinc-400">
+                                {row.pos}
+                              </td>
+
+                              <td className="py-2.5 px-3">
+                                <div className="flex items-center gap-2.5">
+                                  {row.logoUrl ? (
+                                    <div className="w-5 h-5 relative shrink-0">
+                                      <Image
+                                        src={row.logoUrl}
+                                        alt={row.teamName}
+                                        fill
+                                        className="object-contain"
+                                        unoptimized
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center text-[9px] font-bold text-zinc-400">
+                                      {row.teamName.slice(0, 2).toUpperCase()}
+                                    </div>
+                                  )}
+                                  <span className="font-bold text-white text-xs sm:text-sm truncate">
+                                    {row.teamName}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td className="py-2.5 px-2 text-center font-mono font-black text-sm text-yellow-400 bg-yellow-950/20">
+                                {row.pts}
+                              </td>
+                              <td className="py-2.5 px-2 text-center text-zinc-300">{row.pj}</td>
+                              <td className="py-2.5 px-2 text-center text-zinc-300">{row.pg}</td>
+                              <td className="py-2.5 px-2 text-center text-zinc-400">{row.pe}</td>
+                              <td className="py-2.5 px-2 text-center text-zinc-500">{row.pp}</td>
+                              <td className="py-2.5 px-2 text-center text-zinc-400">{row.gf}</td>
+                              <td className="py-2.5 px-2 text-center text-zinc-400">{row.gc}</td>
+                              <td
+                                className={`py-2.5 px-2 text-center font-bold ${
+                                  row.dif > 0 ? 'text-emerald-400' : row.dif < 0 ? 'text-red-400' : 'text-zinc-400'
+                                }`}
+                              >
+                                {row.dif > 0 ? `+${row.dif}` : row.dif}
+                              </td>
+
+                              <td className="py-2.5 px-3 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  {(row.trend || []).map((trendVal: number, i: number) => (
+                                    <span
+                                      key={i}
+                                      className={`w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center ${
+                                        trendVal === 1
+                                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/60'
+                                          : trendVal === 2
+                                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/60'
+                                          : 'bg-red-500/20 text-red-400 border border-red-500/60'
+                                      }`}
+                                      title={trendVal === 1 ? 'Victoria' : trendVal === 2 ? 'Empate' : 'Derrota'}
+                                    >
+                                      {trendVal === 1 ? 'G' : trendVal === 2 ? 'E' : 'P'}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* SUBTAB 2: TABLA ANUAL 2026 */}
+            {afaSubTab === 'anual' && (
+              <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl space-y-4">
                 <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-emerald-500" />
                     <h2 className="text-lg font-black text-white uppercase tracking-wider">
-                      {tbl.name} • {promiedosData?.league || 'Primera División'}
+                      Tabla Anual Acumulada 2026
                     </h2>
                   </div>
-                  <span className="text-[10px] text-zinc-500 font-mono">15 Equipos</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    {promiedosData?.anual?.rows?.length || 30} Equipos
+                  </span>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -1042,19 +1352,22 @@ export default function PosicionesPage() {
                         <th className="py-2.5 px-2 text-center w-12">GF</th>
                         <th className="py-2.5 px-2 text-center w-12">GC</th>
                         <th className="py-2.5 px-2 text-center w-12 font-bold">+/-</th>
-                        <th className="py-2.5 px-3 text-center min-w-[110px]">Últimas</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/40">
-                      {(tbl.rows || []).map((row: any) => (
+                      {(promiedosData?.anual?.rows || []).map((row: any, idx: number) => (
                         <tr
                           key={row.teamId || row.teamName}
                           className={`hover:bg-zinc-800/40 transition-colors ${
-                            row.pos <= 8 ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-transparent'
+                            idx < 4
+                              ? 'border-l-4 border-l-emerald-500'
+                              : idx < 10
+                              ? 'border-l-4 border-l-cyan-500'
+                              : 'border-l-4 border-l-transparent'
                           }`}
                         >
                           <td className="py-2.5 px-2 text-center font-bold text-zinc-400">
-                            {row.pos}
+                            {idx + 1}
                           </td>
 
                           <td className="py-2.5 px-3">
@@ -1096,25 +1409,87 @@ export default function PosicionesPage() {
                           >
                             {row.dif > 0 ? `+${row.dif}` : row.dif}
                           </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-                          <td className="py-2.5 px-3 text-center">
-                            <div className="flex items-center justify-center gap-1">
-                              {(row.trend || []).map((t: number, i: number) => (
-                                <span
-                                  key={i}
-                                  className={`w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center ${
-                                    t === 1
-                                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/60'
-                                      : t === 2
-                                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/60'
-                                      : 'bg-red-500/20 text-red-400 border border-red-500/60'
-                                  }`}
-                                  title={t === 1 ? 'Victoria' : t === 2 ? 'Empate' : 'Derrota'}
-                                >
-                                  {t === 1 ? 'G' : t === 2 ? 'E' : 'P'}
-                                </span>
-                              ))}
+            {/* SUBTAB 3: TABLA DE PROMEDIOS */}
+            {afaSubTab === 'promedios' && (
+              <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-red-500" />
+                    <h2 className="text-lg font-black text-white uppercase tracking-wider">
+                      Tabla de Promedios (Descenso)
+                    </h2>
+                  </div>
+                  <span className="text-[10px] text-zinc-500 font-mono">
+                    {promiedosData?.promedios?.rows?.length || 30} Equipos
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead>
+                      <tr className="border-b border-zinc-800/90 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
+                        <th className="py-2.5 px-2 w-10 text-center">#</th>
+                        <th className="py-2.5 px-3 min-w-[200px]">Equipo</th>
+                        <th className="py-2.5 px-2 text-center w-24 text-emerald-400 font-black bg-emerald-950/30">PROMEDIO</th>
+                        <th className="py-2.5 px-2 text-center w-16 text-yellow-400 font-black">PTS</th>
+                        <th className="py-2.5 px-2 text-center w-16">PJ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800/40">
+                      {(promiedosData?.promedios?.rows || []).map((row: any, idx: number) => (
+                        <tr
+                          key={row.teamId || row.teamName}
+                          className={`hover:bg-zinc-800/40 transition-colors ${
+                            idx >= (promiedosData?.promedios?.rows?.length || 30) - 2
+                              ? 'border-l-4 border-l-red-500 bg-red-950/10'
+                              : 'border-l-4 border-l-transparent'
+                          }`}
+                        >
+                          <td className="py-2.5 px-2 text-center font-bold text-zinc-400">
+                            {idx + 1}
+                          </td>
+
+                          <td className="py-2.5 px-3">
+                            <div className="flex items-center gap-2.5">
+                              {row.logoUrl ? (
+                                <div className="w-5 h-5 relative shrink-0">
+                                  <Image
+                                    src={row.logoUrl}
+                                    alt={row.teamName}
+                                    fill
+                                    className="object-contain"
+                                    unoptimized
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center text-[9px] font-bold text-zinc-400">
+                                  {row.teamName.slice(0, 2).toUpperCase()}
+                                </div>
+                              )}
+                              <span className="font-bold text-white text-xs sm:text-sm truncate">
+                                {row.teamName}
+                              </span>
                             </div>
+                          </td>
+
+                          <td className="py-2.5 px-2 text-center font-mono font-black text-sm text-emerald-400 bg-emerald-950/20">
+                            {row.pct !== null && row.pct !== undefined ? Number(row.pct).toFixed(3) : '-'}
+                          </td>
+
+                          <td className="py-2.5 px-2 text-center font-mono font-bold text-yellow-400">
+                            {row.pts}
+                          </td>
+
+                          <td className="py-2.5 px-2 text-center text-zinc-300">
+                            {row.pj}
                           </td>
                         </tr>
                       ))}
@@ -1122,7 +1497,8 @@ export default function PosicionesPage() {
                   </table>
                 </div>
               </div>
-            ))
+            )}
+          </>
         )}
       </div>
     )}

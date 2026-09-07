@@ -118,7 +118,15 @@ const PLAYLISTS: PlaylistCard[] = [
   },
 ];
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 export default function VideosPage() {
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/galeria?tab=videos');
+  }, [router]);
+
   const [activeFilter, setActiveFilter] = useState<'todas' | 'mayor' | 'juveniles' | 'programas'>('todas');
   const [activeModalPlaylist, setActiveModalPlaylist] = useState<PlaylistCard | null>(null);
 

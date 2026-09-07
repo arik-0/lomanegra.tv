@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+if (typeof process !== 'undefined') {
   // Evitar que problemas de certificados locales en Windows bloqueen peticiones a Supabase
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }

@@ -28,6 +28,7 @@ import {
   Save,
   Check,
   X,
+  RotateCcw,
 } from 'lucide-react';
 import {
   TournamentStandings,
@@ -35,12 +36,15 @@ import {
   ZoneData,
   TeamStandingsRow,
   PlayoffMatch,
+  PlayoffRound,
   GoleadorRow,
   FixtureMatch,
   recalculateZoneStandings,
   getTeamLogo,
+  syncPlayoffMatches,
   syncPlayoffQuarterfinals,
   generateFullRoundRobinFixture,
+  resolvePlayoffSeed,
 } from '@/lib/standingsStore';
 
 interface Match {
@@ -54,6 +58,8 @@ interface Match {
   image_url: string | null;
   is_active: boolean;
   is_live?: boolean;
+  league?: string;
+  category?: string;
 }
 
 export default function AdminPage() {
@@ -66,10 +72,12 @@ export default function AdminPage() {
   const [adminSection, setAdminSection] = useState<'partidos' | 'tablas'>('partidos');
 
   // ==========================================
-  // ESTADO: PARTIDOS (ABM)
+  // ESTADO: PARTIDOS (ABM, LIGAS Y CATEGORÍAS)
   // ==========================================
   const [matches, setMatches] = useState<Match[]>([]);
   const [loadingMatches, setLoadingMatches] = useState(false);
+  const [matchCategoryFilter, setMatchCategoryFilter] = useState<string>('Todas');
+  const [matchLeagueFilter, setMatchLeagueFilter] = useState<string>('Todas');
 
   // Anclaje de Stream
   const [selectedMatchId, setSelectedMatchId] = useState('');
@@ -82,6 +90,8 @@ export default function AdminPage() {
   const [editingMatch, setEditingMatch] = useState<Match | null>(null);
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
+  const [formLeague, setFormLeague] = useState('Liga Deportiva del Sur');
+  const [formCategory, setFormCategory] = useState('Fútbol Mayor');
   const [formDate, setFormDate] = useState('');
   const [formIsDateConfirmed, setFormIsDateConfirmed] = useState(true);
   const [formPrice, setFormPrice] = useState(3500);
@@ -100,6 +110,7 @@ export default function AdminPage() {
   const [standingsSavedMsg, setStandingsSavedMsg] = useState(false);
   const [adminGoleadorCategory, setAdminGoleadorCategory] = useState<string>('Todas');
   const [adminFixtureRounds, setAdminFixtureRounds] = useState<Record<string, string>>({});
+  const [adminPlayoffRoundFilter, setAdminPlayoffRoundFilter] = useState<string>('todas');
 
   // Comprobar autenticación inicial y cargar datos
   useEffect(() => {
@@ -244,12 +255,14 @@ export default function AdminPage() {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  const openMatchModal = (match?: Match) => {
+  const openMatchModal = (match?: Match, initialCategory?: string, initialLeague?: string) => {
     setSaveMatchError('');
     if (match) {
       setEditingMatch(match);
       setFormTitle(match.title);
       setFormDesc(match.description || '');
+      setFormLeague(match.league || 'Liga Deportiva del Sur');
+      setFormCategory(match.category || 'Fútbol Mayor');
       setFormDate(match.date ? formatForDateTimeInput(new Date(match.date)) : '');
       setFormIsDateConfirmed(match.is_date_confirmed);
       setFormPrice(match.price);
@@ -257,9 +270,16 @@ export default function AdminPage() {
       setFormImageUrl(match.image_url || '');
       setFormIsLive(Boolean(match.is_live));
     } else {
+      const selectedLeague =
+        initialLeague || (matchLeagueFilter !== 'Todas' ? matchLeagueFilter : 'Liga Deportiva del Sur');
+      const selectedCategory =
+        initialCategory || (matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Fútbol Mayor');
+
       setEditingMatch(null);
       setFormTitle('Blanco y Negro vs ');
-      setFormDesc('Fútbol Mayor • Torneo Oficial');
+      setFormDesc(`${selectedCategory} • ${selectedLeague}`);
+      setFormLeague(selectedLeague);
+      setFormCategory(selectedCategory);
       const defaultNext = new Date(Date.now() + 24 * 3600 * 1000);
       defaultNext.setHours(15, 30, 0, 0);
       setFormDate(formatForDateTimeInput(defaultNext));
@@ -283,7 +303,9 @@ export default function AdminPage() {
 
       const payload = {
         title: formTitle.trim(),
-        description: formDesc.trim(),
+        description: formDesc.trim() || `${formCategory.trim()} • ${formLeague.trim()}`,
+        league: formLeague.trim() || 'Liga Deportiva del Sur',
+        category: formCategory.trim() || 'Fútbol Mayor',
         date: formIsDateConfirmed && formDate ? new Date(formDate).toISOString() : null,
         is_date_confirmed: formIsDateConfirmed,
         price: Number(formPrice) || 3500,
@@ -340,7 +362,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteMatch = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este partido de la cartelera?')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este partido de la cartelera? Esta acción no se puede deshacer.')) return;
     // Eliminación optimista inmediata en la interfaz
     setMatches((prev) => prev.filter((m) => m.id !== id));
     try {
@@ -450,6 +472,10 @@ export default function AdminPage() {
       alert('Debe haber al menos 1 zona.');
       return;
     }
+    const zone = standings.zones.find((z) => z.id === zoneId);
+    if (!confirm(`¿Estás seguro de eliminar la "${zone?.name || 'zona'}" y todos sus equipos y fixtures asociados?`)) {
+      return;
+    }
     setStandings({
       ...standings,
       zones: standings.zones.filter((z) => z.id !== zoneId),
@@ -484,7 +510,7 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
@@ -509,14 +535,14 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
   const handleDeleteTeam = (zoneId: string, teamId: string) => {
     const zone = standings.zones.find((z) => z.id === zoneId);
     const team = zone?.teams.find((t) => t.id === teamId);
-    if (!confirm(`¿Eliminar el equipo "${team?.name || 'seleccionado'}" de ${zone?.name || 'la zona'}?`)) {
+    if (!confirm(`¿Estás seguro de eliminar el equipo "${team?.name || 'seleccionado'}" de ${zone?.name || 'la zona'}?`)) {
       return;
     }
 
@@ -545,7 +571,7 @@ export default function AdminPage() {
       return z;
     });
 
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
@@ -601,7 +627,7 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
@@ -628,11 +654,12 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
   const handleDeleteFixture = (zoneId: string, fixId: string) => {
+    if (!confirm('¿Estás seguro de eliminar este partido del fixture de la zona?')) return;
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
         const updatedFixs = (z.fixtures || []).filter((f) => f.id !== fixId);
@@ -641,7 +668,7 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
@@ -652,24 +679,171 @@ export default function AdminPage() {
       }
       return z;
     });
-    const synced = syncPlayoffQuarterfinals({ ...standings, zones: updatedZones });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
     setStandings(synced);
   };
 
   const handleSyncPlayoffsFromTable = () => {
-    const synced = syncPlayoffQuarterfinals(standings);
+    const synced = syncPlayoffMatches(standings);
     setStandings(synced);
   };
 
-  // PLAY-OFFS
+  // PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final con cálculo por casilleros)
   const handleUpdatePlayoff = (matchId: string, field: keyof PlayoffMatch, value: any) => {
     const updated = standings.playoffs.map((m) => {
       if (m.id === matchId) {
-        return { ...m, [field]: value };
+        const updatedMatch = { ...m, [field]: value };
+        // Si se actualiza el casillero de semilla (seed1 o seed2), resolver dinámicamente el club desde la tabla
+        if (field === 'seed1' && typeof value === 'string') {
+          const resolved = resolvePlayoffSeed(value, standings.zones);
+          if (resolved) {
+            updatedMatch.team1 = resolved;
+          }
+        } else if (field === 'seed2' && typeof value === 'string') {
+          const resolved = resolvePlayoffSeed(value, standings.zones);
+          if (resolved) {
+            updatedMatch.team2 = resolved;
+          }
+        }
+        return updatedMatch;
       }
       return m;
     });
     setStandings({ ...standings, playoffs: updated });
+  };
+
+  const handleDeletePlayoff = (matchId: string) => {
+    const target = standings.playoffs.find((m) => m.id === matchId);
+    if (!confirm(`¿Estás seguro de eliminar el cruce de play-off "${target?.title || 'seleccionado'}"?`)) return;
+    setStandings({
+      ...standings,
+      playoffs: standings.playoffs.filter((m) => m.id !== matchId),
+    });
+  };
+
+  const handleAddPlayoffMatch = (round: PlayoffRound = 'cuartos') => {
+    const roundCount = standings.playoffs.filter((p) => p.round === round).length + 1;
+    const roundNames: Record<PlayoffRound, string> = {
+      '16avos': '16avos',
+      '8vos': 'Octavos',
+      'cuartos': 'Cuartos',
+      'semifinal': 'Semifinal',
+      'final': 'Gran Final',
+    };
+    const defaultTitle = `${roundNames[round]} ${roundCount}`;
+    const newPlayoff: PlayoffMatch = {
+      id: `playoff-${round}-${Date.now()}`,
+      round,
+      title: defaultTitle,
+      seed1: '',
+      seed2: '',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    };
+    setStandings({
+      ...standings,
+      playoffs: [...standings.playoffs, newPlayoff],
+    });
+  };
+
+  const handleGenerate16avos = () => {
+    if (standings.playoffs.some((p) => p.round === '16avos')) {
+      if (!confirm('¿Ya existen cruces de 16avos de Final. Deseas regenerarlos a partir de las tablas de posiciones?')) return;
+    }
+    const new16avos: PlayoffMatch[] = [];
+    for (let i = 1; i <= 16; i++) {
+      const s1 = `${i}ero A`;
+      const s2 = `${17 - i}to B`;
+      const t1 = resolvePlayoffSeed(s1, standings.zones) || `Clasificado ${s1}`;
+      const t2 = resolvePlayoffSeed(s2, standings.zones) || `Clasificado ${s2}`;
+      new16avos.push({
+        id: `16avos-${i}-${Date.now()}`,
+        round: '16avos',
+        title: `16avos ${i} (${i}°A vs ${17 - i}°B)`,
+        seed1: s1,
+        seed2: s2,
+        team1: t1,
+        team2: t2,
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      });
+    }
+    const filtered = standings.playoffs.filter((p) => p.round !== '16avos');
+    setStandings({
+      ...standings,
+      playoffs: [...new16avos, ...filtered],
+    });
+  };
+
+  const handleGenerate8vos = () => {
+    if (standings.playoffs.some((p) => p.round === '8vos')) {
+      if (!confirm('¿Ya existen cruces de Octavos de Final. Deseas regenerarlos a partir de las tablas de posiciones?')) return;
+    }
+    const new8vos: PlayoffMatch[] = [];
+    for (let i = 1; i <= 8; i++) {
+      const s1 = `${i}ero A`;
+      const s2 = `${9 - i}to B`;
+      const t1 = resolvePlayoffSeed(s1, standings.zones) || `Clasificado ${s1}`;
+      const t2 = resolvePlayoffSeed(s2, standings.zones) || `Clasificado ${s2}`;
+      new8vos.push({
+        id: `8vos-${i}-${Date.now()}`,
+        round: '8vos',
+        title: `Octavos ${i} (${i}°A vs ${9 - i}°B)`,
+        seed1: s1,
+        seed2: s2,
+        team1: t1,
+        team2: t2,
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      });
+    }
+    const filtered = standings.playoffs.filter((p) => p.round !== '8vos');
+    setStandings({
+      ...standings,
+      playoffs: [...new8vos, ...filtered],
+    });
+  };
+
+  const handleGenerateCuartos = () => {
+    if (standings.playoffs.some((p) => p.round === 'cuartos')) {
+      if (!confirm('¿Regenerar los 4 cruces reglamentarios de Cuartos de Final (1°A vs 4°B, 2°A vs 3°B, 1°B vs 4°A, 2°B vs 3°A)?')) return;
+    }
+    const quartersDefs = [
+      { id: 'c1', title: 'Cuartos 1 (1°A vs 4°B)', seed1: '1ero A', seed2: '4to B' },
+      { id: 'c2', title: 'Cuartos 2 (2°A vs 3°B)', seed1: '2do A', seed2: '3ro B' },
+      { id: 'c3', title: 'Cuartos 3 (1°B vs 4°A)', seed1: '1ero B', seed2: '4to A' },
+      { id: 'c4', title: 'Cuartos 4 (2°B vs 3°A)', seed1: '2do B', seed2: '3ro A' },
+    ];
+    const newCuartos: PlayoffMatch[] = quartersDefs.map((q) => {
+      const t1 = resolvePlayoffSeed(q.seed1, standings.zones) || `Clasificado ${q.seed1}`;
+      const t2 = resolvePlayoffSeed(q.seed2, standings.zones) || `Clasificado ${q.seed2}`;
+      return {
+        id: `${q.id}-${Date.now()}`,
+        round: 'cuartos',
+        title: q.title,
+        seed1: q.seed1,
+        seed2: q.seed2,
+        team1: t1,
+        team2: t2,
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      };
+    });
+    const filtered = standings.playoffs.filter((p) => p.round !== 'cuartos');
+    setStandings({
+      ...standings,
+      playoffs: [...filtered, ...newCuartos],
+    });
   };
 
   // GOLEADORES BYN (SIN PARTIDOS JUGADOS)
@@ -698,6 +872,8 @@ export default function AdminPage() {
   };
 
   const handleDeleteGoleador = (id: string) => {
+    const gol = standings.goleadores.find((g) => g.id === id);
+    if (!confirm(`¿Estás seguro de eliminar al goleador "${gol?.name || 'seleccionado'}"?`)) return;
     setStandings({
       ...standings,
       goleadores: standings.goleadores.filter((g) => g.id !== id).map((g, idx) => ({ ...g, pos: idx + 1 })),
@@ -902,8 +1078,9 @@ export default function AdminPage() {
             </div>
 
             {/* Listado y ABM de Partidos */}
+            {/* Listado y ABM de Partidos */}
             <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-4">
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-red-500" />
                   <h2 className="text-base font-black text-white uppercase tracking-wider">
@@ -911,17 +1088,100 @@ export default function AdminPage() {
                   </h2>
                 </div>
 
-                <button
-                  onClick={() => openMatchModal()}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-white text-black hover:bg-zinc-200 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Crear Partido</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      openMatchModal(
+                        undefined,
+                        matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Fútbol Mayor',
+                        matchLeagueFilter !== 'Todas' ? matchLeagueFilter : 'Liga Deportiva del Sur'
+                      )
+                    }
+                    className="flex items-center gap-1.5 px-4 py-2 bg-white text-black hover:bg-zinc-200 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Crear Partido</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Filtros por Categoría y por Liga */}
+              <div className="bg-[#181922] border border-zinc-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-4">
+                  {/* Selector Liga */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Liga:</span>
+                    <select
+                      value={matchLeagueFilter}
+                      onChange={(e) => setMatchLeagueFilter(e.target.value)}
+                      className="bg-[#12131a] border border-zinc-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-red-500"
+                    >
+                      <option value="Todas">Todas las Ligas</option>
+                      <option value="Liga Deportiva del Sur">Liga Deportiva del Sur</option>
+                      <option value="Torneo Regional">Torneo Regional</option>
+                      <option value="Copa Santa Fe">Copa Santa Fe</option>
+                      <option value="Amistoso Oficial">Amistoso Oficial</option>
+                    </select>
+                  </div>
+
+                  {/* Selector Categoría */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Categoría:</span>
+                    <select
+                      value={matchCategoryFilter}
+                      onChange={(e) => setMatchCategoryFilter(e.target.value)}
+                      className="bg-[#12131a] border border-zinc-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-red-500"
+                    >
+                      <option value="Todas">Todas las Categorías</option>
+                      <option value="Fútbol Mayor">Fútbol Mayor</option>
+                      <option value="Reserva">Reserva</option>
+                      <option value="Tercera División">Tercera División</option>
+                      <option value="Cuarta División">Cuarta División</option>
+                      <option value="Quinta División">Quinta División</option>
+                      <option value="Inferiores">Inferiores</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-zinc-400 font-mono">
+                  Mostrando{' '}
+                  <span className="text-white font-bold">
+                    {
+                      matches.filter((m) => {
+                        if (matchLeagueFilter !== 'Todas') {
+                          const mLeague =
+                            m.league || (m.description?.includes('Regional') ? 'Torneo Regional' : 'Liga Deportiva del Sur');
+                          if (mLeague.toLowerCase() !== matchLeagueFilter.toLowerCase()) return false;
+                        }
+                        if (matchCategoryFilter !== 'Todas') {
+                          const mCat =
+                            m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Fútbol Mayor');
+                          if (!mCat.toLowerCase().includes(matchCategoryFilter.toLowerCase())) return false;
+                        }
+                        return true;
+                      }).length
+                    }
+                  </span>{' '}
+                  de {matches.length} partidos
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {matches.map((m) => (
+                {matches
+                  .filter((m) => {
+                    if (matchLeagueFilter !== 'Todas') {
+                      const mLeague =
+                        m.league || (m.description?.includes('Regional') ? 'Torneo Regional' : 'Liga Deportiva del Sur');
+                      if (mLeague.toLowerCase() !== matchLeagueFilter.toLowerCase()) return false;
+                    }
+                    if (matchCategoryFilter !== 'Todas') {
+                      const mCat =
+                        m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Fútbol Mayor');
+                      if (!mCat.toLowerCase().includes(matchCategoryFilter.toLowerCase())) return false;
+                    }
+                    return true;
+                  })
+                  .map((m) => (
                   <div
                     key={m.id}
                     className="bg-[#181922] border border-zinc-800 rounded-2xl p-4 flex flex-col justify-between space-y-3"
@@ -940,7 +1200,13 @@ export default function AdminPage() {
                         <span className="font-bold text-white font-mono">${m.price} ARS</span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 text-[10px]">
+                      <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
+                        <span className="px-2 py-0.5 rounded font-bold uppercase bg-zinc-800 border border-zinc-700 text-zinc-300">
+                          {m.category || 'Fútbol Mayor'}
+                        </span>
+                        <span className="px-2 py-0.5 rounded font-bold uppercase bg-red-950/70 border border-red-800/80 text-red-300">
+                          {m.league || 'Liga Deportiva del Sur'}
+                        </span>
                         {m.is_live ? (
                           <span className="px-2 py-0.5 rounded font-black uppercase bg-red-950/80 border border-red-700 text-red-400 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
@@ -949,7 +1215,7 @@ export default function AdminPage() {
                         ) : (
                           <span className="px-2 py-0.5 rounded font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400 flex items-center gap-1">
                             <Clock className="w-2.5 h-2.5 text-zinc-500" />
-                            <span>En Espera (Placeholder)</span>
+                            <span>En Espera</span>
                           </span>
                         )}
                       </div>
@@ -1043,10 +1309,13 @@ export default function AdminPage() {
 
               <div className="flex items-center gap-2.5">
                 <button
+                  type="button"
                   onClick={handleResetStandings}
-                  className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-white text-xs font-bold transition"
+                  className="px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition flex items-center gap-1.5"
+                  title="Restablecer equipos y estadísticas oficiales de la Liga Deportiva del Sur"
                 >
-                  Restablecer
+                  <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>↺ Restaurar Estadísticas del Campeonato</span>
                 </button>
 
                 <button
@@ -1335,6 +1604,7 @@ export default function AdminPage() {
                             <th className="py-2 px-1 text-center w-10">GF</th>
                             <th className="py-2 px-1 text-center w-10">GC</th>
                             <th className="py-2 px-1 text-center w-10">DIF</th>
+                            <th className="py-2 px-1 text-center w-28">Forma (G, E, P)</th>
                             <th className="py-2 px-1 text-center w-16">PlayOff</th>
                             <th className="py-2 px-1 text-center w-8"></th>
                           </tr>
@@ -1421,6 +1691,38 @@ export default function AdminPage() {
                                 {team.dif > 0 ? `+${team.dif}` : team.dif}
                               </td>
                               <td className="py-2 px-1 text-center">
+                                <div className="flex items-center justify-center gap-1">
+                                  <input
+                                    type="text"
+                                    value={(team.form || []).map((f) => (f === 'W' ? 'G' : f === 'D' ? 'E' : 'P')).join(', ')}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.toUpperCase().replace(/[^GEPWDL]/g, '');
+                                      const newForm: ('W' | 'D' | 'L')[] = raw.split('').map((char) => {
+                                        if (char === 'G' || char === 'W') return 'W';
+                                        if (char === 'P' || char === 'L') return 'L';
+                                        return 'D';
+                                      });
+                                      handleUpdateTeam(zone.id, team.id, 'form', newForm);
+                                    }}
+                                    placeholder="G, E, P"
+                                    className="w-20 text-center bg-[#12131a] border border-zinc-800 rounded px-1 py-1 text-[11px] font-mono text-zinc-200 focus:outline-none"
+                                    title="Racha reciente de partidos: G (Ganado), E (Empatado), P (Perdido)"
+                                  />
+                                  <div className="hidden xl:flex items-center gap-0.5 shrink-0">
+                                    {(team.form || []).map((f, fIdx) => (
+                                      <span
+                                        key={fIdx}
+                                        className={`w-2.5 h-2.5 rounded-full flex items-center justify-center text-[6px] font-black text-white ${
+                                          f === 'W' ? 'bg-emerald-600' : f === 'D' ? 'bg-amber-600' : 'bg-red-600'
+                                        }`}
+                                      >
+                                        {f === 'W' ? 'G' : f === 'D' ? 'E' : 'P'}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-2 px-1 text-center">
                                 <input
                                   type="checkbox"
                                   checked={team.qualified}
@@ -1448,102 +1750,310 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* MÓDULO 2: PLAY-OFFS (SISTEMA DE LLAVES) */}
-            <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-500 shrink-0" />
+            {/* MÓDULO 2: PLAY-OFFS (SISTEMA DE LLAVES Y FORMATO DINÁMICO POR CASILLEROS) */}
+            <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-5">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-950/60 border border-amber-800/70 flex items-center justify-center text-amber-500 shrink-0">
+                    <Award className="w-5 h-5" />
+                  </div>
                   <div>
-                    <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                      Cruces de Play-Offs ({standings.playoffs.length} Partidos)
+                    <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                      Cruces de Play-Offs ({standings.playoffs.length} Cruces)
                     </h3>
-                    <div className="text-[10px] text-zinc-400">
-                      Cuartos predefinidos desde tabla (1°A vs 4°B, 2°A vs 3°B, 1°B vs 4°A, 2°B vs 3°A). Semis y Final independientes.
-                    </div>
+                    <p className="text-[10px] text-zinc-400 mt-0.5">
+                      Todos los torneos son play-off. Escribe <span className="text-amber-400 font-bold">1ero A</span>, <span className="text-amber-400 font-bold">2do B</span>, etc. en cada casillero para calcular los cruces automáticamente desde la tabla.
+                    </p>
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleSyncPlayoffsFromTable}
-                  className="px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition shrink-0 self-start sm:self-auto"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Sincronizar Cuartos desde Tablas</span>
-                </button>
+                {/* Botones de Generación Rápida y Sincronización */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerate16avos}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#181922] hover:bg-zinc-800 border border-zinc-800 text-[11px] font-bold text-zinc-300 hover:text-white transition flex items-center gap-1"
+                    title="Generar llaves completas de 16avos de Final"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Generar 16avos</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleGenerate8vos}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#181922] hover:bg-zinc-800 border border-zinc-800 text-[11px] font-bold text-zinc-300 hover:text-white transition flex items-center gap-1"
+                    title="Generar llaves completas de Octavos de Final"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Generar 8vos</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleGenerateCuartos}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#181922] hover:bg-zinc-800 border border-zinc-800 text-[11px] font-bold text-zinc-300 hover:text-white transition flex items-center gap-1"
+                    title="Generar llaves oficiales de Cuartos (1°A vs 4°B, 2°A vs 3°B...)"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Generar Cuartos</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddPlayoffMatch('cuartos')}
+                    className="px-3 py-1.5 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-800/80 text-white text-[11px] font-bold transition flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-red-400" />
+                    <span>+ Añadir Cruce</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSyncPlayoffsFromTable}
+                    className="px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 text-amber-300 text-[11px] font-bold flex items-center gap-1.5 transition"
+                    title="Recalcular automáticamente todos los equipos a partir de los casilleros y las posiciones"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Sincronizar Tablas</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {standings.playoffs.map((m) => (
-                  <div key={m.id} className="bg-[#181922] border border-zinc-800 rounded-2xl p-4 space-y-3">
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className="font-bold text-amber-400 uppercase">{m.round}</span>
-                      <input
-                        type="text"
-                        value={m.title}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'title', e.target.value)}
-                        className="bg-[#12131a] border border-zinc-800 rounded px-2 py-0.5 text-[10px] text-white focus:outline-none"
-                      />
-                    </div>
-
-                    {/* Equipo 1 */}
-                    <div className="grid grid-cols-12 gap-2 items-center">
-                      <input
-                        type="text"
-                        value={m.team1}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'team1', e.target.value)}
-                        placeholder="Equipo 1"
-                        className="col-span-8 bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"
-                      />
-                      <input
-                        type="number"
-                        value={m.score1 !== null ? m.score1 : ''}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'score1', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder="Goles"
-                        className="col-span-4 bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-center text-white focus:outline-none"
-                      />
-                    </div>
-
-                    {/* Equipo 2 */}
-                    <div className="grid grid-cols-12 gap-2 items-center">
-                      <input
-                        type="text"
-                        value={m.team2}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'team2', e.target.value)}
-                        placeholder="Equipo 2"
-                        className="col-span-8 bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:outline-none"
-                      />
-                      <input
-                        type="number"
-                        value={m.score2 !== null ? m.score2 : ''}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'score2', e.target.value === '' ? null : Number(e.target.value))}
-                        placeholder="Goles"
-                        className="col-span-4 bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-center text-white focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[10px]">
-                      <select
-                        value={m.winner || 0}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'winner', Number(e.target.value) || undefined)}
-                        className="bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-zinc-300 focus:outline-none"
-                      >
-                        <option value="0">Sin ganador aún</option>
-                        <option value="1">Gana: {m.team1}</option>
-                        <option value="2">Gana: {m.team2}</option>
-                      </select>
-
-                      <input
-                        type="text"
-                        value={m.dateInfo || ''}
-                        onChange={(e) => handleUpdatePlayoff(m.id, 'dateInfo', e.target.value)}
-                        placeholder="Estado / Fecha"
-                        className="w-28 bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-[10px] text-zinc-300 focus:outline-none"
-                      />
-                    </div>
-                  </div>
+              {/* Filtro por Ronda de Play-off */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-bold">
+                <span className="text-zinc-500 uppercase tracking-wider text-[9px] mr-1 shrink-0">Filtrar Ronda:</span>
+                {[
+                  { id: 'todas', label: 'Todas las Rondas', count: standings.playoffs.length },
+                  { id: '16avos', label: '16avos', count: standings.playoffs.filter((p) => p.round === '16avos').length },
+                  { id: '8vos', label: '8vos de Final', count: standings.playoffs.filter((p) => p.round === '8vos').length },
+                  { id: 'cuartos', label: 'Cuartos', count: standings.playoffs.filter((p) => p.round === 'cuartos').length },
+                  { id: 'semifinal', label: 'Semifinal', count: standings.playoffs.filter((p) => p.round === 'semifinal').length },
+                  { id: 'final', label: 'Final', count: standings.playoffs.filter((p) => p.round === 'final').length },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setAdminPlayoffRoundFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-xl transition shrink-0 flex items-center gap-1.5 ${
+                      adminPlayoffRoundFilter === tab.id
+                        ? 'bg-red-600 text-white shadow-md shadow-red-950 font-black'
+                        : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-black/40 text-zinc-300">
+                      {tab.count}
+                    </span>
+                  </button>
                 ))}
               </div>
+
+              {standings.playoffs.length === 0 ? (
+                <div className="py-8 text-center text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-2xl">
+                  No hay cruces de play-off registrados. Utiliza los botones "Generar 16avos", "Generar 8vos", "Generar Cuartos" o "+ Añadir Cruce".
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {standings.playoffs
+                    .filter((m) => adminPlayoffRoundFilter === 'todas' || m.round === adminPlayoffRoundFilter)
+                    .map((m) => (
+                      <div
+                        key={m.id}
+                        className="bg-[#181922] border border-zinc-800 rounded-2xl p-4 space-y-3 hover:border-zinc-700 transition"
+                      >
+                        {/* Cabecera del Cruce */}
+                        <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 pb-2">
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={m.round}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'round', e.target.value as PlayoffRound)}
+                              className="bg-[#12131a] border border-zinc-800 rounded-lg px-2 py-1 text-[10px] font-black uppercase text-amber-400 focus:outline-none"
+                            >
+                              <option value="16avos">16avos</option>
+                              <option value="8vos">8vos de Final</option>
+                              <option value="cuartos">Cuartos</option>
+                              <option value="semifinal">Semifinal</option>
+                              <option value="final">Final</option>
+                            </select>
+
+                            <input
+                              type="text"
+                              value={m.title}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'title', e.target.value)}
+                              placeholder="Título del Cruce"
+                              className="bg-[#12131a] border border-zinc-800 rounded-lg px-2 py-1 text-xs text-white font-bold focus:outline-none w-36"
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePlayoff(m.id)}
+                            className="p-1 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-950/40 transition"
+                            title="Eliminar este cruce"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* CASILLEROS DE FORMATO PLAYOFF (AUTO-CÁLCULO DESDE TABLA) */}
+                        <div className="bg-[#12131a] border border-dashed border-zinc-800 rounded-xl p-2.5 space-y-1.5">
+                          <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-zinc-400">
+                            <span>Casilleros Semilla (Formato Playoff):</span>
+                            <span className="text-amber-400 font-normal lowercase">ej: 1ero a, 2do b, 4to b</span>
+                          </div>
+
+                          <div className="grid grid-cols-11 gap-1.5 items-center">
+                            <input
+                              type="text"
+                              value={m.seed1 || ''}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'seed1', e.target.value)}
+                              placeholder="1ero A"
+                              className="col-span-5 bg-[#181922] border border-zinc-800 focus:border-amber-500 rounded px-2 py-1 text-xs text-center font-mono font-bold text-amber-300 focus:outline-none placeholder:text-zinc-600"
+                              title="Casillero Semilla Equipo 1 (ej: 1ero A, 1A, 2do B)"
+                            />
+
+                            <span className="col-span-1 text-center text-[10px] text-zinc-500 font-black">VS</span>
+
+                            <input
+                              type="text"
+                              value={m.seed2 || ''}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'seed2', e.target.value)}
+                              placeholder="2do B"
+                              className="col-span-5 bg-[#181922] border border-zinc-800 focus:border-amber-500 rounded px-2 py-1 text-xs text-center font-mono font-bold text-amber-300 focus:outline-none placeholder:text-zinc-600"
+                              title="Casillero Semilla Equipo 2 (ej: 2do B, 4to B, 8vo B)"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Equipo 1: Escudo, Nombre y Goles */}
+                        <div className="grid grid-cols-12 gap-2 items-center bg-[#14151e] border border-zinc-800/60 rounded-xl p-2">
+                          <div className="col-span-8 flex items-center gap-2">
+                            <div className="w-5 h-5 relative shrink-0">
+                              <Image
+                                src={getTeamLogo(m.team1)}
+                                alt={m.team1}
+                                fill
+                                className="object-contain"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              value={m.team1}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'team1', e.target.value)}
+                              placeholder="Equipo 1"
+                              className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
+                            />
+                          </div>
+
+                          <div className="col-span-4 flex items-center justify-end gap-1">
+                            <input
+                              type="number"
+                              value={m.score1 !== null ? m.score1 : ''}
+                              onChange={(e) =>
+                                handleUpdatePlayoff(
+                                  m.id,
+                                  'score1',
+                                  e.target.value === '' ? null : Number(e.target.value)
+                                )
+                              }
+                              placeholder="0"
+                              className="w-11 bg-[#12131a] border border-zinc-800 rounded py-1 text-xs text-center font-mono font-black text-white focus:outline-none focus:border-red-500"
+                              title="Goles Equipo 1"
+                            />
+                            <input
+                              type="number"
+                              value={m.penalties1 !== undefined && m.penalties1 !== null ? m.penalties1 : ''}
+                              onChange={(e) =>
+                                handleUpdatePlayoff(
+                                  m.id,
+                                  'penalties1',
+                                  e.target.value === '' ? null : Number(e.target.value)
+                                )
+                              }
+                              placeholder="pen"
+                              className="w-9 bg-[#12131a] border border-zinc-800 rounded py-1 text-[10px] text-center font-mono text-zinc-400 focus:outline-none"
+                              title="Penales (opcional)"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Equipo 2: Escudo, Nombre y Goles */}
+                        <div className="grid grid-cols-12 gap-2 items-center bg-[#14151e] border border-zinc-800/60 rounded-xl p-2">
+                          <div className="col-span-8 flex items-center gap-2">
+                            <div className="w-5 h-5 relative shrink-0">
+                              <Image
+                                src={getTeamLogo(m.team2)}
+                                alt={m.team2}
+                                fill
+                                className="object-contain"
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              value={m.team2}
+                              onChange={(e) => handleUpdatePlayoff(m.id, 'team2', e.target.value)}
+                              placeholder="Equipo 2"
+                              className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
+                            />
+                          </div>
+
+                          <div className="col-span-4 flex items-center justify-end gap-1">
+                            <input
+                              type="number"
+                              value={m.score2 !== null ? m.score2 : ''}
+                              onChange={(e) =>
+                                handleUpdatePlayoff(
+                                  m.id,
+                                  'score2',
+                                  e.target.value === '' ? null : Number(e.target.value)
+                                )
+                              }
+                              placeholder="0"
+                              className="w-11 bg-[#12131a] border border-zinc-800 rounded py-1 text-xs text-center font-mono font-black text-white focus:outline-none focus:border-red-500"
+                              title="Goles Equipo 2"
+                            />
+                            <input
+                              type="number"
+                              value={m.penalties2 !== undefined && m.penalties2 !== null ? m.penalties2 : ''}
+                              onChange={(e) =>
+                                handleUpdatePlayoff(
+                                  m.id,
+                                  'penalties2',
+                                  e.target.value === '' ? null : Number(e.target.value)
+                                )
+                              }
+                              placeholder="pen"
+                              className="w-9 bg-[#12131a] border border-zinc-800 rounded py-1 text-[10px] text-center font-mono text-zinc-400 focus:outline-none"
+                              title="Penales (opcional)"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Pie de Cruce: Ganador, Estado y Fecha */}
+                        <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-2 text-[10px]">
+                          <select
+                            value={m.winner || 0}
+                            onChange={(e) => handleUpdatePlayoff(m.id, 'winner', Number(e.target.value) || undefined)}
+                            className="bg-[#12131a] border border-zinc-800 rounded-lg px-2 py-1 text-zinc-300 focus:outline-none text-[10px] max-w-[140px] truncate"
+                          >
+                            <option value="0">Sin ganador aún</option>
+                            <option value="1">Gana: {m.team1}</option>
+                            <option value="2">Gana: {m.team2}</option>
+                          </select>
+
+                          <input
+                            type="text"
+                            value={m.dateInfo || ''}
+                            onChange={(e) => handleUpdatePlayoff(m.id, 'dateInfo', e.target.value)}
+                            placeholder="Estado / Fecha"
+                            className="w-28 bg-[#12131a] border border-zinc-800 rounded-lg px-2 py-1 text-[10px] text-zinc-300 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
 
             {/* MÓDULO 3: GOLEADORES DE BLANCO Y NEGRO (DIVIDIDO POR CATEGORÍAS) */}
@@ -1695,6 +2205,46 @@ export default function AdminPage() {
                     placeholder="Blanco y Negro vs Rival"
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Liga del Torneo</label>
+                    <select
+                      value={formLeague}
+                      onChange={(e) => {
+                        const newLeague = e.target.value;
+                        setFormLeague(newLeague);
+                        setFormDesc(`${formCategory} • ${newLeague}`);
+                      }}
+                      className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
+                    >
+                      <option value="Liga Deportiva del Sur">Liga Deportiva del Sur</option>
+                      <option value="Torneo Regional">Torneo Regional</option>
+                      <option value="Copa Santa Fe">Copa Santa Fe</option>
+                      <option value="Amistoso Oficial">Amistoso Oficial</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Categoría / División</label>
+                    <select
+                      value={formCategory}
+                      onChange={(e) => {
+                        const newCat = e.target.value;
+                        setFormCategory(newCat);
+                        setFormDesc(`${newCat} • ${formLeague}`);
+                      }}
+                      className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
+                    >
+                      <option value="Fútbol Mayor">Fútbol Mayor</option>
+                      <option value="Reserva">Reserva</option>
+                      <option value="Tercera División">Tercera División</option>
+                      <option value="Cuarta División">Cuarta División</option>
+                      <option value="Quinta División">Quinta División</option>
+                      <option value="Inferiores">Inferiores</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>

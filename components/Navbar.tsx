@@ -97,7 +97,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-4 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
           <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[#181920] border border-red-900/50 text-red-400 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="font-bold">SEÑAL EN VIVO</span>
+            <span className="font-bold">TRANSMISIÓN EN VIVO</span>
           </div>
 
           <Link
@@ -106,14 +106,6 @@ export default function Navbar() {
           >
             <Trophy className="w-3.5 h-3.5 text-amber-400" />
             <span>Tablas & Play-Offs</span>
-          </Link>
-
-          <Link
-            href="/videos"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181920] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all shadow-sm"
-          >
-            <Youtube className="w-3.5 h-3.5 text-red-500" />
-            <span>Videos</span>
           </Link>
 
           <Link

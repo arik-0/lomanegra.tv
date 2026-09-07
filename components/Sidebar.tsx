@@ -29,7 +29,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const [activeTab, setActiveTab] = useState<'matches' | 'events' | 'youtube'>('matches');
+  const [activeTab, setActiveTab] = useState<'matches' | 'events'>('matches');
 
   // Partidos oficiales de la agenda (sincronizados con los 20 clubes reales)
   const matches = [
@@ -79,33 +79,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
     },
   ];
 
-  // Listas de YouTube oficiales de @PasionlomonegraByN
-  const youtubePlaylists = [
-    {
-      id: 'pl-1',
-      title: 'Transmisiones de Fútbol Mayor',
-      description: 'Partidos completos transmitidos en vivo con relatos de Pasión Lomonegra.',
-      videoCount: '24 partidos',
-      badge: '#MAYOR',
-      url: 'https://www.youtube.com/@PasionlomonegraByN/playlists',
-    },
-    {
-      id: 'pl-2',
-      title: 'Resúmenes y Goles de Blanco y Negro',
-      description: 'Los compactos de jugadas, goles y mejores momentos de cada fecha.',
-      videoCount: '48 videos',
-      badge: '#GOLES',
-      url: 'https://www.youtube.com/@PasionlomonegraByN/videos',
-    },
-    {
-      id: 'pl-3',
-      title: 'Reserva e Inferiores',
-      description: 'Cobertura de los semilleros y categorías formativas del club.',
-      videoCount: '19 emisiones',
-      badge: '#JUVENILES',
-      url: 'https://www.youtube.com/@PasionlomonegraByN/playlists',
-    },
-  ];
+
 
   // Cerrar al presionar Escape en móviles
   useEffect(() => {
@@ -159,7 +133,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 <span className="text-red-500 ml-1">LOMONEGRA</span>
               </div>
               <div className="text-[8px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">
-                SEÑAL // TRANSMISIÓN OFICIAL
+                TRANSMISIÓN // EN VIVO
               </div>
             </div>
           </Link>
@@ -188,7 +162,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           >
             <span className="flex items-center gap-2">
               <Radio className="w-3.5 h-3.5 text-red-400" />
-              <span>Señal En Vivo</span>
+              <span>Transmisión En Vivo</span>
             </span>
             <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
           </Link>
@@ -220,15 +194,15 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           >
             <span className="flex items-center gap-2">
               <Camera className="w-3.5 h-3.5 text-red-500" />
-              <span>Galería de Fotos</span>
+              <span>Galería</span>
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
           </Link>
         </div>
 
-        {/* 4. Selector de Pestañas Tipo Pill */}
+        {/* 4. Selector de Pestañas Tipo Pill (Agenda vs Tablas) */}
         <div className="p-3 border-b border-zinc-800/80 bg-[#12131a]/40 shrink-0">
-          <div className="grid grid-cols-3 p-1 rounded-xl bg-[#161720] border border-zinc-800 text-[10px] font-mono uppercase tracking-wider">
+          <div className="grid grid-cols-2 p-1 rounded-xl bg-[#161720] border border-zinc-800 text-[10px] font-mono uppercase tracking-wider">
             <button
               onClick={() => setActiveTab('matches')}
               className={`py-1.5 rounded-lg transition-all text-center ${
@@ -248,17 +222,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               }`}
             >
               Tablas
-            </button>
-            <button
-              onClick={() => setActiveTab('youtube')}
-              className={`py-1.5 rounded-lg transition-all text-center flex items-center justify-center gap-1 ${
-                activeTab === 'youtube'
-                  ? 'bg-red-600 text-white font-bold shadow-[0_0_12px_rgba(220,38,38,0.4)]'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              <Youtube className="w-3 h-3" />
-              <span>Videos</span>
             </button>
           </div>
         </div>
@@ -373,63 +336,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <span>Datos oficiales en vivo</span>
                 </p>
               </Link>
-            </div>
-          )}
-
-          {/* TAB 3: VIDEOS YOUTUBE */}
-          {activeTab === 'youtube' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500">
-                  Listas en YouTube
-                </span>
-                <Youtube className="w-3.5 h-3.5 text-red-500" />
-              </div>
-
-              <div className="space-y-2">
-                <Link
-                  href="/videos"
-                  onClick={handleLinkClick}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-red-950/60 hover:brightness-110 transition group"
-                >
-                  <div className="flex items-center gap-2">
-                    <Youtube className="w-4 h-4 text-white" />
-                    <span>Galería de Playlists</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-                {youtubePlaylists.map((pl) => (
-                  <a
-                    key={pl.id}
-                    href={pl.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block p-3 rounded-2xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition-all shadow-sm"
-                  >
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[8px] font-mono font-black uppercase text-red-400 bg-red-950/70 border border-red-800/60 px-1.5 py-0.5 rounded">
-                        {pl.badge}
-                      </span>
-                      <ExternalLink className="w-3 h-3 text-zinc-500 group-hover:text-red-400 transition-colors" />
-                    </div>
-
-                    <h4 className="text-xs font-bold text-white group-hover:text-red-400 transition-colors leading-snug mb-1">
-                      {pl.title}
-                    </h4>
-
-                    <p className="text-[10px] text-zinc-400 leading-relaxed line-clamp-2 mb-2">
-                      {pl.description}
-                    </p>
-
-                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                      <span>{pl.videoCount}</span>
-                      <span className="text-red-500 font-bold group-hover:translate-x-0.5 transition-transform flex items-center">
-                        Abrir <ChevronRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </a>
-                ))}
-              </div>
             </div>
           )}
 

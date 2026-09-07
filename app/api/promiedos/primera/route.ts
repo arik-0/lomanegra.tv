@@ -27,42 +27,71 @@ export async function GET() {
 
       if (match && match[1]) {
         const json = JSON.parse(match[1]);
-        const groups = json.props?.pageProps?.data?.tables_groups;
+        const groups = json.props?.pageProps?.data?.tables_groups || [];
         const clausura = groups?.[0];
+        const promediosGroup = groups.find((g: any) =>
+          (g.tables || []).some((t: any) => (t.name || '').toLowerCase().includes('promedio'))
+        );
+        const anualGroup = groups.find((g: any) =>
+          (g.tables || []).some((t: any) => (t.name || '').toLowerCase().includes('anual'))
+        );
 
-        if (clausura && Array.isArray(clausura.tables) && clausura.tables.length > 0) {
-          const tables = clausura.tables.map((t: any) => {
+        const parseTableRows = (t: any) => {
+          return (t.table?.rows || []).map((r: any) => {
+            const valMap: Record<string, any> = {};
+            (r.values || []).forEach((v: any) => {
+              valMap[v.key] = v.value;
+            });
+            const goalsParts = (valMap['Goals'] || '0:0').split(':');
             return {
-              name: t.name,
-              destinations: t.table?.destinations || [],
-              rows: (t.table?.rows || []).map((r: any) => {
-                const valMap: Record<string, any> = {};
-                (r.values || []).forEach((v: any) => {
-                  valMap[v.key] = v.value;
-                });
-                const goalsParts = (valMap['Goals'] || '0:0').split(':');
-                return {
-                  pos: r.num,
-                  teamId: r.entity?.object?.id || '',
-                  teamName: r.entity?.object?.name || '',
-                  teamShort: r.entity?.object?.short_name || r.entity?.object?.name || '',
-                  logoUrl: r.entity?.object?.id
-                    ? `https://api.promiedos.com.ar/images/team/${r.entity.object.id}/1`
-                    : '',
-                  pts: Number(valMap['Points'] || 0),
-                  pj: Number(valMap['GamePlayed'] || 0),
-                  pg: Number(valMap['GamesWon'] || 0),
-                  pe: Number(valMap['GamesEven'] || 0),
-                  pp: Number(valMap['GamesLost'] || 0),
-                  gf: Number(goalsParts[0] || 0),
-                  gc: Number(goalsParts[1] || 0),
-                  dif: Number(valMap['Ratio'] || 0),
-                  trend: Array.isArray(valMap['{trend}']) ? valMap['{trend}'] : [],
-                  destinationColor: r.destination_color || null,
-                };
-              }),
+              pos: r.num,
+              teamId: r.entity?.object?.id || '',
+              teamName: r.entity?.object?.name || '',
+              teamShort: r.entity?.object?.short_name || r.entity?.object?.name || '',
+              logoUrl: r.entity?.object?.id
+                ? `https://api.promiedos.com.ar/images/team/${r.entity.object.id}/1`
+                : '',
+              pts: Number(valMap['Points'] || 0),
+              pj: Number(valMap['GamePlayed'] || 0),
+              pg: Number(valMap['GamesWon'] || 0),
+              pe: Number(valMap['GamesEven'] || 0),
+              pp: Number(valMap['GamesLost'] || 0),
+              gf: Number(goalsParts[0] || 0),
+              gc: Number(goalsParts[1] || 0),
+              dif: Number(valMap['Ratio'] || 0),
+              pct: valMap['Pct'] ? Number(valMap['Pct']) : null,
+              trend: Array.isArray(valMap['{trend}']) ? valMap['{trend}'] : [],
+              destinationColor: r.destination_color || null,
             };
           });
+        };
+
+        if (clausura && Array.isArray(clausura.tables) && clausura.tables.length > 0) {
+          const tables = clausura.tables.map((t: any) => ({
+            name: t.name,
+            destinations: t.table?.destinations || [],
+            rows: parseTableRows(t),
+          }));
+
+          let promedios = null;
+          if (promediosGroup?.tables?.[0]) {
+            const pt = promediosGroup.tables[0];
+            promedios = {
+              name: 'Tabla de Promedios',
+              destinations: pt.table?.destinations || [],
+              rows: parseTableRows(pt),
+            };
+          }
+
+          let anual = null;
+          if (anualGroup?.tables?.[0]) {
+            const at = anualGroup.tables[0];
+            anual = {
+              name: 'Tabla Anual 2026',
+              destinations: at.table?.destinations || [],
+              rows: parseTableRows(at),
+            };
+          }
 
           return NextResponse.json({
             success: true,
@@ -71,6 +100,8 @@ export async function GET() {
             league: 'Liga Profesional de Fútbol (AFA)',
             tournament: clausura.name || 'Torneo Clausura',
             tables,
+            promedios,
+            anual,
           });
         }
       }

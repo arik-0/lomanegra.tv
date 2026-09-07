@@ -63,18 +63,44 @@ export default async function HomePage() {
       );
 
       if (matchesRes && !matchesRes.error && matchesRes.data && matchesRes.data.length > 0) {
-        matches = matchesRes.data.map((m: any) => {
-          const isTbd =
-            m.description?.includes('[A CONFIRMAR]') ||
-            (m.date && new Date(m.date).getFullYear() >= 2099);
-          return {
-            ...m,
-            title: sanitizeRegionalText(m.title),
-            is_date_confirmed: !isTbd,
-            date: isTbd ? null : m.date,
-            description: sanitizeRegionalText((m.description || '').replace('[A CONFIRMAR]', '').trim()),
-          };
-        });
+        matches = matchesRes.data
+          .filter((m: any) => !m.title?.startsWith('__SYSTEM_'))
+          .map((m: any) => {
+            const rawDesc = m.description || '';
+            const isTbd =
+              rawDesc.includes('[A CONFIRMAR]') ||
+              (m.date && new Date(m.date).getFullYear() >= 2099);
+
+            let league = m.league || 'Liga Deportiva del Sur';
+            let category = m.category || 'Fútbol Mayor';
+            let is_live = m.is_live !== undefined ? Boolean(m.is_live) : false;
+
+            const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
+            if (metaMatch) {
+              try {
+                const parsed = JSON.parse(metaMatch[1]);
+                if (parsed.league) league = parsed.league;
+                if (parsed.category) category = parsed.category;
+                if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
+              } catch {}
+            }
+
+            const cleanDesc = rawDesc
+              .replace(/\[META:\{.*?\}\]/g, '')
+              .replace('[A CONFIRMAR]', '')
+              .trim();
+
+            return {
+              ...m,
+              title: sanitizeRegionalText(m.title),
+              is_date_confirmed: !isTbd,
+              date: isTbd ? null : m.date,
+              description: sanitizeRegionalText(cleanDesc),
+              league: sanitizeRegionalText(league),
+              category: sanitizeRegionalText(category),
+              is_live,
+            };
+          });
       }
 
       if (!user) {
@@ -410,7 +436,7 @@ export default async function HomePage() {
           {/* Métrica 1 */}
           <div className="p-4 sm:p-6 text-left">
             <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
-              SEÑAL OFICIAL
+              TRANSMISIÓN OFICIAL
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
               1080p <span className="text-[10px] sm:text-xs font-bold text-red-400 bg-red-950/70 border border-red-800/60 px-1.5 py-0.5 rounded align-middle">60 FPS</span>
@@ -425,17 +451,29 @@ export default async function HomePage() {
             <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
               COMIENZA
             </div>
-            <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              {isFeaturedDateConfirmed && featuredMatch.date ? (
-                new Date(featuredMatch.date).toLocaleDateString('es-AR', {
-                  weekday: 'short',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }).toUpperCase()
-              ) : (
-                'A CONFIRMAR'
-              )}
-            </div>
+            {isFeaturedDateConfirmed && featuredMatch.date ? (
+              <div className="space-y-1">
+                <div className="text-xs sm:text-sm font-bold text-zinc-300 font-mono tracking-wider">
+                  {new Date(featuredMatch.date).toLocaleDateString('es-AR', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                  }).toUpperCase()}
+                </div>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
+                  {new Date(featuredMatch.date).toLocaleTimeString('es-AR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })}{' '}
+                  <span className="text-xs sm:text-sm font-bold text-red-500">HS</span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-xl sm:text-2xl font-black font-mono tracking-tight text-amber-400 leading-none">
+                A CONFIRMAR
+              </div>
+            )}
             <div className="text-[10px] sm:text-[11px] text-red-400 mt-2 font-mono flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
               <span>Transmisión en vivo</span>
