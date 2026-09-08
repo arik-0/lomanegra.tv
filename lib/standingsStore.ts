@@ -1,9 +1,40 @@
 // Almacén central de datos deportivos de la Liga Deportiva del Sur
 // Soporta División en Zonas, Llaves de Play-offs (16avos, 8vos, Cuartos, Semis, Final) y Goleadores
 
+export type DeporteType = 'futbol' | 'hockey';
 export type TorneoType = 'apertura' | 'clausura' | 'primer' | 'segundo';
-export type CategoriaType = 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta';
+export type CategoriaType =
+  | 'mayor'
+  | 'reserva'
+  | 'tercera'
+  | 'cuarta'
+  | 'quinta'
+  | 'primera_hockey'
+  | 'reserva_hockey'
+  | 'sub18_hockey'
+  | 'sub16_hockey'
+  | 'sub14_hockey'
+  | 'sub12_hockey';
+
 export type PlayoffRound = '16avos' | '8vos' | 'cuartos' | 'semifinal' | 'final';
+export type PlayoffModality = '16avos' | '8vos' | 'cuartos' | 'semifinal' | 'final' | 'none';
+
+export const FUTBOL_CATEGORIES: { id: CategoriaType; label: string }[] = [
+  { id: 'mayor', label: 'Primera División' },
+  { id: 'reserva', label: 'Reserva' },
+  { id: 'tercera', label: 'Tercera División' },
+  { id: 'cuarta', label: 'Cuarta División' },
+  { id: 'quinta', label: 'Quinta División' },
+];
+
+export const HOCKEY_CATEGORIES: { id: CategoriaType; label: string }[] = [
+  { id: 'primera_hockey', label: 'Primera División' },
+  { id: 'reserva_hockey', label: 'Reserva' },
+  { id: 'sub18_hockey', label: 'Sub-18' },
+  { id: 'sub16_hockey', label: 'Sub-16' },
+  { id: 'sub14_hockey', label: 'Sub-14' },
+  { id: 'sub12_hockey', label: 'Sub-12' },
+];
 
 export interface TeamStandingsRow {
   id: string;
@@ -30,9 +61,10 @@ export const TEAM_LOGOS: Record<string, string> = {
   'byn': '/teams/Blanco y Negro.png',
   'san martín': '/teams/San Martin.png',
   'san martin': '/teams/San Martin.png',
+  'argentino de firmat': '/teams/Argentino de Firmat.png',
+  'argentino firmat': '/teams/Argentino de Firmat.png',
   'firmat fbc': '/teams/Firmat FBC.png',
   'firmat': '/teams/Firmat FBC.png',
-  'argentino de firmat': '/teams/Argentino de Firmat.png',
   'atlético acebal': '/teams/Atletico Acebal.png',
   'atletico acebal': '/teams/Atletico Acebal.png',
   'atlético paz': '/teams/Atletico Paz.png',
@@ -63,33 +95,104 @@ export const TEAM_LOGOS: Record<string, string> = {
   'sportivo bombal': '/teams/Sportivo Bombal.png',
 };
 
+// Algoritmo de reconocimiento inteligente y robusto de escudos de clubes
 export function getTeamLogo(teamName: string): string {
   if (!teamName) return '/teams/Blanco y Negro.png';
   const clean = teamName.toLowerCase().trim();
   const normalized = clean.replace(/\./g, '').replace(/\s+/g, ' ').trim();
 
-  // Mapeo directo para I. F. C. (Independiente)
+  // 1. REGLAS PRIORITARIAS ANTI-COLISIÓN (Soluciona error de Imagen 1)
+  // Argentino de Firmat: NO debe ser capturado por "Firmat FBC"
+  if (
+    clean.includes('argentino de firmat') ||
+    clean.includes('argentino firmat') ||
+    normalized.includes('argentino firmat') ||
+    clean.startsWith('argentino')
+  ) {
+    return '/teams/Argentino de Firmat.png';
+  }
+
+  // Firmat FBC (solo si no es Argentino de Firmat)
+  if (
+    clean.includes('firmat fbc') ||
+    clean.includes('firmat fútbol club') ||
+    clean.includes('firmat futbol club') ||
+    clean === 'firmat' ||
+    clean.startsWith('firmat')
+  ) {
+    return '/teams/Firmat FBC.png';
+  }
+
+  // Sportivo Bombal: NO debe confundirse con Bombal Juniors
+  if (
+    clean.includes('sportivo bombal') ||
+    clean.startsWith('sportivo')
+  ) {
+    return '/teams/Sportivo Bombal.png';
+  }
+
+  // Bombal Juniors
+  if (
+    clean.includes('bombal juniors') ||
+    clean.includes('bombal jr') ||
+    clean === 'bombal'
+  ) {
+    return '/teams/Bombal Juniors.png';
+  }
+
+  // Sporting de Bigand: NO debe confundirse con Independiente de Bigand
+  if (
+    clean.includes('sporting de bigand') ||
+    clean.includes('sporting bigand') ||
+    clean.startsWith('sporting')
+  ) {
+    return '/teams/Sporting de Bigan.png';
+  }
+
+  // Independiente de Bigand / IFC
   if (
     normalized === 'ifc' ||
     normalized === 'i f c' ||
     clean.includes('ifc') ||
     clean.includes('i. f. c') ||
     clean.includes('i.f.c') ||
+    clean.includes('independiente de bigand') ||
+    clean.includes('independiente de bigan') ||
     clean.includes('independiente')
   ) {
     return '/teams/ifc.png';
   }
 
-  // Mapeo directo para Blanco y Negro / ByD
+  // Blanco y Negro / ByD / ByN
   if (clean.includes('blanco y negro') || clean === 'byd' || clean === 'byn') {
     return '/teams/Blanco y Negro.png';
   }
 
-  for (const [key, path] of Object.entries(TEAM_LOGOS)) {
-    if (clean === key || clean.includes(key) || key.includes(clean)) {
-      return path;
+  // 2. Coincidencia directa exacta
+  if (TEAM_LOGOS[clean]) {
+    return TEAM_LOGOS[clean];
+  }
+  if (TEAM_LOGOS[normalized]) {
+    return TEAM_LOGOS[normalized];
+  }
+
+  // 3. Coincidencia por frases más largas primero (longitud descendente para evitar falsos positivos)
+  const sortedKeys = Object.keys(TEAM_LOGOS).sort((a, b) => b.length - a.length);
+  for (const key of sortedKeys) {
+    if (key.length >= 4 && clean.includes(key)) {
+      return TEAM_LOGOS[key];
     }
   }
+
+  // 4. Si el usuario está escribiendo y lleva 4 o más caracteres, autocompletar por prefijo
+  if (clean.length >= 4) {
+    for (const key of sortedKeys) {
+      if (key.startsWith(clean)) {
+        return TEAM_LOGOS[key];
+      }
+    }
+  }
+
   return '/teams/Blanco y Negro.png';
 }
 
@@ -139,7 +242,9 @@ export interface GoleadorRow {
 export interface TournamentStandings {
   year: string;
   torneo: TorneoType;
+  deporte?: DeporteType;
   categoria: CategoriaType;
+  playoffModality?: PlayoffModality;
   zones: ZoneData[];
   playoffs: PlayoffMatch[];
   goleadores: GoleadorRow[];
@@ -438,12 +543,93 @@ export function resolvePlayoffSeed(expression?: string, zones?: ZoneData[]): str
   return team ? team.name : null;
 }
 
-// Sincroniza dinámicamente los cruces de PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final)
-// a partir de los casilleros de semillas (seed1 / seed2) y las tablas de posiciones de las zonas.
-export function syncPlayoffMatches(standings: TournamentStandings): TournamentStandings {
-  if (!standings || !standings.zones || standings.zones.length === 0) return standings;
+// Función que propaga automáticamente los ganadores de cada fase de play-off a la siguiente ronda
+export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] {
+  if (!playoffs || playoffs.length === 0) return playoffs;
 
+  const getWinner = (m?: PlayoffMatch): string | null => {
+    if (!m || !m.team1 || !m.team2 || m.team1 === 'A definir' || m.team2 === 'A definir') return null;
+    if (m.winner === 1) return m.team1;
+    if (m.winner === 2) return m.team2;
+    if (m.score1 !== null && m.score2 !== null) {
+      if (m.score1 > m.score2) return m.team1;
+      if (m.score2 > m.score1) return m.team2;
+      if (typeof m.penalties1 === 'number' && typeof m.penalties2 === 'number') {
+        if (m.penalties1 > m.penalties2) return m.team1;
+        if (m.penalties2 > m.penalties1) return m.team2;
+      }
+    }
+    return null;
+  };
+
+  const matchMap = new Map<string, PlayoffMatch>();
+  playoffs.forEach((m) => matchMap.set(m.id, { ...m }));
+
+  // 1. De 8vos a Cuartos
+  for (let i = 1; i <= 4; i++) {
+    const cId = `c${i}`;
+    const cuarto = matchMap.get(cId);
+    if (cuarto) {
+      const w1 = getWinner(matchMap.get(`o${i * 2 - 1}`));
+      const w2 = getWinner(matchMap.get(`o${i * 2}`));
+      if (w1 && (!cuarto.seed1 || cuarto.seed1.toLowerCase().includes('ganador') || cuarto.team1 === 'A definir')) {
+        cuarto.team1 = w1;
+      }
+      if (w2 && (!cuarto.seed2 || cuarto.seed2.toLowerCase().includes('ganador') || cuarto.team2 === 'A definir')) {
+        cuarto.team2 = w2;
+      }
+    }
+  }
+
+  // 2. De Cuartos a Semifinal
+  const s1 = matchMap.get('s1');
+  if (s1) {
+    const w1 = getWinner(matchMap.get('c1'));
+    const w2 = getWinner(matchMap.get('c2'));
+    if (w1 && (!s1.seed1 || s1.seed1.toLowerCase().includes('ganador') || s1.team1 === 'A definir')) {
+      s1.team1 = w1;
+    }
+    if (w2 && (!s1.seed2 || s1.seed2.toLowerCase().includes('ganador') || s1.team2 === 'A definir')) {
+      s1.team2 = w2;
+    }
+  }
+  const s2 = matchMap.get('s2');
+  if (s2) {
+    const w1 = getWinner(matchMap.get('c3'));
+    const w2 = getWinner(matchMap.get('c4'));
+    if (w1 && (!s2.seed1 || s2.seed1.toLowerCase().includes('ganador') || s2.team1 === 'A definir')) {
+      s2.team1 = w1;
+    }
+    if (w2 && (!s2.seed2 || s2.seed2.toLowerCase().includes('ganador') || s2.team2 === 'A definir')) {
+      s2.team2 = w2;
+    }
+  }
+
+  // 3. De Semifinal a Gran Final
+  const f1 = matchMap.get('f1');
+  if (f1) {
+    const w1 = getWinner(matchMap.get('s1'));
+    const w2 = getWinner(matchMap.get('s2'));
+    if (w1 && (!f1.seed1 || f1.seed1.toLowerCase().includes('ganador') || f1.team1 === 'A definir')) {
+      f1.team1 = w1;
+    }
+    if (w2 && (!f1.seed2 || f1.seed2.toLowerCase().includes('ganador') || f1.team2 === 'A definir')) {
+      f1.team2 = w2;
+    }
+  }
+
+  return Array.from(matchMap.values());
+}
+
+// Sincroniza dinámicamente los cruces de PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final)
+// a partir de los casilleros de semillas (seed1 / seed2), tablas de posiciones y avance de ganadores.
+export function syncPlayoffMatches(standings: TournamentStandings): TournamentStandings {
+  if (!standings) return standings;
   const currentPlayoffs = standings.playoffs || [];
+
+  if (!standings.zones || standings.zones.length === 0) {
+    return { ...standings, playoffs: advancePlayoffWinners(currentPlayoffs) };
+  }
 
   // Si no hay cuartos definidos por defecto, proveer los cruces reglamentarios estándar
   const defaultCuartosSeeds: Record<string, { seed1: string; seed2: string; title: string }> = {
@@ -454,7 +640,6 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
   };
 
   const updatedPlayoffs = currentPlayoffs.map((m) => {
-    // Si no tiene semillas asignadas y es un cuarto estándar, asignarlas
     let seed1 = m.seed1;
     let seed2 = m.seed2;
     let title = m.title;
@@ -468,12 +653,12 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
     let team1 = m.team1;
     let team2 = m.team2;
 
-    if (seed1) {
+    if (seed1 && !seed1.toLowerCase().includes('ganador')) {
       const resolved = resolvePlayoffSeed(seed1, standings.zones);
       if (resolved) team1 = resolved;
     }
 
-    if (seed2) {
+    if (seed2 && !seed2.toLowerCase().includes('ganador')) {
       const resolved = resolvePlayoffSeed(seed2, standings.zones);
       if (resolved) team2 = resolved;
     }
@@ -496,10 +681,231 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
     };
   });
 
+  // Auto-propagar ganadores a las siguientes rondas
+  const finalizedPlayoffs = advancePlayoffWinners(updatedPlayoffs);
+
   return {
     ...standings,
-    playoffs: updatedPlayoffs,
+    playoffs: finalizedPlayoffs,
   };
+}
+
+// Generador de estructura de Play-Offs según modalidad seleccionada
+export function generatePlayoffsByModality(
+  standings: TournamentStandings,
+  modality: PlayoffModality
+): TournamentStandings {
+  let list: PlayoffMatch[] = [];
+
+  if (modality === '8vos') {
+    const octavosSeeds = [
+      { id: 'o1', s1: '1ero A', s2: '8vo B', title: '8vos 1 (1°A vs 8°B)' },
+      { id: 'o2', s1: '4to A', s2: '5to B', title: '8vos 2 (4°A vs 5°B)' },
+      { id: 'o3', s1: '2do A', s2: '7mo B', title: '8vos 3 (2°A vs 7°B)' },
+      { id: 'o4', s1: '3ro A', s2: '6to B', title: '8vos 4 (3°A vs 6°B)' },
+      { id: 'o5', s1: '1ero B', s2: '8vo A', title: '8vos 5 (1°B vs 8°A)' },
+      { id: 'o6', s1: '4to B', s2: '5to A', title: '8vos 6 (4°B vs 5°A)' },
+      { id: 'o7', s1: '2do B', s2: '7mo A', title: '8vos 7 (2°B vs 7°A)' },
+      { id: 'o8', s1: '3ro B', s2: '6to A', title: '8vos 8 (3°B vs 6°A)' },
+    ];
+    octavosSeeds.forEach((o) => {
+      list.push({
+        id: o.id,
+        round: '8vos',
+        title: o.title,
+        seed1: o.s1,
+        seed2: o.s2,
+        team1: 'A definir',
+        team2: 'A definir',
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      });
+    });
+
+    for (let i = 1; i <= 4; i++) {
+      list.push({
+        id: `c${i}`,
+        round: 'cuartos',
+        title: `Cuartos ${i} (Ganador 8vos ${i * 2 - 1} vs ${i * 2})`,
+        seed1: `Ganador 8vos ${i * 2 - 1}`,
+        seed2: `Ganador 8vos ${i * 2}`,
+        team1: 'A definir',
+        team2: 'A definir',
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      });
+    }
+
+    list.push({
+      id: 's1',
+      round: 'semifinal',
+      title: 'Semifinal 1 (Ganador C1 vs C2)',
+      seed1: 'Ganador C1',
+      seed2: 'Ganador C2',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 's2',
+      round: 'semifinal',
+      title: 'Semifinal 2 (Ganador C3 vs C4)',
+      seed1: 'Ganador C3',
+      seed2: 'Ganador C4',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 'f1',
+      round: 'final',
+      title: 'Gran Final del Torneo',
+      seed1: 'Ganador Semi 1',
+      seed2: 'Ganador Semi 2',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+  } else if (modality === 'cuartos') {
+    const cuartosSeeds = [
+      { id: 'c1', s1: '1ero A', s2: '4to B', title: 'Cuartos 1 (1°A vs 4°B)' },
+      { id: 'c2', s1: '2do A', s2: '3ro B', title: 'Cuartos 2 (2°A vs 3°B)' },
+      { id: 'c3', s1: '1ero B', s2: '4to A', title: 'Cuartos 3 (1°B vs 4°A)' },
+      { id: 'c4', s1: '2do B', s2: '3ro A', title: 'Cuartos 4 (2°B vs 3°A)' },
+    ];
+    cuartosSeeds.forEach((c) => {
+      list.push({
+        id: c.id,
+        round: 'cuartos',
+        title: c.title,
+        seed1: c.s1,
+        seed2: c.s2,
+        team1: 'A definir',
+        team2: 'A definir',
+        score1: null,
+        score2: null,
+        status: 'programado',
+        dateInfo: 'A disputarse',
+      });
+    });
+
+    list.push({
+      id: 's1',
+      round: 'semifinal',
+      title: 'Semifinal 1 (Ganador C1 vs C2)',
+      seed1: 'Ganador C1',
+      seed2: 'Ganador C2',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 's2',
+      round: 'semifinal',
+      title: 'Semifinal 2 (Ganador C3 vs C4)',
+      seed1: 'Ganador C3',
+      seed2: 'Ganador C4',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 'f1',
+      round: 'final',
+      title: 'Gran Final del Torneo',
+      seed1: 'Ganador Semi 1',
+      seed2: 'Ganador Semi 2',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+  } else if (modality === 'semifinal') {
+    list.push({
+      id: 's1',
+      round: 'semifinal',
+      title: 'Semifinal 1 (1°A vs 2°B)',
+      seed1: '1ero A',
+      seed2: '2do B',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 's2',
+      round: 'semifinal',
+      title: 'Semifinal 2 (1°B vs 2°A)',
+      seed1: '1ero B',
+      seed2: '2do A',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+    list.push({
+      id: 'f1',
+      round: 'final',
+      title: 'Gran Final del Torneo',
+      seed1: 'Ganador Semi 1',
+      seed2: 'Ganador Semi 2',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+  } else if (modality === 'final') {
+    list.push({
+      id: 'f1',
+      round: 'final',
+      title: 'Gran Final del Torneo (1°A vs 1°B)',
+      seed1: '1ero A',
+      seed2: '1ero B',
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      status: 'programado',
+      dateInfo: 'A disputarse',
+    });
+  } else if (modality === 'none') {
+    list = [];
+  }
+
+  const updated: TournamentStandings = {
+    ...standings,
+    playoffModality: modality,
+    playoffs: list,
+  };
+
+  return syncPlayoffMatches(updated);
 }
 
 // Alias para compatibilidad hacia atrás
@@ -1102,21 +1508,84 @@ rawClausuraStandings.playoffs = rawClausuraStandings.playoffs.map((p) => ({
 export const defaultClausuraStandings: TournamentStandings = syncPlayoffQuarterfinals(rawClausuraStandings);
 export const defaultStandings: TournamentStandings = defaultAperturaStandings;
 
-// Almacén en memoria global para el servidor Next.js con soporte Apertura / Clausura
+// Almacén en memoria global para el servidor Next.js con soporte multi-deporte y categorías
 declare global {
   // eslint-disable-next-line no-var
-  var globalTournamentsStore: {
-    apertura: TournamentStandings;
-    clausura: TournamentStandings;
-  } | undefined;
+  var globalTournamentsStore: Record<string, TournamentStandings> | undefined;
 }
 
-export function normalizeTorneoKey(torneo?: string): 'apertura' | 'clausura' {
-  if (!torneo) return 'apertura';
-  const clean = torneo.toLowerCase().trim();
-  if (clean === 'clausura' || clean === 'segundo') return 'clausura';
-  return 'apertura';
+export function createDefaultStandings(
+  deporte: DeporteType = 'futbol',
+  categoria: CategoriaType = 'mayor',
+  torneo: TorneoType = 'apertura'
+): TournamentStandings {
+  const normTorneo: TorneoType = torneo === 'clausura' || torneo === 'segundo' ? 'clausura' : 'apertura';
+
+  // Fútbol Mayor
+  if (deporte === 'futbol' && (categoria === 'mayor' || !categoria)) {
+    return normTorneo === 'clausura' ? defaultClausuraStandings : defaultAperturaStandings;
+  }
+
+  // Fútbol Formativas (Reserva, Tercera, Cuarta, Quinta)
+  if (deporte === 'futbol') {
+    const base = JSON.parse(JSON.stringify(normTorneo === 'clausura' ? defaultClausuraStandings : defaultAperturaStandings));
+    base.deporte = 'futbol';
+    base.categoria = categoria;
+    base.torneo = normTorneo;
+    base.goleadores = [];
+    return syncPlayoffMatches(base);
+  }
+
+  // Hockey (Primera División, Reserva, Sub-18, Sub-16, Sub-14, Sub-12)
+  const hockeyTeamsA: TeamStandingsRow[] = [
+    { id: 'h-byn', pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['W', 'W', 'W'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+    { id: 'h-san-martin', pos: 2, name: 'San Martín', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['W'], qualified: true, logoUrl: '/teams/San Martin.png' },
+    { id: 'h-argentino-firmat', pos: 3, name: 'Argentino de Firmat', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: true, logoUrl: '/teams/Argentino de Firmat.png' },
+    { id: 'h-los-andes', pos: 4, name: 'Los Andes', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: true, logoUrl: '/teams/Los Andes.png' },
+    { id: 'h-sportivo-bombal', pos: 5, name: 'Sportivo Bombal', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: false, logoUrl: '/teams/Sportivo Bombal.png' },
+  ];
+
+  const hockeyTeamsB: TeamStandingsRow[] = [
+    { id: 'h-firmat-fbc', pos: 1, name: 'Firmat FBC', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['W'], qualified: true, logoUrl: '/teams/Firmat FBC.png' },
+    { id: 'h-hughes', pos: 2, name: 'Hughes', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: true, logoUrl: '/teams/Hughes.png' },
+    { id: 'h-sporting-bigand', pos: 3, name: 'Sporting de Bigand', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: true, logoUrl: '/teams/Sporting de Bigan.png' },
+    { id: 'h-atletico-acebal', pos: 4, name: 'Atlético Acebal', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
+    { id: 'h-carreras', pos: 5, name: 'Carreras', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: ['D'], qualified: false, logoUrl: '/teams/Carreras.png' },
+  ];
+
+  const zoneA: ZoneData = {
+    id: 'hockey-zona-a',
+    name: 'Zona A',
+    teams: hockeyTeamsA,
+  };
+  zoneA.fixtures = generateFullRoundRobinFixture(zoneA);
+
+  const zoneB: ZoneData = {
+    id: 'hockey-zona-b',
+    name: 'Zona B',
+    teams: hockeyTeamsB,
+  };
+  zoneB.fixtures = generateFullRoundRobinFixture(zoneB);
+
+  const hockeyStandings: TournamentStandings = {
+    year: '2026',
+    torneo: normTorneo,
+    deporte: 'hockey',
+    categoria: categoria || 'primera_hockey',
+    playoffModality: 'cuartos',
+    zones: [zoneA, zoneB],
+    playoffs: [],
+    goleadores: [
+      { id: 'hg1', pos: 1, name: 'Delfina Meier', category: 'Hockey Femenino', goals: 6 },
+      { id: 'hg2', pos: 2, name: 'Micaela Schmidt', category: 'Hockey Femenino', goals: 4 },
+    ],
+  };
+
+  return generatePlayoffsByModality(hockeyStandings, 'cuartos');
 }
+
+export const defaultHockeyStandings: TournamentStandings = createDefaultStandings('hockey', 'primera_hockey', 'apertura');
+
 
 
 

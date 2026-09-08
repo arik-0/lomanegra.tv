@@ -21,6 +21,9 @@ import {
   TournamentStandings,
   TorneoType,
   CategoriaType,
+  DeporteType,
+  FUTBOL_CATEGORIES,
+  HOCKEY_CATEGORIES,
   defaultStandings,
   TeamStandingsRow,
   ZoneData,
@@ -50,9 +53,11 @@ export default function PosicionesPage() {
   const [selectedPublicRound, setSelectedPublicRound] = useState<string>('Fecha 1');
   const [selectedPublicZone, setSelectedPublicZone] = useState<string>('todas');
 
+  const [selectedDeporte, setSelectedDeporte] = useState<DeporteType>('futbol');
   const [selectedYear, setSelectedYear] = useState<string>('2026');
   const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('apertura');
   const [selectedCategoria, setSelectedCategoria] = useState<CategoriaType>('mayor');
+  const [isPlayoffOpen, setIsPlayoffOpen] = useState(true);
 
   const fetchPromiedos = async () => {
     setPromiedosLoading(true);
@@ -79,7 +84,9 @@ export default function PosicionesPage() {
     async function loadStandings() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/admin/standings?torneo=${selectedTorneo}`);
+        const res = await fetch(
+          `/api/admin/standings?deporte=${selectedDeporte}&categoria=${selectedCategoria}&torneo=${selectedTorneo}`
+        );
         if (res.ok) {
           const data = await res.json();
           if (data.standings) {
@@ -93,14 +100,20 @@ export default function PosicionesPage() {
       }
     }
     loadStandings();
-  }, [selectedTorneo]);
+  }, [selectedDeporte, selectedCategoria, selectedTorneo]);
 
-  const categoryLabels: Record<CategoriaType, string> = {
+  const categoryLabels: Record<string, string> = {
     mayor: 'Primera División',
     reserva: 'Reserva',
     tercera: 'Tercera División',
     cuarta: 'Cuarta División',
     quinta: 'Quinta División',
+    primera_hockey: 'Primera División',
+    reserva_hockey: 'Reserva',
+    sub18_hockey: 'Sub-18',
+    sub16_hockey: 'Sub-16',
+    sub14_hockey: 'Sub-14',
+    sub12_hockey: 'Sub-12',
   };
 
   // Unificación de todos los equipos de la liga para Tabla Anual y Promedios
@@ -293,19 +306,57 @@ export default function PosicionesPage() {
             </div>
           </div>
 
-          {/* Selector Horizontal de Categorías (Mayor, Reserva, 3ª, 4ª, 5ª) */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {(['mayor', 'reserva', 'tercera', 'cuarta', 'quinta'] as CategoriaType[]).map((cat) => (
+          {/* Selector de Deporte: FÚTBOL vs HOCKEY */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+            <div className="flex items-center gap-2 p-1 rounded-2xl bg-[#181922] border border-zinc-800 w-fit">
               <button
-                key={cat}
-                onClick={() => setSelectedCategoria(cat)}
+                onClick={() => {
+                  setSelectedDeporte('futbol');
+                  setSelectedCategoria('mayor');
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  selectedDeporte === 'futbol'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span>⚽</span>
+                <span>Fútbol</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedDeporte('hockey');
+                  setSelectedCategoria('primera_hockey');
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  selectedDeporte === 'hockey'
+                    ? 'bg-amber-500 text-black font-black shadow-md shadow-amber-950'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span>🏑</span>
+                <span>Hockey</span>
+              </button>
+            </div>
+
+            <div className="text-[10px] text-zinc-400 font-mono">
+              Disciplina: <span className="text-white font-bold">{selectedDeporte === 'futbol' ? 'Fútbol' : 'Hockey'}</span> &bull; {categoryLabels[selectedCategoria]}
+            </div>
+          </div>
+
+          {/* Selector Horizontal de Categorías dinámico según deporte */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {(selectedDeporte === 'futbol' ? FUTBOL_CATEGORIES : HOCKEY_CATEGORIES).map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategoria(cat.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition uppercase tracking-wider border ${
-                  selectedCategoria === cat
-                    ? 'bg-white text-black border-white shadow-md'
+                  selectedCategoria === cat.id
+                    ? 'bg-white text-black border-white shadow-md font-black'
                     : 'bg-[#181922] text-zinc-400 border-zinc-800/80 hover:border-zinc-700 hover:text-white'
                 }`}
               >
-                {categoryLabels[cat]}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -701,28 +752,40 @@ export default function PosicionesPage() {
         {/* ============================================================================== */}
         <section className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-950/60 border border-amber-800/70 flex items-center justify-center text-amber-500">
+            <button
+              type="button"
+              onClick={() => setIsPlayoffOpen((prev) => !prev)}
+              className="flex items-center gap-2.5 text-left group cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-950/60 border border-amber-800/70 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
                 <Award className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
-                  Play-Offs // Llaves Eliminatorias
+                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
+                  <span>Play-Offs // Llaves Eliminatorias</span>
+                  <span className="text-xs font-mono font-bold text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2 py-0.5 rounded-md">
+                    {isPlayoffOpen ? '▼ Plegar' : '▶ Desplegar'}
+                  </span>
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  Cuartos de final predefinidos desde la tabla (1°A vs 4°B, 2°A vs 3°B, 1°B vs 4°A, 2°B vs 3°A)
+                  Cruces eliminatorios calculados desde la tabla de posiciones &bull; Clic para {isPlayoffOpen ? 'ocultar' : 'mostrar'}
                 </div>
               </div>
-            </div>
+            </button>
 
             <div className="flex items-center gap-2 text-xs">
-              <span className="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-400 text-[10px]">
-                Eliminación Directa
-              </span>
+              <button
+                type="button"
+                onClick={() => setIsPlayoffOpen((prev) => !prev)}
+                className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition flex items-center gap-1.5"
+              >
+                <span>{isPlayoffOpen ? 'Ocultar Cuadro' : 'Ver Cuadro Completo'}</span>
+              </button>
             </div>
           </div>
 
-          <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-x-auto">
+          {isPlayoffOpen && (
+            <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-x-auto transition-all">
             {/* Diagrama de Llaves Interactivo */}
             <div className={`min-w-[760px] grid ${
               dieciseisMatches.length > 0
@@ -1005,6 +1068,7 @@ export default function PosicionesPage() {
               </div>
             </div>
           </div>
+          )}
         </section>
         {/* ============================================================================== */}
         {/* 4. SECCIÓN 3 DEL BOCETO: GOLEADORES DE BLANCO Y NEGRO (POR CATEGORÍA)         */}

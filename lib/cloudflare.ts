@@ -26,8 +26,8 @@ export async function generateStreamToken(
     return 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
   }
 
-  // Normalizar saltos de línea literales \n a saltos de línea reales
-  let formattedKey = privateKeyPem.replace(/\\n/g, '\n').trim();
+  // Normalizar saltos de línea literales \n a saltos de línea reales y remover comillas envolventes
+  let formattedKey = privateKeyPem.replace(/^["']|["']$/g, '').replace(/\\n/g, '\n').trim();
 
   // Si la clave viene en formato PKCS#1 (BEGIN RSA PRIVATE KEY), convertir a PKCS#8
   if (formattedKey.includes('BEGIN RSA PRIVATE KEY')) {
