@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import StreamPlayerWrapper from './StreamPlayerWrapper';
 import CheckoutButton from './CheckoutButton';
-import SimulatePurchaseButton from './SimulatePurchaseButton';
+import MatchPoster from '@/components/MatchPoster';
 import CountdownTimer from '@/components/CountdownTimer';
 import SponsorsStrip from '@/components/SponsorsStrip';
 import { getTeamLogo } from '@/lib/standingsStore';
@@ -21,6 +22,8 @@ import {
   ArrowRight,
   Info,
   Clock,
+  Sparkles,
+  X,
 } from 'lucide-react';
 
 interface MatchViewClientProps {
@@ -33,11 +36,14 @@ interface MatchViewClientProps {
     image_url: string | null;
     cloudflare_live_input_uid: string;
     is_date_confirmed?: boolean;
+    league?: string | null;
+    category?: string | null;
   };
   serverHasPaid: boolean;
   currentUserEmail: string | null;
   paymentStatus?: string;
   queryGuestEmail?: string;
+  isAdmin?: boolean;
 }
 
 export default function MatchViewClient({
@@ -46,10 +52,12 @@ export default function MatchViewClient({
   currentUserEmail,
   paymentStatus,
   queryGuestEmail,
+  isAdmin = false,
 }: MatchViewClientProps) {
-  const [hasPaid, setHasPaid] = useState(serverHasPaid);
+  const [hasPaid, setHasPaid] = useState(serverHasPaid || isAdmin);
+  const [isAdminActive, setIsAdminActive] = useState(isAdmin);
   const [activeGuestEmail, setActiveGuestEmail] = useState<string | null>(
-    queryGuestEmail || null
+    queryGuestEmail || (isAdmin ? 'operador@pasionlomonegra.com' : null)
   );
   const [showRestoreInput, setShowRestoreInput] = useState(false);
   const [restoreEmail, setRestoreEmail] = useState('');
@@ -58,6 +66,12 @@ export default function MatchViewClient({
     type: 'error' | 'success';
     text: string;
   } | null>(null);
+
+  // Estados para el backdoor seguro de operador/administrador
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminError, setAdminError] = useState('');
+  const [adminLoading, setAdminLoading] = useState(false);
 
   // Al cargar, verificar si hay aprobación local previa o retorno exitoso de pasarela
   useEffect(() => {
@@ -137,6 +151,34 @@ export default function MatchViewClient({
     verifyGuestEmail(restoreEmail.toLowerCase().trim());
   };
 
+  const handleAdminUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminPassword.trim()) return;
+    setAdminLoading(true);
+    setAdminError('');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPassword.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAdminActive(true);
+        setHasPaid(true);
+        setActiveGuestEmail('operador@pasionlomonegra.com');
+        setShowAdminModal(false);
+        setAdminPassword('');
+      } else {
+        setAdminError(data.error || 'Clave de operador no válida.');
+      }
+    } catch {
+      setAdminError('Error de conexión al autenticar operador.');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
   const isDateConfirmed = match.is_date_confirmed !== false && !!match.date;
   const matchDate = isDateConfirmed && match.date
     ? new Date(match.date).toLocaleString('es-AR', {
@@ -164,6 +206,21 @@ export default function MatchViewClient({
       {hasPaid ? (
         /* VISTA: REPRODUCTOR ACTIVO ESTILO FORG1 CON ESQUINAS HUD */
         <div className="space-y-6 animate-fade-in">
+          {isAdminActive && (
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-950/80 via-zinc-900 to-[#0c0c10] border border-red-500/50 flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-2 text-xs font-mono text-white">
+                <Radio className="w-4 h-4 text-red-500 animate-pulse" />
+                <span className="font-bold uppercase tracking-wider">Modo Operador / Control de Transmisión Activo</span>
+              </div>
+              <Link
+                href="/admin"
+                className="text-[11px] font-mono font-bold text-red-400 hover:text-white underline transition"
+              >
+                Panel de Operaciones &rarr;
+              </Link>
+            </div>
+          )}
+
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0c0c10] shadow-[0_12px_40px_rgba(0,0,0,0.8)]">
             {/* Escuadras HUD sobre el visor */}
             <span className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-red-500/60 z-30 pointer-events-none" />
@@ -212,38 +269,16 @@ export default function MatchViewClient({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Columna Izquierda: Gráfica del Partido, Cuenta Regresiva e Info */}
           <div className="lg:col-span-7 space-y-6">
-            {/* Banner de Encuadre del Partido con HUD Corners */}
-            <div className="relative overflow-hidden rounded-3xl bg-[#0c0c10] border border-white/[0.08] shadow-2xl group">
-              {/* Escuadras HUD */}
-              <span className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-red-500/50 z-20 pointer-events-none" />
-              <span className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-red-500/50 z-20 pointer-events-none" />
-              <span className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-red-500/50 z-20 pointer-events-none" />
-              <span className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-red-500/50 z-20 pointer-events-none" />
-
-              {match.image_url ? (
-                <div className="relative w-full aspect-video sm:aspect-[16/9] overflow-hidden bg-black flex items-center justify-center">
-                  <Image
-                    src={match.image_url}
-                    alt={match.title}
-                    fill
-                    priority
-                    className="object-contain transform group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
-                </div>
-              ) : (
-                <div className="w-full aspect-video bg-[#0c0c10] flex items-center justify-center p-8">
-                  <Tv className="w-16 h-16 text-zinc-700" />
-                </div>
-              )}
-
-              {/* Superposición con badge técnico */}
-              <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                <span className="px-3 py-1 rounded-md bg-red-600/90 backdrop-blur-md text-white text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-red-950">
-                  <Radio className="w-3 h-3 animate-pulse" />
-                  <span>TRANSMISIÓN EN DIRECTO</span>
-                </span>
-              </div>
+            {/* Afiche Oficial de Transmisión con Escudos Auténticos de Ambos Clubes */}
+            <div className="rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl group">
+              <MatchPoster
+                title={match.title}
+                imageUrl={match.image_url}
+                league={match.league}
+                category={match.category}
+                size="hero"
+                priority={true}
+              />
             </div>
 
             {/* Ficha Técnica del Partido */}
@@ -351,9 +386,14 @@ export default function MatchViewClient({
                     <span className="text-xs font-bold text-red-500">ARS</span>
                   </div>
                 </div>
-                <div className="w-11 h-11 rounded-2xl bg-red-950/50 border border-red-800/60 flex items-center justify-center text-red-500">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminModal(true)}
+                  title="Acceso de Operador / Administración"
+                  className="w-11 h-11 rounded-2xl bg-red-950/50 hover:bg-red-900/70 border border-red-800/60 hover:border-red-600 flex items-center justify-center text-red-500 hover:text-red-400 transition-all cursor-pointer active:scale-95"
+                >
                   <Lock className="w-5 h-5" />
-                </div>
+                </button>
               </div>
 
               {isDateConfirmed ? (
@@ -458,14 +498,17 @@ export default function MatchViewClient({
                 </div>
               )}
 
-              {/* Botón de Desarrollo para simular pase */}
-              <SimulatePurchaseButton
-                matchId={match.id}
-                onSimulated={(email) => {
-                  setHasPaid(true);
-                  setActiveGuestEmail(email);
-                }}
-              />
+              {/* Acceso de Operador / Admin (Backdoor de transmisión) */}
+              <div className="mt-4 pt-4 border-t border-white/[0.06] text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminModal(true)}
+                  className="text-[11px] font-mono text-zinc-500 hover:text-zinc-300 transition-colors inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-white/[0.03]"
+                >
+                  <Lock className="w-3 h-3 text-red-500/70" />
+                  <span>Acceso de Operador</span>
+                </button>
+              </div>
             </div>
 
             {/* Garantías de Seguridad */}
@@ -475,6 +518,68 @@ export default function MatchViewClient({
                 Acceso exclusivo a la transmisión multicámara en HD. Control de concurrencia de 1 pantalla activa.
               </span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Seguro de Acceso para Operador / Admin */}
+      {showAdminModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-sm rounded-3xl bg-[#0e0f14] border border-red-600/40 p-6 shadow-2xl">
+            <button
+              onClick={() => {
+                setShowAdminModal(false);
+                setAdminError('');
+              }}
+              className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500">
+                <Lock className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-white font-mono uppercase tracking-wider">
+                  Acceso de Operador
+                </h3>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  Desbloqueo de señal en vivo
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleAdminUnlock} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1.5">
+                  Contraseña Maestra de Administrador:
+                </label>
+                <input
+                  type="password"
+                  autoFocus
+                  required
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/[0.1] focus:border-red-500 text-sm text-white font-mono placeholder-zinc-600 outline-none"
+                />
+              </div>
+
+              {adminError && (
+                <p className="text-xs font-mono text-red-400 bg-red-950/40 border border-red-900/50 p-2.5 rounded-xl">
+                  {adminError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={adminLoading}
+                className="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-red-950 transition active:scale-95 disabled:opacity-50"
+              >
+                {adminLoading ? 'Validando...' : 'Desbloquear Transmisión'}
+              </button>
+            </form>
           </div>
         </div>
       )}

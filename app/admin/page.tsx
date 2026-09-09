@@ -300,7 +300,7 @@ export default function AdminPage() {
       setFormIsDateConfirmed(true);
       setFormPrice(3500);
       setFormStreamUid('live_input_byn');
-      setFormImageUrl('/matches/blanco-y-negro-vs-ifc.png');
+      setFormImageUrl('');
       setFormIsLive(false);
     }
     setIsMatchModalOpen(true);
@@ -324,7 +324,7 @@ export default function AdminPage() {
         is_date_confirmed: formIsDateConfirmed,
         price: Number(formPrice) || 3500,
         cloudflare_live_input_uid: formStreamUid.trim() || 'live_input_byn',
-        image_url: formImageUrl.trim() || '/matches/blanco-y-negro-vs-ifc.png',
+        image_url: formImageUrl.trim() || null,
         is_live: formIsLive,
       };
 
@@ -2700,7 +2700,7 @@ export default function AdminPage() {
                     type="text"
                     value={formImageUrl}
                     onChange={(e) => setFormImageUrl(e.target.value)}
-                    placeholder="/matches/blanco-y-negro-vs-ifc.png o https://..."
+                    placeholder="Opcional: Dejar vacío para afiche automático con los escudos oficiales"
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                   />
                   {formImageUrl && (

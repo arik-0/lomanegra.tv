@@ -9,6 +9,7 @@ import SponsorsStrip from '@/components/SponsorsStrip';
 import SponsorsTicker from '@/components/SponsorsTicker';
 import { getTeamLogo } from '@/lib/standingsStore';
 import { sanitizeRegionalText } from '@/lib/sanitize';
+import MatchPoster from '@/components/MatchPoster';
 import {
   Calendar,
   PlayCircle,
@@ -380,48 +381,24 @@ export default async function HomePage() {
                 />
               </div>
 
-              {/* Imagen / Encuadre Oficial del Partido (Verde = Miniatura de Cancha) */}
+              {/* Imagen / Afiche Oficial del Partido */}
               <div className="lg:col-span-5">
                 <Link
                   href={`/partido/${featuredMatch.id}`}
                   prefetch={true}
-                  className="block relative rounded-2xl overflow-hidden border border-emerald-500/30 hover:border-emerald-400/60 transition-all duration-300 shadow-[0_8px_32px_rgba(16,185,129,0.15)] group bg-gradient-to-br from-[#052312] via-[#091a11] to-[#0c0c10]"
+                  className="block relative rounded-3xl overflow-hidden border border-red-500/40 hover:border-red-500/80 transition-all duration-300 shadow-[0_8px_32px_rgba(220,38,38,0.2)] group"
                 >
-                  <div className="relative w-full aspect-video flex items-center justify-center p-3 overflow-hidden">
-                    {/* Atmósfera verde de cancha de fútbol con líneas de campo sutiles */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.18),transparent_72%)] pointer-events-none" />
-                    <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 h-[1px] bg-emerald-500/10 pointer-events-none" />
-                    <div className="absolute inset-y-6 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full border border-emerald-500/15 pointer-events-none" />
-
-                    {featuredMatch.image_url ? (
-                      <Image
-                        src={featuredMatch.image_url}
-                        alt={featuredMatch.title}
-                        fill
-                        priority
-                        className="object-contain transform group-hover:scale-105 transition-transform duration-500 relative z-10"
-                      />
-                    ) : (
-                      <div className="relative z-10 flex flex-col items-center gap-3 text-center px-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 relative drop-shadow-lg">
-                            <Image src={featuredT1Logo} alt={featuredT1} fill className="object-contain" unoptimized />
-                          </div>
-                          <span className="text-emerald-400 font-mono font-black text-xs">VS</span>
-                          <div className="w-12 h-12 relative drop-shadow-lg">
-                            <Image src={featuredT2Logo} alt={featuredT2} fill className="object-contain" unoptimized />
-                          </div>
-                        </div>
-                        <span className="font-mono font-black text-xs text-white uppercase tracking-wider">
-                          {featuredMatch.title}
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity z-20 pointer-events-none" />
-                    <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur-md border border-white/[0.1] text-white text-[10px] font-mono uppercase font-bold flex items-center gap-1.5 group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-colors z-30">
-                      <PlayCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white" />
-                      <span>Ingresar al Player</span>
-                    </div>
+                  <MatchPoster
+                    title={featuredMatch.title}
+                    imageUrl={featuredMatch.image_url}
+                    league={featuredMatch.league}
+                    category={featuredMatch.category}
+                    size="hero"
+                    priority={true}
+                  />
+                  <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg bg-black/85 backdrop-blur-md border border-white/[0.1] text-white text-[10px] font-mono uppercase font-bold flex items-center gap-1.5 group-hover:bg-red-600 group-hover:border-red-500 transition-colors z-30 shadow-lg">
+                    <PlayCircle className="w-3.5 h-3.5 text-red-400 group-hover:text-white" />
+                    <span>Ingresar a la Transmisión</span>
                   </div>
                 </Link>
               </div>
@@ -535,49 +512,23 @@ export default async function HomePage() {
                     className="group bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.07] hover:border-red-500/40 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 shadow-sm"
                   >
                     <div>
-                      {/* Miniatura compacta (Reducida para dar jerarquía al partido principal) */}
+                      {/* Miniatura compacta oficial con escudos reales */}
                       <Link
                         href={`/partido/${match.id}`}
                         prefetch={true}
-                        className="relative block w-full h-28 sm:h-32 rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
+                        className="relative block w-full h-32 sm:h-36 rounded-xl overflow-hidden bg-black mb-3 border border-white/[0.08] group-hover:border-red-500/40 transition-colors shadow-inner"
                       >
-                        {match.image_url ? (
-                          <Image
-                            src={match.image_url}
-                            alt={match.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#052312] via-[#08180e] to-[#0c0c10] p-2 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15),transparent_75%)] pointer-events-none" />
-                            <div className="relative z-10 flex items-center gap-3">
-                              <div className="w-7 h-7 relative">
-                                <Image
-                                  src={getTeamLogo(match.title.split(/vs/i)[0]?.trim() || '') || '/teams/blanco-y-negro.png'}
-                                  alt="Local"
-                                  fill
-                                  className="object-contain"
-                                  unoptimized
-                                />
-                              </div>
-                              <span className="text-emerald-400 font-mono font-bold text-[10px]">VS</span>
-                              <div className="w-7 h-7 relative">
-                                <Image
-                                  src={getTeamLogo(match.title.split(/vs/i)[1]?.trim() || '') || '/teams/ifc.png'}
-                                  alt="Visitante"
-                                  fill
-                                  className="object-contain"
-                                  unoptimized
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                        <MatchPoster
+                          title={match.title}
+                          imageUrl={match.image_url}
+                          league={match.league}
+                          category={match.category}
+                          size="card"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 
                         {/* Insignia sobre la miniatura */}
-                        <div className="absolute top-2.5 left-2.5">
+                        <div className="absolute top-2.5 left-2.5 z-20">
                           {isDateConfirmed ? (
                             <span className="px-2 py-0.5 rounded bg-black/85 backdrop-blur-md border border-white/[0.1] text-[9px] font-mono text-white font-bold uppercase tracking-wider">
                               OFICIAL

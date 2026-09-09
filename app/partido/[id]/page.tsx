@@ -109,6 +109,14 @@ export default async function MatchPage({
   let match: any = null;
   let serverHasPaid = false;
 
+  const cookieStore = cookies();
+  const adminSession = cookieStore.get('admin_session');
+  const isAdmin = adminSession?.value === 'authenticated';
+
+  if (isAdmin) {
+    serverHasPaid = true;
+  }
+
   if (isSupabaseConfigured) {
     try {
       const supabase = createServerSupabaseClient();
@@ -183,7 +191,6 @@ export default async function MatchPage({
       match = matchRes?.data || null;
 
       if (!user) {
-        const cookieStore = cookies();
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
         const cookieId = cookieStore.get('lomonegro_user_id')?.value;
         if (cookieEmail) {
@@ -302,6 +309,7 @@ export default async function MatchPage({
           currentUserEmail={user?.email || null}
           paymentStatus={searchParams?.payment}
           queryGuestEmail={searchParams?.guest_email}
+          isAdmin={isAdmin}
         />
       </div>
     </main>
