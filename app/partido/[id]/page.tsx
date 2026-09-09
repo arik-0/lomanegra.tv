@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
@@ -12,6 +13,71 @@ export const revalidate = 0;
 interface MatchPageProps {
   params: { id: string };
   searchParams?: { payment?: string; guest_email?: string };
+}
+
+export async function generateMetadata({ params }: MatchPageProps): Promise<Metadata> {
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
+  let title = 'Transmisión Oficial en Vivo';
+  let description = 'Mirá el partido en directo por Pasión Lomonegra en alta definición HD.';
+  let imageUrl = '/logo-pasion-lomonegra.png';
+
+  try {
+    const isSupabaseConfigured =
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+
+    if (isSupabaseConfigured) {
+      const { data } = isUUID
+        ? await supabaseAdmin.from('matches').select('*').eq('id', params.id).maybeSingle()
+        : await supabaseAdmin.from('matches').select('*').ilike('title', '%blanco y negro%').maybeSingle();
+
+      if (data && !data.title?.startsWith('__SYSTEM_')) {
+        title = sanitizeRegionalText(data.title);
+        if (data.description) {
+          const cleanDesc = data.description
+            .replace(/\[META:\{.*?\}\]/g, '')
+            .replace('[A CONFIRMAR]', '')
+            .trim();
+          if (cleanDesc) description = sanitizeRegionalText(cleanDesc);
+        }
+        if (data.image_url) imageUrl = data.image_url;
+      }
+    }
+  } catch {
+    // Si falla la consulta, continuar con el fallback
+  }
+
+  if (title === 'Transmisión Oficial en Vivo') {
+    const fromStore = getStoredMatches().find((m) => m.id === params.id);
+    if (fromStore) {
+      title = sanitizeRegionalText(fromStore.title);
+      if (fromStore.description) description = sanitizeRegionalText(fromStore.description);
+      if (fromStore.image_url) imageUrl = fromStore.image_url;
+    }
+  }
+
+  return {
+    title: `${title} | Pasión Lomonegra`,
+    description,
+    openGraph: {
+      title: `${title} | Pasión Lomonegra`,
+      description,
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 800,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Pasión Lomonegra`,
+      description,
+      images: [imageUrl],
+    },
+  };
 }
 
 // Helper con timeout para que ninguna consulta externa demore la carga

@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(req: Request) {
   try {
+    // Protección en producción: solo administradores autenticados pueden simular compras
+    if (process.env.NODE_ENV === 'production') {
+      const cookieStore = cookies();
+      const adminSession = cookieStore.get('admin_session');
+      if (!adminSession || adminSession.value !== 'authenticated') {
+        return NextResponse.json(
+          { error: 'El simulador de compras está restringido en producción únicamente a administradores autorizados.' },
+          { status: 403 }
+        );
+      }
+    }
+
     const body = await req.json().catch(() => ({}));
     const { matchId, guestEmail } = body;
 

@@ -5,14 +5,59 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import AppLayoutWrapper from '@/components/AppLayoutWrapper';
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pasionlomonegra.com';
+
 export const metadata: Metadata = {
-  title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
+    template: '%s | Pasión Lomonegra',
+  },
   description:
-    'Plataforma oficial de transmisiones en vivo de Pasión Lomonegra para ver partidos en directo en alta definición con Cloudflare Stream.',
+    'Plataforma oficial de transmisiones en vivo y pay-per-view de Pasión Lomonegra. Viví los partidos de la Liga Deportiva del Sur en directo en alta definición con Cloudflare Stream.',
+  keywords: [
+    'Pasión Lomonegra',
+    'Blanco y Negro',
+    'Liga Deportiva del Sur',
+    'Fútbol en vivo',
+    'Hockey en vivo',
+    'Streaming LDDS',
+    'Alcorta',
+  ],
+  authors: [{ name: 'Pasión Lomonegra' }],
+  creator: 'Pasión Lomonegra',
   icons: {
     icon: '/icon.png',
     shortcut: '/icon.png',
     apple: '/icon.png',
+  },
+  openGraph: {
+    title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
+    description:
+      'Plataforma oficial de transmisiones en vivo y PPV de Pasión Lomonegra. Viví la Liga Deportiva del Sur en directo.',
+    url: baseUrl,
+    siteName: 'Pasión Lomonegra',
+    locale: 'es_AR',
+    type: 'website',
+    images: [
+      {
+        url: '/logo-pasion-lomonegra.png',
+        width: 800,
+        height: 800,
+        alt: 'Pasión Lomonegra',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',
+    description:
+      'Plataforma oficial de transmisiones en vivo y PPV de Pasión Lomonegra.',
+    images: ['/logo-pasion-lomonegra.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

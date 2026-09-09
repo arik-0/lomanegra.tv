@@ -71,9 +71,9 @@ export async function POST(req: Request) {
       } else if (matchId === 'de261139-f0e7-43d3-bd24-f2f9a7262fdf') {
         match = {
           id: matchId,
-          title: 'Real Madrid vs Barcelona',
-          description: 'El Clásico de España • Semifinal',
-          price: 6500,
+          title: 'Atlético Acebal vs Blanco y Negro',
+          description: 'Liga Deportiva del Sur • Semifinal en vivo HD',
+          price: 4500,
           is_date_confirmed: true,
           date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
         };
