@@ -627,9 +627,14 @@ export default function PosicionesPage() {
                       className="bg-[#12131a] border border-zinc-800/90 rounded-2xl p-4 shadow-xl space-y-3"
                     >
                       <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
-                        <span className="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
+                        <span className="text-xs font-black uppercase text-amber-400 tracking-wider flex items-center gap-1.5 flex-wrap">
                           <Shield className="w-3.5 h-3.5" />
                           {zone.name} &bull; {selectedPublicRound}
+                          {(selectedPublicRound === 'Fecha 4' || selectedPublicRound === 'Fecha 9') && (
+                            <span className="text-[10px] bg-red-950/80 text-red-400 border border-red-800/80 px-2 py-0.5 rounded-full font-bold normal-case tracking-normal">
+                              Jornada de Clásicos Interzonales
+                            </span>
+                          )}
                         </span>
                         <span className="text-[10px] text-zinc-500 font-mono">
                           {matchesInRound.length} Partidos
@@ -657,7 +662,14 @@ export default function PosicionesPage() {
                                 className="bg-[#161722] border border-zinc-800/80 hover:border-zinc-700 rounded-xl p-3 transition space-y-2"
                               >
                                 <div className="flex items-center justify-between text-[9px] text-zinc-500 font-bold uppercase">
-                                  <span>{selectedPublicRound}</span>
+                                  <span className="flex items-center gap-1.5">
+                                    <span>{selectedPublicRound}</span>
+                                    {m.date && (
+                                      <span className="text-amber-400/90 font-semibold lowercase tracking-normal">
+                                        • {m.date}
+                                      </span>
+                                    )}
+                                  </span>
                                   {isPlayed ? (
                                     <span className="text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded font-black">
                                       Finalizado

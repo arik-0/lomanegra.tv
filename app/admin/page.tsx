@@ -737,7 +737,8 @@ export default function AdminPage() {
     value: any
   ) => {
     const updatedZones = standings.zones.map((z) => {
-      if (z.id === zoneId) {
+      const hasMatch = (z.fixtures || []).some((f) => f.id === fixId);
+      if (z.id === zoneId || hasMatch) {
         const updatedFixs = (z.fixtures || []).map((f) => {
           if (f.id === fixId) {
             return { ...f, [field]: value };
@@ -1648,13 +1649,20 @@ export default function AdminPage() {
                               key={fix.id}
                               className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-[#161722] border border-zinc-800/80 rounded-lg p-2 text-xs hover:border-zinc-700 transition"
                             >
-                              <div className="sm:col-span-2">
+                              <div className="sm:col-span-2 space-y-1">
                                 <input
                                   type="text"
                                   value={fix.roundName || 'Fecha 1'}
                                   onChange={(e) => handleUpdateFixture(zone.id, fix.id, 'roundName', e.target.value)}
                                   placeholder="Fecha"
                                   className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-[10px] text-zinc-400 focus:outline-none font-bold"
+                                />
+                                <input
+                                  type="text"
+                                  value={fix.date || ''}
+                                  onChange={(e) => handleUpdateFixture(zone.id, fix.id, 'date', e.target.value)}
+                                  placeholder="Día (ej 6/9/2026)"
+                                  className="w-full bg-[#12131a]/70 border border-zinc-800/80 rounded px-1.5 py-0.5 text-[9px] text-amber-400/90 focus:outline-none font-mono"
                                 />
                               </div>
 

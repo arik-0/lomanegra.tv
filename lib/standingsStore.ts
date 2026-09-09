@@ -1,6 +1,13 @@
 // Almacén central de datos deportivos de la Liga Deportiva del Sur
 // Soporta División en Zonas, Llaves de Play-offs (16avos, 8vos, Cuartos, Semis, Final) y Goleadores
 
+import {
+  officialClausuraFixturesZonaA,
+  officialClausuraFixturesZonaB,
+  CLAUSURA_TEAMS_ZONA_A,
+  CLAUSURA_TEAMS_ZONA_B,
+} from './clausuraFixtures';
+
 export type DeporteType = 'futbol' | 'hockey';
 export type TorneoType = 'apertura' | 'clausura' | 'primer' | 'segundo';
 export type CategoriaType =
@@ -54,6 +61,59 @@ export interface TeamStandingsRow {
   qualified?: boolean;
 }
 
+// Función normalizadora canónica para reconocimiento unívoco de clubes de la LDDS
+export function canonicalTeamKey(name: string): string {
+  if (!name) return '';
+  const clean = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const norm = clean.replace(/[.\-]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (norm.includes('italo')) return 'italo';
+  if (norm.includes('argentino')) return 'argentino';
+  if (norm.includes('firmat')) return 'firmat';
+  if (norm.includes('sportivo') || (norm.includes('sp') && norm.includes('bombal'))) return 'sp_bombal';
+  if (norm.includes('bombal')) return 'bombal_jrs';
+  if (norm.includes('sporting')) return 'sporting';
+  if (norm.includes('independiente') || norm === 'ifc' || norm === 'i f c') return 'independiente';
+  if (norm.includes('miguel torres') || norm.includes('torres')) return 'miguel_torres';
+  if (norm.includes('fredriksson')) return 'fredriksson';
+  if (norm.includes('olimpia')) return 'olimpia';
+  if (norm.includes('hughes')) return 'hughes';
+  if (norm.includes('rivadavia')) return 'rivadavia';
+  if (norm.includes('carreras')) return 'carreras';
+  if (norm.includes('acebal')) return 'acebal';
+  if (norm.includes('paz')) return 'paz';
+  if (norm.includes('alberdi')) return 'alberdi';
+  if (norm.includes('hertz')) return 'hertz';
+  if (norm.includes('los andes') || norm.includes('andes')) return 'los_andes';
+  if (norm.includes('san martin')) return 'san_martin';
+  if (norm.includes('blanco y negro') || norm === 'byd' || norm === 'byn') return 'blanco_y_negro';
+
+  return norm;
+}
+
+export const CANONICAL_LOGOS: Record<string, string> = {
+  argentino: '/teams/Argentino de Firmat.png',
+  firmat: '/teams/Firmat FBC.png',
+  sp_bombal: '/teams/Sportivo Bombal.png',
+  bombal_jrs: '/teams/Bombal Juniors.png',
+  sporting: '/teams/Sporting de Bigan.png',
+  independiente: '/teams/ifc.png',
+  miguel_torres: '/teams/Miguel Torres.png',
+  fredriksson: '/teams/Fredriksson.png',
+  olimpia: '/teams/Olimpia de Santa Teresa.png',
+  hughes: '/teams/Hughes.png',
+  rivadavia: '/teams/Bernardino Rivadavia.png',
+  carreras: '/teams/Carreras.png',
+  acebal: '/teams/Atletico Acebal.png',
+  paz: '/teams/Atletico Paz.png',
+  alberdi: '/teams/Nuevo Alberdi.png',
+  hertz: '/teams/Eduardo Hertz.png',
+  los_andes: '/teams/Los Andes.png',
+  san_martin: '/teams/San Martin.png',
+  italo: '/teams/Italo Argentino.png',
+  blanco_y_negro: '/teams/Blanco y Negro.png',
+};
+
 // Mapeo exhaustivo de escudos y equipos reales presentes en la carpeta public/teams/
 export const TEAM_LOGOS: Record<string, string> = {
   'blanco y negro': '/teams/Blanco y Negro.png',
@@ -63,22 +123,34 @@ export const TEAM_LOGOS: Record<string, string> = {
   'san martin': '/teams/San Martin.png',
   'argentino de firmat': '/teams/Argentino de Firmat.png',
   'argentino firmat': '/teams/Argentino de Firmat.png',
+  'c.a. argentino': '/teams/Argentino de Firmat.png',
+  'ca argentino': '/teams/Argentino de Firmat.png',
   'firmat fbc': '/teams/Firmat FBC.png',
   'firmat': '/teams/Firmat FBC.png',
   'atlético acebal': '/teams/Atletico Acebal.png',
   'atletico acebal': '/teams/Atletico Acebal.png',
+  'atl. acebal': '/teams/Atletico Acebal.png',
+  'atl acebal': '/teams/Atletico Acebal.png',
   'atlético paz': '/teams/Atletico Paz.png',
   'atletico paz': '/teams/Atletico Paz.png',
   'bernardino rivadavia': '/teams/Bernardino Rivadavia.png',
+  'b. rivadavia': '/teams/Bernardino Rivadavia.png',
+  'b rivadavia': '/teams/Bernardino Rivadavia.png',
   'bombal juniors': '/teams/Bombal Juniors.png',
+  'bombal jrs': '/teams/Bombal Juniors.png',
+  'bombal jr': '/teams/Bombal Juniors.png',
   'carreras': '/teams/Carreras.png',
+  'carreras ac': '/teams/Carreras.png',
   'eduardo hertz': '/teams/Eduardo Hertz.png',
   'fredriksson': '/teams/Fredriksson.png',
+  'fredriksson fbc': '/teams/Fredriksson.png',
   'hughes': '/teams/Hughes.png',
+  'hughes fbc': '/teams/Hughes.png',
   'independiente de bigand': '/teams/ifc.png',
   'independiente de bigan': '/teams/ifc.png',
   'independiente fútbol club': '/teams/ifc.png',
   'independiente futbol club': '/teams/ifc.png',
+  'independiente fc': '/teams/ifc.png',
   'independiente': '/teams/ifc.png',
   'i. f. c.': '/teams/ifc.png',
   'i.f.c.': '/teams/ifc.png',
@@ -86,18 +158,29 @@ export const TEAM_LOGOS: Record<string, string> = {
   'i f c': '/teams/ifc.png',
   'ítalo argentino': '/teams/Italo Argentino.png',
   'italo argentino': '/teams/Italo Argentino.png',
+  'italo argenitno': '/teams/Italo Argentino.png',
   'los andes': '/teams/Los Andes.png',
   'miguel torres': '/teams/Miguel Torres.png',
+  'dep. miguel torres': '/teams/Miguel Torres.png',
+  'dep miguel torres': '/teams/Miguel Torres.png',
   'nuevo alberdi': '/teams/Nuevo Alberdi.png',
   'olimpia de santa teresa': '/teams/Olimpia de Santa Teresa.png',
+  'olimpia': '/teams/Olimpia de Santa Teresa.png',
   'sporting de bigand': '/teams/Sporting de Bigan.png',
   'sporting de bigan': '/teams/Sporting de Bigan.png',
+  'sporting cs': '/teams/Sporting de Bigan.png',
   'sportivo bombal': '/teams/Sportivo Bombal.png',
+  'sp. bombal': '/teams/Sportivo Bombal.png',
+  'sp bombal': '/teams/Sportivo Bombal.png',
 };
 
 // Algoritmo de reconocimiento inteligente y robusto de escudos de clubes
 export function getTeamLogo(teamName: string): string {
   if (!teamName) return '/teams/Blanco y Negro.png';
+  const cKey = canonicalTeamKey(teamName);
+  if (CANONICAL_LOGOS[cKey]) {
+    return CANONICAL_LOGOS[cKey];
+  }
   const clean = teamName.toLowerCase().trim();
   const normalized = clean.replace(/\./g, '').replace(/\s+/g, ' ').trim();
 
@@ -199,6 +282,7 @@ export function getTeamLogo(teamName: string): string {
 export interface FixtureMatch {
   id: string;
   roundName?: string; // ej: "Fecha 1", "Fecha 2", etc.
+  date?: string; // ej: "6/9/2026", "20/9/2026"
   homeTeamId: string;
   homeTeamName: string;
   awayTeamId: string;
@@ -278,7 +362,8 @@ export function recalculateZoneStandings(zone: ZoneData): ZoneData {
   > = {};
 
   zone.teams.forEach((t) => {
-    statsMap[t.name.trim().toLowerCase()] = {
+    const key = canonicalTeamKey(t.name);
+    statsMap[key] = {
       team: { ...t },
       pj: 0,
       pg: 0,
@@ -293,8 +378,8 @@ export function recalculateZoneStandings(zone: ZoneData): ZoneData {
   });
 
   fixtures.forEach((fix) => {
-    const homeKey = fix.homeTeamName.trim().toLowerCase();
-    const awayKey = fix.awayTeamName.trim().toLowerCase();
+    const homeKey = canonicalTeamKey(fix.homeTeamName);
+    const awayKey = canonicalTeamKey(fix.awayTeamName);
     const hg = Number(fix.homeGoals);
     const ag = Number(fix.awayGoals);
 
@@ -1462,38 +1547,25 @@ rawDefaultStandings.zones = rawDefaultStandings.zones.map((z) => ({
 
 export const defaultAperturaStandings: TournamentStandings = syncPlayoffQuarterfinals(rawDefaultStandings);
 
-// Estructura oficial limpia para el Torneo Clausura (equipos invertidos en localía para la segunda mitad del año)
+// Estructura oficial limpia para el Torneo Clausura con fixture oficial LDDS de 11 fechas e interzonales
 const rawClausuraStandings: TournamentStandings = {
   ...JSON.parse(JSON.stringify(rawDefaultStandings)),
   torneo: 'clausura',
+  zones: [
+    {
+      id: 'zona-a',
+      name: 'Zona A',
+      teams: CLAUSURA_TEAMS_ZONA_A as TeamStandingsRow[],
+      fixtures: officialClausuraFixturesZonaA as FixtureMatch[],
+    },
+    {
+      id: 'zona-b',
+      name: 'Zona B',
+      teams: CLAUSURA_TEAMS_ZONA_B as TeamStandingsRow[],
+      fixtures: officialClausuraFixturesZonaB as FixtureMatch[],
+    },
+  ],
 };
-
-rawClausuraStandings.zones = rawClausuraStandings.zones.map((z) => ({
-  ...z,
-  teams: z.teams.map((t, idx) => ({
-    ...t,
-    pj: 0,
-    pg: 0,
-    pe: 0,
-    pp: 0,
-    gf: 0,
-    gc: 0,
-    dif: 0,
-    pts: 0,
-    pos: idx + 1,
-    form: [],
-    qualified: idx < 4,
-  })),
-  fixtures: (z.fixtures || []).map((f) => ({
-    ...f,
-    homeTeamId: f.awayTeamId,
-    homeTeamName: f.awayTeamName,
-    awayTeamId: f.homeTeamId,
-    awayTeamName: f.homeTeamName,
-    homeGoals: null,
-    awayGoals: null,
-  })),
-}));
 
 rawClausuraStandings.playoffs = rawClausuraStandings.playoffs.map((p) => ({
   ...p,
