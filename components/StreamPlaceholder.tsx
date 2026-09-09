@@ -9,6 +9,7 @@ interface StreamPlaceholderProps {
   onRetry?: () => void;
   isRetrying?: boolean;
   onTogglePreview?: () => void;
+  showPreviewButton?: boolean;
 }
 
 export default function StreamPlaceholder({
@@ -17,6 +18,7 @@ export default function StreamPlaceholder({
   onRetry,
   isRetrying = false,
   onTogglePreview,
+  showPreviewButton = false,
 }: StreamPlaceholderProps) {
   return (
     <div className="w-full aspect-video bg-gradient-to-br from-[#06070a] via-[#0d0e14] to-[#08090f] relative overflow-hidden rounded-2xl border border-zinc-800 shadow-[0_12px_48px_rgba(0,0,0,0.85)] flex flex-col justify-between p-4 sm:p-6 font-mono select-none">
@@ -97,14 +99,14 @@ export default function StreamPlaceholder({
             </button>
           )}
 
-          {onTogglePreview && (
+          {showPreviewButton && onTogglePreview && (
             <button
               onClick={onTogglePreview}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-300 hover:text-white text-xs font-bold transition active:scale-95 cursor-pointer"
-              title="Previsualizar reproductor de video de prueba"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-400 hover:text-white text-xs font-bold transition active:scale-95 cursor-pointer"
+              title="Previsualizar señal de prueba (Solo Operador)"
             >
-              <PlayCircle className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Modo Prueba</span>
+              <PlayCircle className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Señal Demo (Operador)</span>
             </button>
           )}
         </div>

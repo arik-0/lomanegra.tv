@@ -104,7 +104,7 @@ export default function StreamPlayer({
           <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
             <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60">
               <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-              <span>MODO DE PRUEBA (SEÑAL DEMO)</span>
+              <span>SEÑAL EN DIRECTO // 1080p HD</span>
             </div>
 
             {onBackToPlaceholder && (

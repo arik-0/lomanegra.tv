@@ -233,6 +233,7 @@ export default function MatchViewClient({
               guestEmail={activeGuestEmail || undefined}
               matchTitle={match.title}
               matchDate={matchDate}
+              isAdmin={isAdminActive}
             />
           </div>
 

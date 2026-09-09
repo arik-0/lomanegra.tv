@@ -10,6 +10,7 @@ interface StreamPlayerWrapperProps {
   guestEmail?: string;
   matchTitle?: string;
   matchDate?: string;
+  isAdmin?: boolean;
 }
 
 interface StreamResponse {
@@ -26,6 +27,7 @@ export default function StreamPlayerWrapper({
   guestEmail,
   matchTitle,
   matchDate,
+  isAdmin = false,
 }: StreamPlayerWrapperProps) {
   const [streamData, setStreamData] = useState<StreamResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,10 +96,15 @@ export default function StreamPlayerWrapper({
         matchDate={matchDate || streamData?.matchDate}
         onRetry={() => fetchToken(false)}
         isRetrying={loading}
-        onTogglePreview={() => {
-          setPreviewMode(true);
-          fetchToken(true);
-        }}
+        showPreviewButton={isAdmin}
+        onTogglePreview={
+          isAdmin
+            ? () => {
+                setPreviewMode(true);
+                fetchToken(true);
+              }
+            : undefined
+        }
       />
     );
   }
