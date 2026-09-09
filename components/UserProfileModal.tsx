@@ -213,10 +213,10 @@ export default function UserProfileModal({
                   <div className="flex items-center gap-2">
                     <div className="flex items-center -space-x-1.5">
                       <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
-                        <Image src={m.logo1} alt="Equipo 1" fill className="object-contain" />
+                        <Image src={m.logo1} alt="Equipo 1" fill className="object-contain" unoptimized />
                       </div>
                       <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
-                        <Image src={m.logo2} alt="Equipo 2" fill className="object-contain" />
+                        <Image src={m.logo2} alt="Equipo 2" fill className="object-contain" unoptimized />
                       </div>
                     </div>
                     <div>

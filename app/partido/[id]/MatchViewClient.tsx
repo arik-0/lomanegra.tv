@@ -257,49 +257,50 @@ export default function MatchViewClient({
                 {match.title}
               </h1>
 
-              {match.title.toLowerCase().includes('blanco y negro') && (
-                <div className="flex items-center gap-4 sm:gap-6 bg-[#121218] border border-white/[0.08] px-4 py-2.5 rounded-2xl w-fit mb-6">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 relative drop-shadow">
-                      <Image
-                        src="/teams/blanco-y-negro.png"
-                        alt="Blanco y Negro"
-                        fill
-                        className="object-contain"
-                      />
+              {match.title.toLowerCase().includes('vs') && (() => {
+                const matchVsParts = match.title.split(/vs/i);
+                const t1 = matchVsParts[0]?.trim() || 'Blanco y Negro';
+                const t2 = matchVsParts[1]?.trim() || 'Rival';
+                const t1Logo = getTeamLogo(t1) || '/teams/blanco-y-negro.png';
+                const t2Logo = getTeamLogo(t2) || '/teams/ifc.png';
+                return (
+                  <div className="flex items-center gap-4 sm:gap-6 bg-[#121218] border border-white/[0.08] px-4 py-2.5 rounded-2xl w-fit mb-6">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 relative drop-shadow">
+                        <Image
+                          src={t1Logo}
+                          alt={t1}
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                      <span className="font-bold text-xs sm:text-sm text-white">
+                        {t1}
+                      </span>
                     </div>
-                    <span className="font-bold text-xs sm:text-sm text-white">
-                      Blanco y Negro
+
+                    <span className="px-2 py-0.5 bg-red-600/90 text-white rounded-md font-mono font-black text-[10px] uppercase shadow">
+                      VS
                     </span>
-                  </div>
 
-                  <span className="px-2 py-0.5 bg-red-600/90 text-white rounded-md font-mono font-black text-[10px] uppercase shadow">
-                    VS
-                  </span>
-
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 relative drop-shadow">
-                      <Image
-                        src={getTeamLogo(
-                          match.title.toLowerCase().includes('vs')
-                            ? match.title.split(/vs/i)[1].trim()
-                            : 'ifc'
-                        )}
-                        alt={match.title.toLowerCase().includes('vs')
-                          ? match.title.split(/vs/i)[1].trim()
-                          : 'Rival'}
-                        fill
-                        className="object-contain"
-                      />
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 relative drop-shadow">
+                        <Image
+                          src={t2Logo}
+                          alt={t2}
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                      <span className="font-bold text-xs sm:text-sm text-white">
+                        {t2}
+                      </span>
                     </div>
-                    <span className="font-bold text-xs sm:text-sm text-white">
-                      {match.title.toLowerCase().includes('vs')
-                        ? match.title.split(/vs/i)[1].trim()
-                        : 'Rival'}
-                    </span>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6 font-mono">
                 {sanitizeRegionalText(match.description) ||

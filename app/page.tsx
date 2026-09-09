@@ -235,6 +235,12 @@ export default async function HomePage() {
   // Estado de confirmación de la fecha para el contador
   const isFeaturedDateConfirmed = featuredMatch.is_date_confirmed !== false && !!featuredMatch.date;
 
+  const featuredParts = (featuredMatch?.title || '').split(/vs/i);
+  const featuredT1 = featuredParts[0]?.trim() || 'Blanco y Negro';
+  const featuredT2 = featuredParts[1]?.trim() || 'Rival';
+  const featuredT1Logo = getTeamLogo(featuredT1) || '/teams/blanco-y-negro.png';
+  const featuredT2Logo = getTeamLogo(featuredT2) || '/teams/ifc.png';
+
   return (
     <main className="min-h-screen bg-[#08080a] text-white px-4 py-6 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -335,14 +341,15 @@ export default async function HomePage() {
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 relative drop-shadow-md">
                       <Image
-                        src="/teams/blanco-y-negro.png"
-                        alt="Blanco y Negro"
+                        src={featuredT1Logo}
+                        alt={featuredT1}
                         fill
                         className="object-contain"
+                        unoptimized
                       />
                     </div>
                     <span className="font-bold text-xs sm:text-sm text-white tracking-wide">
-                      Blanco y Negro
+                      {featuredT1}
                     </span>
                   </div>
 
@@ -353,22 +360,15 @@ export default async function HomePage() {
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 relative drop-shadow-md">
                       <Image
-                        src={getTeamLogo(
-                          featuredMatch.title.toLowerCase().includes('vs')
-                            ? featuredMatch.title.split(/vs/i)[1].trim()
-                            : 'ifc'
-                        )}
-                        alt={featuredMatch.title.toLowerCase().includes('vs')
-                          ? featuredMatch.title.split(/vs/i)[1].trim()
-                          : 'Rival'}
+                        src={featuredT2Logo}
+                        alt={featuredT2}
                         fill
                         className="object-contain"
+                        unoptimized
                       />
                     </div>
                     <span className="font-bold text-xs sm:text-sm text-white tracking-wide">
-                      {featuredMatch.title.toLowerCase().includes('vs')
-                        ? featuredMatch.title.split(/vs/i)[1].trim()
-                        : 'Rival'}
+                      {featuredT2}
                     </span>
                   </div>
                 </div>
@@ -405,11 +405,11 @@ export default async function HomePage() {
                       <div className="relative z-10 flex flex-col items-center gap-3 text-center px-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 relative drop-shadow-lg">
-                            <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                            <Image src={featuredT1Logo} alt={featuredT1} fill className="object-contain" unoptimized />
                           </div>
                           <span className="text-emerald-400 font-mono font-black text-xs">VS</span>
                           <div className="w-12 h-12 relative drop-shadow-lg">
-                            <Image src="/teams/ifc.png" alt="Rival" fill className="object-contain" />
+                            <Image src={featuredT2Logo} alt={featuredT2} fill className="object-contain" unoptimized />
                           </div>
                         </div>
                         <span className="font-mono font-black text-xs text-white uppercase tracking-wider">
@@ -553,11 +553,23 @@ export default async function HomePage() {
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15),transparent_75%)] pointer-events-none" />
                             <div className="relative z-10 flex items-center gap-3">
                               <div className="w-7 h-7 relative">
-                                <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                                <Image
+                                  src={getTeamLogo(match.title.split(/vs/i)[0]?.trim() || '') || '/teams/blanco-y-negro.png'}
+                                  alt="Local"
+                                  fill
+                                  className="object-contain"
+                                  unoptimized
+                                />
                               </div>
                               <span className="text-emerald-400 font-mono font-bold text-[10px]">VS</span>
                               <div className="w-7 h-7 relative">
-                                <Image src="/teams/ifc.png" alt="Rival" fill className="object-contain" />
+                                <Image
+                                  src={getTeamLogo(match.title.split(/vs/i)[1]?.trim() || '') || '/teams/ifc.png'}
+                                  alt="Visitante"
+                                  fill
+                                  className="object-contain"
+                                  unoptimized
+                                />
                               </div>
                             </div>
                           </div>

@@ -63,30 +63,221 @@ export interface TeamStandingsRow {
 
 // Función normalizadora canónica para reconocimiento unívoco de clubes de la LDDS
 export function canonicalTeamKey(name: string): string {
-  if (!name) return '';
+  if (!name || typeof name !== 'string') return '';
   const clean = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  const norm = clean.replace(/[.\-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const norm = clean.replace(/[.\-_,()]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!norm) return '';
 
-  if (norm.includes('italo')) return 'italo';
-  if (norm.includes('argentino')) return 'argentino';
-  if (norm.includes('firmat')) return 'firmat';
-  if (norm.includes('sportivo') || (norm.includes('sp') && norm.includes('bombal'))) return 'sp_bombal';
-  if (norm.includes('bombal')) return 'bombal_jrs';
-  if (norm.includes('sporting')) return 'sporting';
-  if (norm.includes('independiente') || norm === 'ifc' || norm === 'i f c') return 'independiente';
-  if (norm.includes('miguel torres') || norm.includes('torres')) return 'miguel_torres';
-  if (norm.includes('fredriksson')) return 'fredriksson';
-  if (norm.includes('olimpia')) return 'olimpia';
-  if (norm.includes('hughes')) return 'hughes';
-  if (norm.includes('rivadavia')) return 'rivadavia';
-  if (norm.includes('carreras')) return 'carreras';
-  if (norm.includes('acebal')) return 'acebal';
-  if (norm.includes('paz')) return 'paz';
-  if (norm.includes('alberdi')) return 'alberdi';
-  if (norm.includes('hertz')) return 'hertz';
-  if (norm.includes('los andes') || norm.includes('andes')) return 'los_andes';
-  if (norm.includes('san martin')) return 'san_martin';
-  if (norm.includes('blanco y negro') || norm === 'byd' || norm === 'byn') return 'blanco_y_negro';
+  // Excluir casilleros de semillas y textos de espera en Play-Offs (evita falsos positivos)
+  if (/^[0-9]+(ero|do|to|vo|ro|er|a|b|°|o)?\s*(a|b|zona a|zona b)?$/i.test(norm)) return '';
+  if (/^(por definir|a confirmar|tbd|clasificado|ganador|perdedor|pendiente|rival|equipo \d)/i.test(norm)) return '';
+
+  // 1. Ítalo Argentino (DEBE evaluarse antes de Argentino genérico)
+  if (norm.includes('italo') || norm.startsWith('ita') || norm === 'cia') return 'italo';
+
+  // 2. Argentino de Firmat (DEBE evaluarse antes de Firmat FBC)
+  if (
+    norm.includes('argentino de firmat') ||
+    norm.includes('argentino firmat') ||
+    norm.includes('c a argentino') ||
+    norm.includes('ca argentino') ||
+    norm.startsWith('argentino') ||
+    norm.startsWith('arg') ||
+    norm === 'caa'
+  ) {
+    return 'argentino';
+  }
+
+  // 3. Firmat FBC (tras descartar Argentino de Firmat)
+  if (
+    norm.includes('firmat') ||
+    norm.startsWith('fir')
+  ) {
+    return 'firmat';
+  }
+
+  // 4. Sporting de Bigand (DEBE diferenciarse claramente de Sportivo Bombal)
+  if (
+    norm.includes('sporting') ||
+    norm.startsWith('sportin') ||
+    norm === 'samcs'
+  ) {
+    return 'sporting';
+  }
+
+  // 5. Sportivo Bombal (DEBE diferenciarse de Bombal Juniors)
+  if (
+    norm.includes('sportivo') ||
+    norm.startsWith('sportiv') ||
+    norm === 'sp' ||
+    norm.startsWith('sp ') ||
+    norm.startsWith('sp.') ||
+    norm === 'csb' ||
+    (norm.includes('sp') && norm.includes('bombal'))
+  ) {
+    return 'sp_bombal';
+  }
+
+  // 6. Bombal Juniors (tras descartar Sportivo Bombal)
+  if (
+    norm.includes('bombal') ||
+    norm.startsWith('bom') ||
+    norm.includes('juniors') ||
+    norm.includes('jrs') ||
+    norm === 'bjc'
+  ) {
+    return 'bombal_jrs';
+  }
+
+  // 7. Independiente de Bigand (IFC)
+  if (
+    norm.includes('independiente') ||
+    norm.startsWith('ind') ||
+    norm === 'ifc' ||
+    norm === 'i f c'
+  ) {
+    return 'independiente';
+  }
+
+  // 8. San Martín
+  if (
+    norm.includes('san martin') ||
+    norm.startsWith('san') ||
+    norm === 'sm' ||
+    norm === 'casm'
+  ) {
+    return 'san_martin';
+  }
+
+  // 9. Eduardo Hertz
+  if (
+    norm.includes('hertz') ||
+    norm.startsWith('her') ||
+    norm.includes('eduardo') ||
+    norm.startsWith('edu') ||
+    norm === 'caeh'
+  ) {
+    return 'hertz';
+  }
+
+  // 10. Los Andes
+  if (
+    norm.includes('los andes') ||
+    norm.includes('andes') ||
+    norm.startsWith('los') ||
+    norm === 'cala'
+  ) {
+    return 'los_andes';
+  }
+
+  // 11. Miguel Torres
+  if (
+    norm.includes('miguel torres') ||
+    norm.includes('torres') ||
+    norm.startsWith('mig') ||
+    norm.includes('dep miguel') ||
+    norm === 'cdmt'
+  ) {
+    return 'miguel_torres';
+  }
+
+  // 12. Olimpia de Santa Teresa
+  if (
+    norm.includes('olimpia') ||
+    norm.startsWith('oli') ||
+    norm.includes('santa teresa') ||
+    norm.includes('sdm')
+  ) {
+    return 'olimpia';
+  }
+
+  // 13. Fredriksson
+  if (
+    norm.includes('fredriksson') ||
+    norm.includes('fredrikson') ||
+    norm.startsWith('fred') ||
+    norm.startsWith('fre') ||
+    norm === 'ffbc'
+  ) {
+    return 'fredriksson';
+  }
+
+  // 14. Hughes
+  if (
+    norm.includes('hughes') ||
+    norm.startsWith('hug') ||
+    norm === 'hfbc'
+  ) {
+    return 'hughes';
+  }
+
+  // 15. Nuevo Alberdi
+  if (
+    norm.includes('alberdi') ||
+    norm.startsWith('alb') ||
+    norm.includes('nuevo alberdi') ||
+    norm.startsWith('nue') ||
+    norm === 'cna'
+  ) {
+    return 'alberdi';
+  }
+
+  // 16. Carreras
+  if (
+    norm.includes('carreras') ||
+    norm.startsWith('car') ||
+    norm === 'cac'
+  ) {
+    return 'carreras';
+  }
+
+  // 17. Atlético Acebal vs Atlético Paz
+  if (
+    norm.includes('acebal') ||
+    norm.startsWith('ace') ||
+    norm.includes('atl acebal') ||
+    norm.includes('atletico acebal') ||
+    norm.includes('atl a') ||
+    norm.includes('atletico a')
+  ) {
+    return 'acebal';
+  }
+
+  if (
+    norm.includes('paz') ||
+    norm.startsWith('paz') ||
+    norm.includes('atl paz') ||
+    norm.includes('atletico paz') ||
+    norm.includes('atl p') ||
+    norm.includes('atletico p') ||
+    norm === 'cap'
+  ) {
+    return 'paz';
+  }
+
+  // 18. Bernardino Rivadavia
+  if (
+    norm.includes('rivadavia') ||
+    norm.startsWith('riv') ||
+    norm.includes('bernardino') ||
+    norm.startsWith('ber') ||
+    norm.includes('b rivadavia') ||
+    norm === 'cabr'
+  ) {
+    return 'rivadavia';
+  }
+
+  // 19. Blanco y Negro
+  if (
+    norm.includes('blanco y negro') ||
+    norm.includes('blanco') ||
+    norm.startsWith('bla') ||
+    norm === 'byn' ||
+    norm === 'byd' ||
+    norm.includes('lomonegr')
+  ) {
+    return 'blanco_y_negro';
+  }
 
   return norm;
 }
@@ -133,6 +324,8 @@ export const TEAM_LOGOS: Record<string, string> = {
   'atl acebal': '/teams/Atletico Acebal.png',
   'atlético paz': '/teams/Atletico Paz.png',
   'atletico paz': '/teams/Atletico Paz.png',
+  'atl. paz': '/teams/Atletico Paz.png',
+  'atl paz': '/teams/Atletico Paz.png',
   'bernardino rivadavia': '/teams/Bernardino Rivadavia.png',
   'b. rivadavia': '/teams/Bernardino Rivadavia.png',
   'b rivadavia': '/teams/Bernardino Rivadavia.png',
@@ -175,83 +368,28 @@ export const TEAM_LOGOS: Record<string, string> = {
 };
 
 // Algoritmo de reconocimiento inteligente y robusto de escudos de clubes
-export function getTeamLogo(teamName: string): string {
-  if (!teamName) return '/teams/Blanco y Negro.png';
+export function getTeamLogo(teamName: string, customLogoUrl?: string): string {
+  if (customLogoUrl && typeof customLogoUrl === 'string' && customLogoUrl.trim() !== '') {
+    const trimmed = customLogoUrl.trim();
+    if (
+      trimmed.startsWith('data:') ||
+      trimmed.startsWith('http') ||
+      trimmed.startsWith('/uploads/') ||
+      trimmed.startsWith('blob:')
+    ) {
+      return trimmed;
+    }
+  }
+
+  if (!teamName || typeof teamName !== 'string') return '';
   const cKey = canonicalTeamKey(teamName);
-  if (CANONICAL_LOGOS[cKey]) {
+  if (cKey && CANONICAL_LOGOS[cKey]) {
     return CANONICAL_LOGOS[cKey];
   }
+
   const clean = teamName.toLowerCase().trim();
   const normalized = clean.replace(/\./g, '').replace(/\s+/g, ' ').trim();
 
-  // 1. REGLAS PRIORITARIAS ANTI-COLISIÓN (Soluciona error de Imagen 1)
-  // Argentino de Firmat: NO debe ser capturado por "Firmat FBC"
-  if (
-    clean.includes('argentino de firmat') ||
-    clean.includes('argentino firmat') ||
-    normalized.includes('argentino firmat') ||
-    clean.startsWith('argentino')
-  ) {
-    return '/teams/Argentino de Firmat.png';
-  }
-
-  // Firmat FBC (solo si no es Argentino de Firmat)
-  if (
-    clean.includes('firmat fbc') ||
-    clean.includes('firmat fútbol club') ||
-    clean.includes('firmat futbol club') ||
-    clean === 'firmat' ||
-    clean.startsWith('firmat')
-  ) {
-    return '/teams/Firmat FBC.png';
-  }
-
-  // Sportivo Bombal: NO debe confundirse con Bombal Juniors
-  if (
-    clean.includes('sportivo bombal') ||
-    clean.startsWith('sportivo')
-  ) {
-    return '/teams/Sportivo Bombal.png';
-  }
-
-  // Bombal Juniors
-  if (
-    clean.includes('bombal juniors') ||
-    clean.includes('bombal jr') ||
-    clean === 'bombal'
-  ) {
-    return '/teams/Bombal Juniors.png';
-  }
-
-  // Sporting de Bigand: NO debe confundirse con Independiente de Bigand
-  if (
-    clean.includes('sporting de bigand') ||
-    clean.includes('sporting bigand') ||
-    clean.startsWith('sporting')
-  ) {
-    return '/teams/Sporting de Bigan.png';
-  }
-
-  // Independiente de Bigand / IFC
-  if (
-    normalized === 'ifc' ||
-    normalized === 'i f c' ||
-    clean.includes('ifc') ||
-    clean.includes('i. f. c') ||
-    clean.includes('i.f.c') ||
-    clean.includes('independiente de bigand') ||
-    clean.includes('independiente de bigan') ||
-    clean.includes('independiente')
-  ) {
-    return '/teams/ifc.png';
-  }
-
-  // Blanco y Negro / ByD / ByN
-  if (clean.includes('blanco y negro') || clean === 'byd' || clean === 'byn') {
-    return '/teams/Blanco y Negro.png';
-  }
-
-  // 2. Coincidencia directa exacta
   if (TEAM_LOGOS[clean]) {
     return TEAM_LOGOS[clean];
   }
@@ -259,24 +397,11 @@ export function getTeamLogo(teamName: string): string {
     return TEAM_LOGOS[normalized];
   }
 
-  // 3. Coincidencia por frases más largas primero (longitud descendente para evitar falsos positivos)
-  const sortedKeys = Object.keys(TEAM_LOGOS).sort((a, b) => b.length - a.length);
-  for (const key of sortedKeys) {
-    if (key.length >= 4 && clean.includes(key)) {
-      return TEAM_LOGOS[key];
-    }
+  if (customLogoUrl && typeof customLogoUrl === 'string' && customLogoUrl.trim() !== '') {
+    return customLogoUrl.trim();
   }
 
-  // 4. Si el usuario está escribiendo y lleva 4 o más caracteres, autocompletar por prefijo
-  if (clean.length >= 4) {
-    for (const key of sortedKeys) {
-      if (key.startsWith(clean)) {
-        return TEAM_LOGOS[key];
-      }
-    }
-  }
-
-  return '/teams/Blanco y Negro.png';
+  return '';
 }
 
 export interface FixtureMatch {

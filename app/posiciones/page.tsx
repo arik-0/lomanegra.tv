@@ -451,13 +451,14 @@ export default function PosicionesPage() {
                           {/* Escudo y Nombre */}
                           <td className="py-2.5 px-2">
                             <div className="flex items-center gap-2">
-                              {(team.logoUrl || getTeamLogo(team.name)) ? (
+                              {getTeamLogo(team.name, team.logoUrl) ? (
                                 <div className="w-5 h-5 relative shrink-0">
                                   <Image
-                                    src={team.logoUrl || getTeamLogo(team.name)}
+                                    src={getTeamLogo(team.name, team.logoUrl)}
                                     alt={team.name}
                                     fill
                                     className="object-contain"
+                                    unoptimized
                                   />
                                 </div>
                               ) : (
@@ -695,13 +696,18 @@ export default function PosicionesPage() {
                                     >
                                       {m.homeTeamName}
                                     </span>
-                                    <div className="w-5 h-5 relative shrink-0">
-                                      <Image
-                                        src={getTeamLogo(m.homeTeamName)}
-                                        alt={m.homeTeamName}
-                                        fill
-                                        className="object-contain"
-                                      />
+                                    <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
+                                      {getTeamLogo(m.homeTeamName) ? (
+                                        <Image
+                                          src={getTeamLogo(m.homeTeamName)}
+                                          alt={m.homeTeamName}
+                                          fill
+                                          className="object-contain"
+                                          unoptimized
+                                        />
+                                      ) : (
+                                        <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                                      )}
                                     </div>
                                   </div>
 
@@ -726,13 +732,18 @@ export default function PosicionesPage() {
 
                                   {/* Visitante */}
                                   <div className="col-span-5 flex items-center justify-start gap-2 text-left">
-                                    <div className="w-5 h-5 relative shrink-0">
-                                      <Image
-                                        src={getTeamLogo(m.awayTeamName)}
-                                        alt={m.awayTeamName}
-                                        fill
-                                        className="object-contain"
-                                      />
+                                    <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
+                                      {getTeamLogo(m.awayTeamName) ? (
+                                        <Image
+                                          src={getTeamLogo(m.awayTeamName)}
+                                          alt={m.awayTeamName}
+                                          fill
+                                          className="object-contain"
+                                          unoptimized
+                                        />
+                                      ) : (
+                                        <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                                      )}
                                     </div>
                                     <span
                                       className={`text-xs truncate ${
@@ -830,7 +841,7 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team1) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
                               </div>
                             )}
                             <span className="text-xs truncate">{m.team1}</span>
@@ -845,7 +856,7 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team2) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
                               </div>
                             )}
                             <span className="text-xs truncate">{m.team2}</span>
@@ -884,7 +895,7 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team1) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
                               </div>
                             )}
                             <span className="text-xs truncate">{m.team1}</span>
@@ -899,7 +910,7 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team2) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
                               </div>
                             )}
                             <span className="text-xs truncate">{m.team2}</span>
@@ -937,7 +948,7 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team1) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
                             </div>
                           )}
                           <span className="text-xs truncate">{m.team1}</span>
@@ -952,7 +963,7 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team2) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
                             </div>
                           )}
                           <span className="text-xs truncate">{m.team2}</span>
@@ -989,7 +1000,7 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team1) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" />
+                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
                             </div>
                           )}
                           <span className="text-xs truncate">{m.team1}</span>
@@ -1004,7 +1015,7 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team2) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" />
+                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
                             </div>
                           )}
                           <span className="text-xs truncate">{m.team2}</span>
@@ -1041,7 +1052,7 @@ export default function PosicionesPage() {
                       <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-2">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 relative shrink-0">
-                            <Image src={getTeamLogo(finalMatch.team1) || '/teams/blanco-y-negro.png'} alt={finalMatch.team1} fill className="object-contain" />
+                            <Image src={getTeamLogo(finalMatch.team1) || '/teams/blanco-y-negro.png'} alt={finalMatch.team1} fill className="object-contain" unoptimized />
                           </div>
                           <span className="text-xs font-black text-white">{finalMatch.team1}</span>
                         </div>
@@ -1058,7 +1069,7 @@ export default function PosicionesPage() {
                       <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-3">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 relative shrink-0">
-                            <Image src={getTeamLogo(finalMatch.team2) || '/teams/San Martin.png'} alt={finalMatch.team2} fill className="object-contain" />
+                            <Image src={getTeamLogo(finalMatch.team2) || '/teams/San Martin.png'} alt={finalMatch.team2} fill className="object-contain" unoptimized />
                           </div>
                           <span className="text-xs font-black text-white">{finalMatch.team2}</span>
                         </div>
@@ -1332,10 +1343,10 @@ export default function PosicionesPage() {
 
                               <td className="py-2.5 px-3">
                                 <div className="flex items-center gap-2.5">
-                                  {row.logoUrl ? (
+                                  {getTeamLogo(row.teamName, row.logoUrl) ? (
                                     <div className="w-5 h-5 relative shrink-0">
                                       <Image
-                                        src={row.logoUrl}
+                                        src={getTeamLogo(row.teamName, row.logoUrl)}
                                         alt={row.teamName}
                                         fill
                                         className="object-contain"
@@ -1448,10 +1459,10 @@ export default function PosicionesPage() {
 
                           <td className="py-2.5 px-3">
                             <div className="flex items-center gap-2.5">
-                              {row.logoUrl ? (
+                              {getTeamLogo(row.teamName, row.logoUrl) ? (
                                 <div className="w-5 h-5 relative shrink-0">
                                   <Image
-                                    src={row.logoUrl}
+                                    src={getTeamLogo(row.teamName, row.logoUrl)}
                                     alt={row.teamName}
                                     fill
                                     className="object-contain"
@@ -1535,10 +1546,10 @@ export default function PosicionesPage() {
 
                           <td className="py-2.5 px-3">
                             <div className="flex items-center gap-2.5">
-                              {row.logoUrl ? (
+                              {getTeamLogo(row.teamName, row.logoUrl) ? (
                                 <div className="w-5 h-5 relative shrink-0">
                                   <Image
-                                    src={row.logoUrl}
+                                    src={getTeamLogo(row.teamName, row.logoUrl)}
                                     alt={row.teamName}
                                     fill
                                     className="object-contain"

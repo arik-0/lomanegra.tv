@@ -1639,6 +1639,36 @@ export default function AdminPage() {
                         </div>
                       ) : (
                         <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                          <datalist id={`datalist-zone-${zone.id}`}>
+                            {Array.from(
+                              new Set([
+                                ...zone.teams.map((t) => t.name),
+                                ...standings.zones.flatMap((z) => z.teams.map((t) => t.name)),
+                                'San Martín',
+                                'Eduardo Hertz',
+                                'Argentino de Firmat',
+                                'Los Andes',
+                                'Sportivo Bombal',
+                                'Ítalo Argentino',
+                                'Sporting de Bigand',
+                                'Miguel Torres',
+                                'Olimpia de Santa Teresa',
+                                'Fredriksson',
+                                'Hughes',
+                                'Nuevo Alberdi',
+                                'Independiente de Bigand',
+                                'Blanco y Negro',
+                                'Carreras',
+                                'Firmat FBC',
+                                'Atlético Acebal',
+                                'Atlético Paz',
+                                'Bombal Juniors',
+                                'Bernardino Rivadavia',
+                              ])
+                            ).map((teamOption) => (
+                              <option key={teamOption} value={teamOption} />
+                            ))}
+                          </datalist>
                           {zone.fixtures
                             .filter((fix) => {
                               const sel = adminFixtureRounds[zone.id] || 'Todas';
@@ -1667,13 +1697,18 @@ export default function AdminPage() {
                               </div>
 
                               <div className="sm:col-span-4 flex items-center gap-1.5">
-                                <div className="w-4 h-4 relative shrink-0">
-                                  <Image
-                                    src={getTeamLogo(fix.homeTeamName)}
-                                    alt={fix.homeTeamName}
-                                    fill
-                                    className="object-contain"
-                                  />
+                                <div className="w-4 h-4 relative shrink-0 flex items-center justify-center">
+                                  {getTeamLogo(fix.homeTeamName) ? (
+                                    <Image
+                                      src={getTeamLogo(fix.homeTeamName)}
+                                      alt={fix.homeTeamName}
+                                      fill
+                                      className="object-contain"
+                                      unoptimized
+                                    />
+                                  ) : (
+                                    <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                                  )}
                                 </div>
                                 <input
                                   type="text"
@@ -1718,13 +1753,18 @@ export default function AdminPage() {
                               </div>
 
                               <div className="sm:col-span-3 flex items-center gap-1.5">
-                                <div className="w-4 h-4 relative shrink-0">
-                                  <Image
-                                    src={getTeamLogo(fix.awayTeamName)}
-                                    alt={fix.awayTeamName}
-                                    fill
-                                    className="object-contain"
-                                  />
+                                <div className="w-4 h-4 relative shrink-0 flex items-center justify-center">
+                                  {getTeamLogo(fix.awayTeamName) ? (
+                                    <Image
+                                      src={getTeamLogo(fix.awayTeamName)}
+                                      alt={fix.awayTeamName}
+                                      fill
+                                      className="object-contain"
+                                      unoptimized
+                                    />
+                                  ) : (
+                                    <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                                  )}
                                 </div>
                                 <input
                                   type="text"
@@ -1788,13 +1828,18 @@ export default function AdminPage() {
                                 <td className="py-2 px-1 text-center font-bold text-zinc-500">{team.pos}</td>
                                 <td className="py-2 px-2">
                                   <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 relative shrink-0">
-                                      <Image
-                                        src={team.logoUrl || getTeamLogo(team.name)}
-                                        alt={team.name}
-                                        fill
-                                        className="object-contain"
-                                      />
+                                    <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
+                                      {getTeamLogo(team.name, team.logoUrl) ? (
+                                        <Image
+                                          src={getTeamLogo(team.name, team.logoUrl)}
+                                          alt={team.name}
+                                          fill
+                                          className="object-contain"
+                                          unoptimized
+                                        />
+                                      ) : (
+                                        <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                                      )}
                                     </div>
                                     <label
                                       title="Subir escudo personalizado desde PC"
@@ -1818,6 +1863,7 @@ export default function AdminPage() {
                                     </label>
                                     <input
                                       type="text"
+                                      list={`datalist-zone-${zone.id}`}
                                       value={team.name}
                                       onChange={(e) => handleUpdateTeam(zone.id, team.id, 'name', e.target.value)}
                                       className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-white font-bold focus:outline-none"
@@ -2089,6 +2135,35 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <datalist id="datalist-playoffs">
+                    {Array.from(
+                      new Set([
+                        ...standings.zones.flatMap((z) => z.teams.map((t) => t.name)),
+                        'San Martín',
+                        'Eduardo Hertz',
+                        'Argentino de Firmat',
+                        'Los Andes',
+                        'Sportivo Bombal',
+                        'Ítalo Argentino',
+                        'Sporting de Bigand',
+                        'Miguel Torres',
+                        'Olimpia de Santa Teresa',
+                        'Fredriksson',
+                        'Hughes',
+                        'Nuevo Alberdi',
+                        'Independiente de Bigand',
+                        'Blanco y Negro',
+                        'Carreras',
+                        'Firmat FBC',
+                        'Atlético Acebal',
+                        'Atlético Paz',
+                        'Bombal Juniors',
+                        'Bernardino Rivadavia',
+                      ])
+                    ).map((tName) => (
+                      <option key={tName} value={tName} />
+                    ))}
+                  </datalist>
                   {standings.playoffs
                     .filter((m) => adminPlayoffRoundFilter === 'todas' || m.round === adminPlayoffRoundFilter)
                     .map((m) => (
@@ -2163,16 +2238,22 @@ export default function AdminPage() {
                         {/* Equipo 1: Escudo, Nombre y Goles */}
                         <div className="grid grid-cols-12 gap-2 items-center bg-[#14151e] border border-zinc-800/60 rounded-xl p-2">
                           <div className="col-span-8 flex items-center gap-2">
-                            <div className="w-5 h-5 relative shrink-0">
-                              <Image
-                                src={getTeamLogo(m.team1)}
-                                alt={m.team1}
-                                fill
-                                className="object-contain"
-                              />
+                            <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
+                              {getTeamLogo(m.team1) ? (
+                                <Image
+                                  src={getTeamLogo(m.team1)}
+                                  alt={m.team1}
+                                  fill
+                                  className="object-contain"
+                                  unoptimized
+                                />
+                              ) : (
+                                <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                              )}
                             </div>
                             <input
                               type="text"
+                              list="datalist-playoffs"
                               value={m.team1}
                               onChange={(e) => handleUpdatePlayoff(m.id, 'team1', e.target.value)}
                               placeholder="Equipo 1"
@@ -2215,16 +2296,22 @@ export default function AdminPage() {
                         {/* Equipo 2: Escudo, Nombre y Goles */}
                         <div className="grid grid-cols-12 gap-2 items-center bg-[#14151e] border border-zinc-800/60 rounded-xl p-2">
                           <div className="col-span-8 flex items-center gap-2">
-                            <div className="w-5 h-5 relative shrink-0">
-                              <Image
-                                src={getTeamLogo(m.team2)}
-                                alt={m.team2}
-                                fill
-                                className="object-contain"
-                              />
+                            <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
+                              {getTeamLogo(m.team2) ? (
+                                <Image
+                                  src={getTeamLogo(m.team2)}
+                                  alt={m.team2}
+                                  fill
+                                  className="object-contain"
+                                  unoptimized
+                                />
+                              ) : (
+                                <Shield className="w-3.5 h-3.5 text-zinc-600" />
+                              )}
                             </div>
                             <input
                               type="text"
+                              list="datalist-playoffs"
                               value={m.team2}
                               onChange={(e) => handleUpdatePlayoff(m.id, 'team2', e.target.value)}
                               placeholder="Equipo 2"
