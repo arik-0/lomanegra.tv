@@ -177,44 +177,52 @@ export async function POST(req: Request) {
     const isTestToken = process.env.MP_ACCESS_TOKEN?.startsWith('TEST-');
 
     // 3. Crear preferencia en Mercado Pago Checkout Pro oficial
+    const isHttps = appUrl.startsWith('https://');
+
+    const preferenceBody: any = {
+      items: [
+        {
+          id: match.id,
+          title: `Pasión Lomonegra: ${match.title}`,
+          description: `Pase oficial de transmisión en vivo HD • ${match.category || 'Fútbol Mayor'}`,
+          picture_url: match.image_url
+            ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
+            : `${appUrl}/logo-pasion-lomonegra.png`,
+          category_id: 'sports',
+          quantity: 1,
+          unit_price: Number(match.price) || 3500,
+          currency_id: 'ARS',
+        },
+      ],
+      payer: {
+        email: payerEmail,
+      },
+      metadata: {
+        user_id: user ? user.id : null,
+        guest_email: user ? null : payerEmail,
+        match_id: match.id,
+      },
+      external_reference: `match_${match.id}_${Date.now()}_${payerEmail}`,
+      statement_descriptor: 'LOMONEGRA TV',
+      back_urls: {
+        success: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
+        failure: `${appUrl}/partido/${match.id}?payment=failure`,
+        pending: `${appUrl}/partido/${match.id}?payment=pending`,
+      },
+      payment_methods: {
+        installments: 6,
+      },
+    };
+
+    // Mercado Pago solo admite auto_return y notification_url con HTTPS público
+    if (isHttps) {
+      preferenceBody.auto_return = 'approved';
+      preferenceBody.notification_url = `${appUrl}/api/webhooks/mercadopago`;
+    }
+
     const preference = new Preference(mpClient);
     const response = await preference.create({
-      body: {
-        items: [
-          {
-            id: match.id,
-            title: `Pasión Lomonegra: ${match.title}`,
-            description: `Pase oficial de transmisión en vivo HD • ${match.category || 'Fútbol Mayor'}`,
-            picture_url: match.image_url
-              ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
-              : `${appUrl}/logo-pasion-lomonegra.png`,
-            category_id: 'sports',
-            quantity: 1,
-            unit_price: Number(match.price) || 3500,
-            currency_id: 'ARS',
-          },
-        ],
-        payer: {
-          email: payerEmail,
-        },
-        metadata: {
-          user_id: user ? user.id : null,
-          guest_email: user ? null : payerEmail,
-          match_id: match.id,
-        },
-        external_reference: `match_${match.id}_${Date.now()}_${payerEmail}`,
-        statement_descriptor: 'LOMONEGRA TV',
-        back_urls: {
-          success: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
-          failure: `${appUrl}/partido/${match.id}?payment=failure`,
-          pending: `${appUrl}/partido/${match.id}?payment=pending`,
-        },
-        auto_return: 'approved',
-        notification_url: `${appUrl}/api/webhooks/mercadopago`,
-        payment_methods: {
-          installments: 6,
-        },
-      },
+      body: preferenceBody,
     });
 
     const initPoint =
