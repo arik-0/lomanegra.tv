@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
@@ -76,6 +77,46 @@ export async function POST(req: Request) {
           }
         }
 
+        // 3. Verificación de Autorización (Operador Admin o Compra Aprobada)
+        const cookieStore = cookies();
+        const adminSession = cookieStore.get('admin_session');
+        const isAdmin = adminSession?.value === 'authenticated';
+
+        let hasAuthorization = isAdmin;
+
+        if (!hasAuthorization) {
+          const cleanGuestEmail = guestEmail?.toLowerCase().trim();
+          if (user) {
+            const { data: p } = await supabaseAdmin
+              .from('purchases')
+              .select('status')
+              .eq('match_id', targetId)
+              .eq('user_id', user.id)
+              .eq('status', 'approved')
+              .maybeSingle();
+            if (p) hasAuthorization = true;
+          } else if (cleanGuestEmail) {
+            const { data: p } = await supabaseAdmin
+              .from('purchases')
+              .select('status')
+              .eq('match_id', targetId)
+              .eq('guest_email', cleanGuestEmail)
+              .eq('status', 'approved')
+              .maybeSingle();
+            if (p) hasAuthorization = true;
+          }
+        }
+
+        if (!hasAuthorization) {
+          return NextResponse.json(
+            {
+              error: 'Acceso no autorizado: debes adquirir tu pase oficial para ver la transmisión en vivo.',
+              code: 'PAYMENT_REQUIRED',
+            },
+            { status: 403 }
+          );
+        }
+
         // Registrar sesión activa
         const newSessionId = crypto.randomUUID();
         if (user) {
@@ -91,10 +132,17 @@ export async function POST(req: Request) {
             session_id: newSessionId,
             last_heartbeat: new Date().toISOString(),
           });
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.code === 'PAYMENT_REQUIRED' || err?.status === 403) {
+          throw err;
+        }
         console.warn('DB no disponible para stream token, operando en modo local resiliente.');
       }
     }
+
+    const cookieStore = cookies();
+    const adminSession = cookieStore.get('admin_session');
+    const isAdmin = adminSession?.value === 'authenticated';
 
     const newSessionId = crypto.randomUUID();
     const matchTitle = resolvedMatch?.title || 'Club Atlético Blanco y Negro';
@@ -111,7 +159,7 @@ export async function POST(req: Request) {
     const isBroadcasting = Boolean(
       resolvedMatch?.is_live === true ||
       (resolvedMatch?.is_live !== false && (hasDirectUrl || (hasCloudflareKeys && !liveInputUid.startsWith('live_input_')))) ||
-      previewMode === true
+      (previewMode === true && isAdmin)
     );
 
     // Si NO está transmitiendo en vivo, retornar estado 'waiting' para activar el StreamPlaceholder

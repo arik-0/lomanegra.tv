@@ -24,6 +24,8 @@ import {
   Clock,
   Sparkles,
   X,
+  Loader2,
+  LogOut,
 } from 'lucide-react';
 
 interface MatchViewClientProps {
@@ -43,6 +45,7 @@ interface MatchViewClientProps {
   currentUserEmail: string | null;
   paymentStatus?: string;
   queryGuestEmail?: string;
+  paymentId?: string;
   isAdmin?: boolean;
 }
 
@@ -52,6 +55,7 @@ export default function MatchViewClient({
   currentUserEmail,
   paymentStatus,
   queryGuestEmail,
+  paymentId,
   isAdmin = false,
 }: MatchViewClientProps) {
   const [hasPaid, setHasPaid] = useState(serverHasPaid || isAdmin);
@@ -67,29 +71,42 @@ export default function MatchViewClient({
     text: string;
   } | null>(null);
 
+  // Estados de verificación estricta de pago y operador
+  const [verifyingPayment, setVerifyingPayment] = useState(paymentStatus === 'success');
+  const [paymentVerifiedError, setPaymentVerifiedError] = useState<string | null>(null);
+  const [operatorLoggingOut, setOperatorLoggingOut] = useState(false);
+
   // Estados para el backdoor seguro de operador/administrador
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
   const [adminLoading, setAdminLoading] = useState(false);
 
-  // Al cargar, verificar si hay aprobación local previa o retorno exitoso de pasarela
+  // Al cargar, verificar autenticidad estricta y purgar residuos de pruebas
   useEffect(() => {
-    const isLocallyApproved =
-      localStorage.getItem(`lomonegrotv_approved_${match.id}`) === 'true';
+    // 1. Purgar cualquier residuo de aprobaciones locales falsas de pruebas pasadas
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('lomonegrotv_approved_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch {}
 
-    if (isLocallyApproved || paymentStatus === 'success') {
-      setHasPaid(true);
-      localStorage.setItem(`lomonegrotv_approved_${match.id}`, 'true');
-      const email =
+    // 2. Si el usuario retornó con status 'success' de Mercado Pago, verificar con el servidor oficial
+    if (paymentStatus === 'success') {
+      const emailToVerify =
         queryGuestEmail ||
+        currentUserEmail ||
         localStorage.getItem('lomonegrotv_guest_email') ||
-        'invitado@pasionlomonegra.com';
-      setActiveGuestEmail(email);
+        '';
+
+      verifyPaymentTransaction(emailToVerify, paymentId);
       return;
     }
 
-    if (!serverHasPaid && !currentUserEmail) {
+    // 3. Si no es admin y no pagó por servidor, consultar si el email invitado ya tiene pase
+    if (!serverHasPaid && !currentUserEmail && !isAdmin) {
       const emailToCheck =
         queryGuestEmail ||
         localStorage.getItem('lomonegrotv_guest_email') ||
@@ -98,7 +115,55 @@ export default function MatchViewClient({
         verifyGuestEmail(emailToCheck);
       }
     }
-  }, [match.id, serverHasPaid, currentUserEmail, queryGuestEmail, paymentStatus]);
+  }, [match.id, serverHasPaid, currentUserEmail, queryGuestEmail, paymentStatus, paymentId, isAdmin]);
+
+  const verifyPaymentTransaction = async (email: string, pId?: string) => {
+    try {
+      setVerifyingPayment(true);
+      setPaymentVerifiedError(null);
+      const res = await fetch('/api/purchases/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId: match.id,
+          paymentId: pId,
+          guestEmail: email || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.approved) {
+        setHasPaid(true);
+        if (data.email) {
+          setActiveGuestEmail(data.email);
+          localStorage.setItem('lomonegrotv_guest_email', data.email);
+        }
+      } else {
+        setPaymentVerifiedError(
+          data.message || 'No se pudo verificar la acreditación del pago en Mercado Pago.'
+        );
+      }
+    } catch {
+      setPaymentVerifiedError('Error de red al comprobar el estado del pago con Mercado Pago.');
+    } finally {
+      setVerifyingPayment(false);
+    }
+  };
+
+  const handleOperatorLogout = async () => {
+    try {
+      setOperatorLoggingOut(true);
+      await fetch('/api/admin/login', { method: 'DELETE' });
+      localStorage.removeItem('admin_session_auth');
+      setIsAdminActive(false);
+      if (!serverHasPaid) {
+        setHasPaid(false);
+      }
+      window.location.reload();
+    } catch {
+      window.location.reload();
+    }
+  };
 
   const verifyGuestEmail = async (email: string) => {
     try {
@@ -189,14 +254,27 @@ export default function MatchViewClient({
 
   return (
     <div className="space-y-8">
-      {/* Alertas de Retorno de Pago Mercado Pago */}
-      {paymentStatus === 'success' && !hasPaid && (
-        <div className="p-4 rounded-2xl bg-[#0c0c10] border border-red-600/70 flex items-start gap-3 shadow-lg">
-          <CheckCircle2 className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+      {/* Alerta de Verificación en Curso */}
+      {verifyingPayment && (
+        <div className="p-4 rounded-2xl bg-[#0c0c10] border border-[#009ee3]/60 flex items-center gap-3 shadow-lg animate-pulse">
+          <Loader2 className="w-5 h-5 text-[#009ee3] animate-spin shrink-0" />
           <div>
-            <p className="text-sm font-black text-white font-mono">¡Pago recibido en Mercado Pago!</p>
+            <p className="text-sm font-black text-white font-mono">Verificando tu pago en Mercado Pago...</p>
             <p className="text-xs text-zinc-400 mt-0.5 font-mono">
-              Activando tu señal en vivo. Si no inicia en unos segundos, recarga la página.
+              Comprobando acreditación oficial con la pasarela. Tu señal se habilitará automáticamente.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Alerta de Retorno con Error o Pago no Acreditado */}
+      {paymentVerifiedError && !hasPaid && (
+        <div className="p-4 rounded-2xl bg-red-950/40 border border-red-600/70 flex items-start gap-3 shadow-lg">
+          <Info className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-black text-white font-mono">Aviso de Pago</p>
+            <p className="text-xs text-red-300 mt-0.5 font-mono leading-relaxed">
+              {paymentVerifiedError}
             </p>
           </div>
         </div>
@@ -207,17 +285,41 @@ export default function MatchViewClient({
         /* VISTA: REPRODUCTOR ACTIVO ESTILO FORG1 CON ESQUINAS HUD */
         <div className="space-y-6 animate-fade-in">
           {isAdminActive && (
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-950/80 via-zinc-900 to-[#0c0c10] border border-red-500/50 flex items-center justify-between shadow-lg">
-              <div className="flex items-center gap-2 text-xs font-mono text-white">
-                <Radio className="w-4 h-4 text-red-500 animate-pulse" />
-                <span className="font-bold uppercase tracking-wider">Modo Operador / Control de Transmisión Activo</span>
+            <div className="p-4 rounded-3xl bg-gradient-to-r from-red-950/90 via-zinc-900 to-[#0c0c10] border-2 border-red-600/70 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 shrink-0">
+                  <Radio className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-xs sm:text-sm uppercase tracking-wider text-white font-mono">
+                      Modo Operador / Transmisión Activo
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-black uppercase tracking-wider">
+                      Acceso Administrador (Sin Pago)
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-300 font-mono mt-0.5">
+                    Estás viendo la señal con privilegios de operador del club. Los hinchas y espectadores comunes ven la pasarela de compra.
+                  </p>
+                </div>
               </div>
-              <Link
-                href="/admin"
-                className="text-[11px] font-mono font-bold text-red-400 hover:text-white underline transition"
-              >
-                Panel de Operaciones &rarr;
-              </Link>
+              <div className="flex items-center gap-2 font-mono shrink-0">
+                <Link
+                  href="/admin"
+                  className="px-3.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-xs text-white transition"
+                >
+                  Panel Operativo &rarr;
+                </Link>
+                <button
+                  onClick={handleOperatorLogout}
+                  disabled={operatorLoggingOut}
+                  className="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 text-xs text-white font-bold transition shadow-md shadow-red-950 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>{operatorLoggingOut ? 'Cerrando...' : 'Cerrar Sesión (Ver como Hincha)'}</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -256,9 +358,11 @@ export default function MatchViewClient({
               <div className="flex items-center gap-2 text-xs text-zinc-300 bg-[#121218] border border-white/[0.08] px-4 py-2 rounded-xl">
                 <ShieldCheck className="w-4 h-4 text-red-500" />
                 <span className="truncate max-w-[200px]">
-                  {currentUserEmail
-                    ? `Pase: ${currentUserEmail}`
-                    : `Invitado: ${activeGuestEmail}`}
+                  {isAdminActive && !serverHasPaid
+                    ? 'Operador Autorizado'
+                    : (currentUserEmail
+                        ? `Pase: ${currentUserEmail}`
+                        : `Invitado: ${activeGuestEmail}`)}
                 </span>
               </div>
               <span className="text-[10px] text-zinc-500">Sesión simultánea única protegida</span>

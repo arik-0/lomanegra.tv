@@ -12,7 +12,13 @@ export const revalidate = 0;
 
 interface MatchPageProps {
   params: { id: string };
-  searchParams?: { payment?: string; guest_email?: string };
+  searchParams?: {
+    payment?: string;
+    guest_email?: string;
+    payment_id?: string;
+    collection_id?: string;
+    status?: string;
+  };
 }
 
 export async function generateMetadata({ params }: MatchPageProps): Promise<Metadata> {
@@ -113,9 +119,7 @@ export default async function MatchPage({
   const adminSession = cookieStore.get('admin_session');
   const isAdmin = adminSession?.value === 'authenticated';
 
-  if (isAdmin) {
-    serverHasPaid = true;
-  }
+  // serverHasPaid reflejará estrictamente si existe compra aprobada en la base de datos
 
   if (isSupabaseConfigured) {
     try {
@@ -309,6 +313,7 @@ export default async function MatchPage({
           currentUserEmail={user?.email || null}
           paymentStatus={searchParams?.payment}
           queryGuestEmail={searchParams?.guest_email}
+          paymentId={searchParams?.payment_id || searchParams?.collection_id}
           isAdmin={isAdmin}
         />
       </div>
