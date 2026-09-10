@@ -93,16 +93,23 @@ export default function MatchViewClient({
       });
     } catch {}
 
-    // 2. Si el usuario retornó con status 'success' de Mercado Pago, verificar con el servidor oficial
+    // 2. Si el usuario retornó de Mercado Pago con paymentId oficial
     if (paymentStatus === 'success') {
-      const emailToVerify =
-        queryGuestEmail ||
-        currentUserEmail ||
-        localStorage.getItem('lomonegrotv_guest_email') ||
-        '';
+      if (paymentId) {
+        const emailToVerify =
+          queryGuestEmail ||
+          currentUserEmail ||
+          localStorage.getItem('lomonegrotv_guest_email') ||
+          '';
 
-      verifyPaymentTransaction(emailToVerify, paymentId);
-      return;
+        verifyPaymentTransaction(emailToVerify, paymentId);
+        return;
+      } else {
+        // Si solo estaba ?payment=success sin ID de transacción, limpiar URL sin mostrar error
+        try {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch {}
+      }
     }
 
     // 3. Si no es admin y no pagó por servidor, consultar si el email invitado ya tiene pase
@@ -269,14 +276,23 @@ export default function MatchViewClient({
 
       {/* Alerta de Retorno con Error o Pago no Acreditado */}
       {paymentVerifiedError && !hasPaid && (
-        <div className="p-4 rounded-2xl bg-red-950/40 border border-red-600/70 flex items-start gap-3 shadow-lg">
-          <Info className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-black text-white font-mono">Aviso de Pago</p>
-            <p className="text-xs text-red-300 mt-0.5 font-mono leading-relaxed">
-              {paymentVerifiedError}
-            </p>
+        <div className="p-4 rounded-2xl bg-red-950/40 border border-red-600/70 flex items-start justify-between gap-3 shadow-lg">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-black text-white font-mono">Aviso de Pago</p>
+              <p className="text-xs text-red-300 mt-0.5 font-mono leading-relaxed">
+                {paymentVerifiedError}
+              </p>
+            </div>
           </div>
+          <button
+            onClick={() => setPaymentVerifiedError(null)}
+            className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition shrink-0"
+            title="Cerrar aviso"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

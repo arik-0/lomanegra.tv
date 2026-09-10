@@ -93,34 +93,7 @@ export default function CheckoutButton({
 
       setLastInitPoint(data.init_point);
 
-      // Si se ejecuta en modo simulación/demo (sin tokens en .env), redirigir directamente
-      if (data.isMock) {
-        window.location.href = data.init_point;
-        return;
-      }
-
-      // Intentar abrir el Modal de Checkout Pro si el SDK está disponible en desktop
-      const isMobile =
-        typeof window !== 'undefined' &&
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-      if (!preferRedirect && !isMobile && data.publicKey && window.MercadoPago) {
-        try {
-          const mp = new window.MercadoPago(data.publicKey, { locale: 'es-AR' });
-          mp.checkout({
-            preference: {
-              id: data.preferenceId,
-            },
-            autoOpen: true,
-          });
-          setLoading(false);
-          return;
-        } catch (modalErr) {
-          console.warn('Fallo modal Checkout Pro, usando redirección:', modalErr);
-        }
-      }
-
-      // Redirección directa al portal oficial de Mercado Pago Checkout Pro
+      // Redirección directa e infalible al portal oficial de Mercado Pago Checkout Pro
       if (data.init_point) {
         window.location.href = data.init_point;
       } else {
