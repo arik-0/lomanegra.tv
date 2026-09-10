@@ -73,12 +73,15 @@ export default function CheckoutButton({
         }
       }
 
+      const resolvedEmail = (isUserLoggedIn && userEmail ? userEmail : guestEmail)?.toLowerCase()?.trim();
+
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           matchId,
-          guestEmail: isUserLoggedIn ? undefined : guestEmail.toLowerCase().trim(),
+          guestEmail: resolvedEmail,
+          userEmail: userEmail || undefined,
         }),
       });
 

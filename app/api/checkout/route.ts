@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
     const body = await req.json().catch(() => ({}));
-    const { matchId, guestEmail } = body;
+    const { matchId, guestEmail, userEmail, email } = body;
 
     let user: any = null;
 
@@ -25,13 +25,13 @@ export async function POST(req: Request) {
       try {
         const supabase = createServerSupabaseClient();
         const { data } = await supabase.auth.getUser();
-        user = data.user;
+        user = data?.user || null;
       } catch {
         user = null;
       }
     }
 
-    const payerEmail = user?.email || guestEmail;
+    const payerEmail = (user?.email || guestEmail || userEmail || email)?.toLowerCase()?.trim();
 
     if (!payerEmail) {
       return NextResponse.json(
@@ -137,7 +137,26 @@ export async function POST(req: Request) {
       );
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Determinar URL base dinámica según el dominio real del usuario
+    const origin = req.headers.get('origin') || req.headers.get('referer');
+    const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host');
+    const forwardedProto = req.headers.get('x-forwarded-proto') || 'https';
+
+    let appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    if (origin && !origin.includes('localhost')) {
+      try {
+        const parsed = new URL(origin);
+        appUrl = `${parsed.protocol}//${parsed.host}`;
+      } catch {}
+    } else if (forwardedHost && !forwardedHost.includes('localhost')) {
+      appUrl = `${forwardedProto}://${forwardedHost}`;
+    } else if (origin) {
+      try {
+        const parsed = new URL(origin);
+        appUrl = `${parsed.protocol}//${parsed.host}`;
+      } catch {}
+    }
+
     const returnUrlParam = user ? '' : `&guest_email=${encodeURIComponent(payerEmail)}`;
 
     // Si las credenciales de Mercado Pago están en placeholder, responder en 0ms
