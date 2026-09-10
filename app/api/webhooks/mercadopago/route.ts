@@ -145,3 +145,10 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  return NextResponse.json(
+    { status: 'ok', message: 'Mercado Pago Webhook endpoint is active' },
+    { status: 200 }
+  );
+}
