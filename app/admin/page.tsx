@@ -99,6 +99,7 @@ export default function AdminPage() {
   const [anchorMessage, setAnchorMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showStreamGuide, setShowStreamGuide] = useState(false);
   const [copiedRtmp, setCopiedRtmp] = useState(false);
+  const [mpStatus, setMpStatus] = useState<'production' | 'sandbox' | 'mock'>('mock');
 
   // Modal Partido
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
@@ -207,6 +208,9 @@ export default function AdminPage() {
             setSelectedMatchId(data.matches[0].id);
             setStreamInput(data.matches[0].cloudflare_live_input_uid || '');
           }
+        }
+        if (data.mpStatus) {
+          setMpStatus(data.mpStatus);
         }
       }
     } catch (err) {
@@ -1137,6 +1141,29 @@ export default function AdminPage() {
                 <Trophy className="w-3.5 h-3.5 text-amber-400" />
                 <span>Tablas & Zonas</span>
               </button>
+            </div>
+
+            {/* Estado Mercado Pago Checkout Pro */}
+            <div className="hidden md:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#181922] border border-zinc-800 text-xs font-mono">
+              <span className="text-zinc-500 font-bold uppercase text-[10px]">MP Checkout Pro:</span>
+              {mpStatus === 'production' && (
+                <span className="flex items-center gap-1.5 text-emerald-400 font-black text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Producción Activa</span>
+                </span>
+              )}
+              {mpStatus === 'sandbox' && (
+                <span className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <span>Modo Sandbox</span>
+                </span>
+              )}
+              {mpStatus === 'mock' && (
+                <span className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-zinc-600" />
+                  <span>Modo Simulación</span>
+                </span>
+              )}
             </div>
 
             <button

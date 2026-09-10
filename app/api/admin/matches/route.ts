@@ -95,11 +95,19 @@ export async function GET() {
       supabaseAdmin.from('matches').select('*').order('date', { ascending: true })
     );
 
+    const mpToken = process.env.MP_ACCESS_TOKEN || '';
+    let mpStatus: 'production' | 'sandbox' | 'mock' = 'mock';
+    if (mpToken.startsWith('APP_USR-') && !mpToken.includes('xxxx')) {
+      mpStatus = 'production';
+    } else if (mpToken.startsWith('TEST-') && !mpToken.includes('xxxx')) {
+      mpStatus = 'sandbox';
+    }
+
     if (res && !res.error && res.data && res.data.length > 0) {
       // Filtrar filas del sistema (como persistencia de tablas)
       const realMatches = res.data.filter((m: any) => !m.title?.startsWith('__SYSTEM_'));
       const normalized = realMatches.map(decodeMatchFields);
-      return NextResponse.json({ matches: normalized, source: 'supabase' });
+      return NextResponse.json({ matches: normalized, source: 'supabase', mpStatus });
     }
 
     // Retornar partidos del almacén en memoria
@@ -108,14 +116,22 @@ export async function GET() {
       title: sanitizeRegionalText(m.title),
       description: sanitizeRegionalText(m.description),
     }));
-    return NextResponse.json({ matches: memMatches, source: 'memory' });
+    return NextResponse.json({ matches: memMatches, source: 'memory', mpStatus });
   } catch (error: any) {
+    const mpToken = process.env.MP_ACCESS_TOKEN || '';
+    let mpStatus: 'production' | 'sandbox' | 'mock' = 'mock';
+    if (mpToken.startsWith('APP_USR-') && !mpToken.includes('xxxx')) {
+      mpStatus = 'production';
+    } else if (mpToken.startsWith('TEST-') && !mpToken.includes('xxxx')) {
+      mpStatus = 'sandbox';
+    }
+
     const memMatches = getStoredMatches().map((m) => ({
       ...m,
       title: sanitizeRegionalText(m.title),
       description: sanitizeRegionalText(m.description),
     }));
-    return NextResponse.json({ matches: memMatches, source: 'fallback' });
+    return NextResponse.json({ matches: memMatches, source: 'fallback', mpStatus });
   }
 }
 

@@ -399,8 +399,8 @@ export default function MatchViewClient({
 
               {isDateConfirmed ? (
                 <>
-                  <p className="text-xs font-mono text-zinc-400 mb-6 leading-relaxed">
-                    Adquiere tu pase al instante con <strong>Mercado Pago</strong> sin necesidad de crear cuenta, o ingresando con tu usuario si ya estás registrado.
+                  <p className="text-xs font-mono text-zinc-400 mb-5 leading-relaxed">
+                    Adquiere tu pase al instante con <strong>Mercado Pago Checkout Pro</strong> sin necesidad de crear cuenta, o ingresando con tu usuario si ya estás registrado.
                   </p>
 
                   {/* Botón de Checkout con soporte de invitado */}

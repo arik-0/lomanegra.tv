@@ -37,14 +37,31 @@ export async function POST(req: Request) {
     const payment = new Payment(mpClient);
     const paymentData = await payment.get({ id: paymentId });
 
-    if (!paymentData || !paymentData.metadata) {
+    if (!paymentData) {
       return NextResponse.json(
-        { message: 'Pago consultado no contiene la metadata esperada' },
+        { message: 'Pago consultado no existe en Mercado Pago' },
         { status: 200 }
       );
     }
 
-    const { user_id, guest_email, match_id } = paymentData.metadata;
+    let user_id = paymentData.metadata?.user_id;
+    let guest_email = paymentData.metadata?.guest_email;
+    let match_id = paymentData.metadata?.match_id;
+
+    // Fallback con external_reference si metadata no vino en el webhook
+    // Formato generado en checkout: match_${match.id}_${Date.now()}_${payerEmail}
+    if ((!match_id || (!user_id && !guest_email)) && paymentData.external_reference) {
+      const ref = String(paymentData.external_reference);
+      if (ref.startsWith('match_')) {
+        const parts = ref.split('_');
+        if (parts.length >= 4) {
+          match_id = parts[1];
+          if (!guest_email && !user_id) {
+            guest_email = parts.slice(3).join('_');
+          }
+        }
+      }
+    }
 
     if (!match_id || (!user_id && !guest_email)) {
       return NextResponse.json(

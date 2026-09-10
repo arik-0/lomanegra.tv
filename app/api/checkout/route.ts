@@ -145,10 +145,15 @@ export async function POST(req: Request) {
       return NextResponse.json({
         preferenceId: 'mock_pref_' + Date.now(),
         init_point: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
+        sandbox_init_point: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
+        publicKey: process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '',
+        isMock: true,
       });
     }
 
-    // 3. Crear preferencia en Mercado Pago Checkout Pro
+    const isTestToken = process.env.MP_ACCESS_TOKEN?.startsWith('TEST-');
+
+    // 3. Crear preferencia en Mercado Pago Checkout Pro oficial
     const preference = new Preference(mpClient);
     const response = await preference.create({
       body: {
@@ -156,9 +161,13 @@ export async function POST(req: Request) {
           {
             id: match.id,
             title: `Pasión Lomonegra: ${match.title}`,
-            description: match.description || 'Acceso a transmisión en vivo HD',
+            description: `Pase oficial de transmisión en vivo HD • ${match.category || 'Fútbol Mayor'}`,
+            picture_url: match.image_url
+              ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
+              : `${appUrl}/logo-pasion-lomonegra.png`,
+            category_id: 'sports',
             quantity: 1,
-            unit_price: Number(match.price),
+            unit_price: Number(match.price) || 3500,
             currency_id: 'ARS',
           },
         ],
@@ -170,6 +179,8 @@ export async function POST(req: Request) {
           guest_email: user ? null : payerEmail,
           match_id: match.id,
         },
+        external_reference: `match_${match.id}_${Date.now()}_${payerEmail}`,
+        statement_descriptor: 'LOMONEGRA TV',
         back_urls: {
           success: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
           failure: `${appUrl}/partido/${match.id}?payment=failure`,
@@ -177,12 +188,23 @@ export async function POST(req: Request) {
         },
         auto_return: 'approved',
         notification_url: `${appUrl}/api/webhooks/mercadopago`,
+        payment_methods: {
+          installments: 6,
+        },
       },
     });
 
+    const initPoint =
+      isTestToken && response.sandbox_init_point
+        ? response.sandbox_init_point
+        : (response.init_point || response.sandbox_init_point);
+
     return NextResponse.json({
       preferenceId: response.id,
-      init_point: response.init_point,
+      init_point: initPoint,
+      sandbox_init_point: response.sandbox_init_point,
+      publicKey: process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '',
+      isMock: false,
     });
   } catch (error: any) {
     console.error('Error en POST /api/checkout:', error);

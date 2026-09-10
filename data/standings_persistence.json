@@ -3175,163 +3175,191 @@
         "name": "Zona A",
         "teams": [
           {
-            "id": "san-martin",
-            "pos": 1,
-            "name": "San Martín",
-            "logoUrl": "/teams/San Martin.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
             "id": "eduardo-hertz",
-            "pos": 2,
+            "pos": 1,
             "name": "Eduardo Hertz",
             "logoUrl": "/teams/Eduardo Hertz.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "ca-argentino",
-            "pos": 3,
-            "name": "C.A. Argentino",
-            "logoUrl": "/teams/Argentino de Firmat.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "los-andes",
-            "pos": 4,
-            "name": "Los Andes",
-            "logoUrl": "/teams/Los Andes.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "gf": 4,
+            "gc": 1,
+            "dif": 3,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
             "id": "sp-bombal",
-            "pos": 5,
+            "pos": 2,
             "name": "Sp. Bombal",
             "logoUrl": "/teams/Sportivo Bombal.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
+            "pe": 1,
+            "pp": 0,
+            "gf": 2,
+            "gc": 1,
+            "dif": 1,
+            "pts": 4,
+            "form": [
+              "W",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "los-andes",
+            "pos": 3,
+            "name": "Los Andes",
+            "logoUrl": "/teams/Los Andes.png",
+            "pj": 1,
+            "pg": 1,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 3,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "dif": 3,
+            "pts": 3,
+            "form": [
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "italo-argentino",
-            "pos": 6,
+            "pos": 4,
             "name": "Ítalo Argentino",
             "logoUrl": "/teams/Italo Argentino.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
+            "qualified": true
           },
           {
-            "id": "sporting-cs",
-            "pos": 7,
-            "name": "Sporting CS",
-            "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 0,
-            "pg": 0,
+            "id": "ca-argentino",
+            "pos": 5,
+            "name": "C.A. Argentino",
+            "logoUrl": "/teams/Argentino de Firmat.png",
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
+            "pp": 1,
+            "gf": 3,
+            "gc": 3,
             "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "dep-miguel-torres",
-            "pos": 8,
-            "name": "Dep. Miguel Torres",
-            "logoUrl": "/teams/Miguel Torres.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "olimpia",
-            "pos": 9,
-            "name": "Olimpia",
-            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
             "qualified": false
           },
           {
             "id": "fredriksson-fbc",
-            "pos": 10,
+            "pos": 6,
             "name": "Fredriksson FBC",
             "logoUrl": "/teams/Fredriksson.png",
-            "pj": 0,
+            "pj": 2,
+            "pg": 1,
+            "pe": 0,
+            "pp": 1,
+            "gf": 2,
+            "gc": 3,
+            "dif": -1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "olimpia",
+            "pos": 7,
+            "name": "Olimpia",
+            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
+            "pj": 2,
+            "pg": 1,
+            "pe": 0,
+            "pp": 1,
+            "gf": 1,
+            "gc": 2,
+            "dif": -1,
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "san-martin",
+            "pos": 8,
+            "name": "San Martín",
+            "logoUrl": "/teams/San Martin.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 2,
+            "gc": 3,
+            "dif": -1,
+            "pts": 1,
+            "form": [
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "sporting-cs",
+            "pos": 9,
+            "name": "Sporting CS",
+            "logoUrl": "/teams/Sporting de Bigan.png",
+            "pj": 1,
             "pg": 0,
             "pe": 0,
-            "pp": 0,
+            "pp": 1,
             "gf": 0,
-            "gc": 0,
-            "dif": 0,
+            "gc": 1,
+            "dif": -1,
             "pts": 0,
-            "form": [],
+            "form": [
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "dep-miguel-torres",
+            "pos": 10,
+            "name": "Dep. Miguel Torres",
+            "logoUrl": "/teams/Miguel Torres.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 0,
+            "pp": 2,
+            "gf": 0,
+            "gc": 4,
+            "dif": -4,
+            "pts": 0,
+            "form": [
+              "L",
+              "L"
+            ],
             "qualified": false
           }
         ],
@@ -3344,8 +3372,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f1-2",
@@ -3355,8 +3383,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-3",
@@ -3366,8 +3394,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-4",
@@ -3377,8 +3405,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-5",
@@ -3388,8 +3416,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-6",
@@ -3399,8 +3427,8 @@
             "homeTeamName": "San Martín",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-7",
@@ -3421,8 +3449,8 @@
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-9",
@@ -3432,8 +3460,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f2-10",
@@ -3443,8 +3471,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-11",
@@ -4058,164 +4086,192 @@
         "name": "Zona B",
         "teams": [
           {
-            "id": "hughes-fbc",
+            "id": "atletico-paz",
             "pos": 1,
-            "name": "Hughes FBC",
-            "logoUrl": "/teams/Hughes.png",
-            "pj": 0,
-            "pg": 0,
+            "name": "Atlético Paz",
+            "logoUrl": "/teams/Atletico Paz.png",
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "gf": 4,
+            "gc": 1,
+            "dif": 3,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
-            "id": "nuevo-alberdi",
+            "id": "bombal-jrs",
             "pos": 2,
-            "name": "Nuevo Alberdi",
-            "logoUrl": "/teams/Nuevo Alberdi.png",
-            "pj": 0,
-            "pg": 0,
+            "name": "Bombal Jrs",
+            "logoUrl": "/teams/Bombal Juniors.png",
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 2,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "independiente-fc",
-            "pos": 3,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "blanco-y-negro",
-            "pos": 4,
-            "name": "Blanco y Negro",
-            "logoUrl": "/teams/Blanco y Negro.png",
-            "isBlancoYNegro": true,
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "dif": 2,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
             "id": "carreras-ac",
-            "pos": 5,
+            "pos": 3,
             "name": "Carreras AC",
             "logoUrl": "/teams/Carreras.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 1,
+            "pg": 1,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 4,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "dif": 4,
+            "pts": 3,
+            "form": [
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "firmat-fbc",
-            "pos": 6,
+            "pos": 4,
             "name": "Firmat FBC",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "atl-acebal",
-            "pos": 7,
+            "pos": 5,
             "name": "Atl. Acebal",
             "logoUrl": "/teams/Atletico Acebal.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pp": 1,
+            "gf": 2,
+            "gc": 1,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
             "qualified": false
           },
           {
-            "id": "atletico-paz",
+            "id": "blanco-y-negro",
+            "pos": 6,
+            "name": "Blanco y Negro",
+            "logoUrl": "/teams/Blanco y Negro.png",
+            "isBlancoYNegro": true,
+            "pj": 1,
+            "pg": 0,
+            "pe": 1,
+            "pp": 0,
+            "gf": 1,
+            "gc": 1,
+            "dif": 0,
+            "pts": 1,
+            "form": [
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "independiente-fc",
+            "pos": 7,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 2,
+            "dif": -1,
+            "pts": 1,
+            "form": [
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "hughes-fbc",
             "pos": 8,
-            "name": "Atlético Paz",
-            "logoUrl": "/teams/Atletico Paz.png",
-            "pj": 0,
+            "name": "Hughes FBC",
+            "logoUrl": "/teams/Hughes.png",
+            "pj": 2,
             "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "bombal-jrs",
-            "pos": 9,
-            "name": "Bombal Jrs",
-            "logoUrl": "/teams/Bombal Juniors.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 4,
+            "dif": -3,
+            "pts": 1,
+            "form": [
+              "D",
+              "L"
+            ],
             "qualified": false
           },
           {
             "id": "b-rivadavia",
-            "pos": 10,
+            "pos": 9,
             "name": "B. Rivadavia",
             "logoUrl": "/teams/Bernardino Rivadavia.png",
-            "pj": 0,
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 5,
+            "dif": -4,
+            "pts": 1,
+            "form": [
+              "D",
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "nuevo-alberdi",
+            "pos": 10,
+            "name": "Nuevo Alberdi",
+            "logoUrl": "/teams/Nuevo Alberdi.png",
+            "pj": 2,
             "pg": 0,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
+            "pp": 2,
+            "gf": 1,
+            "gc": 4,
+            "dif": -3,
             "pts": 0,
-            "form": [],
+            "form": [
+              "L",
+              "L"
+            ],
             "qualified": false
           }
         ],
@@ -4228,8 +4284,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-2",
@@ -4250,8 +4306,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-4",
@@ -4261,8 +4317,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-5",
@@ -4272,8 +4328,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f2-6",
@@ -4283,8 +4339,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-7",
@@ -4294,8 +4350,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-8",
@@ -4305,8 +4361,8 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-zb-f2-9",
@@ -4316,8 +4372,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-10",
@@ -4327,8 +4383,8 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-11",
@@ -4945,11 +5001,13 @@
         "title": "Cuartos 1 (1°A vs 4°B)",
         "seed1": "1ero A",
         "seed2": "4to B",
-        "team1": "San Martín",
-        "team2": "Blanco y Negro",
+        "team1": "Eduardo Hertz",
+        "team2": "Firmat FBC",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c2",
@@ -4957,11 +5015,13 @@
         "title": "Cuartos 2 (2°A vs 3°B)",
         "seed1": "2do A",
         "seed2": "3ro B",
-        "team1": "Eduardo Hertz",
-        "team2": "Independiente FC",
+        "team1": "Sp. Bombal",
+        "team2": "Carreras AC",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c3",
@@ -4969,11 +5029,13 @@
         "title": "Cuartos 3 (1°B vs 4°A)",
         "seed1": "1ero B",
         "seed2": "4to A",
-        "team1": "Hughes FBC",
-        "team2": "Los Andes",
+        "team1": "Atlético Paz",
+        "team2": "Ítalo Argentino",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c4",
@@ -4981,11 +5043,13 @@
         "title": "Cuartos 4 (2°B vs 3°A)",
         "seed1": "2do B",
         "seed2": "3ro A",
-        "team1": "Nuevo Alberdi",
-        "team2": "C.A. Argentino",
+        "team1": "Bombal Jrs",
+        "team2": "Los Andes",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "s1",
@@ -5123,163 +5187,191 @@
         "name": "Zona A",
         "teams": [
           {
-            "id": "san-martin",
-            "pos": 1,
-            "name": "San Martín",
-            "logoUrl": "/teams/San Martin.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
             "id": "eduardo-hertz",
-            "pos": 2,
+            "pos": 1,
             "name": "Eduardo Hertz",
             "logoUrl": "/teams/Eduardo Hertz.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "ca-argentino",
-            "pos": 3,
-            "name": "C.A. Argentino",
-            "logoUrl": "/teams/Argentino de Firmat.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "los-andes",
-            "pos": 4,
-            "name": "Los Andes",
-            "logoUrl": "/teams/Los Andes.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "gf": 4,
+            "gc": 1,
+            "dif": 3,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
             "id": "sp-bombal",
-            "pos": 5,
+            "pos": 2,
             "name": "Sp. Bombal",
             "logoUrl": "/teams/Sportivo Bombal.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
+            "pe": 1,
+            "pp": 0,
+            "gf": 2,
+            "gc": 1,
+            "dif": 1,
+            "pts": 4,
+            "form": [
+              "W",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "los-andes",
+            "pos": 3,
+            "name": "Los Andes",
+            "logoUrl": "/teams/Los Andes.png",
+            "pj": 1,
+            "pg": 1,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 3,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "dif": 3,
+            "pts": 3,
+            "form": [
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "italo-argentino",
-            "pos": 6,
+            "pos": 4,
             "name": "Ítalo Argentino",
             "logoUrl": "/teams/Italo Argentino.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
+            "qualified": true
           },
           {
-            "id": "sporting-cs",
-            "pos": 7,
-            "name": "Sporting CS",
-            "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 0,
-            "pg": 0,
+            "id": "ca-argentino",
+            "pos": 5,
+            "name": "C.A. Argentino",
+            "logoUrl": "/teams/Argentino de Firmat.png",
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
+            "pp": 1,
+            "gf": 3,
+            "gc": 3,
             "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "dep-miguel-torres",
-            "pos": 8,
-            "name": "Dep. Miguel Torres",
-            "logoUrl": "/teams/Miguel Torres.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "olimpia",
-            "pos": 9,
-            "name": "Olimpia",
-            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
             "qualified": false
           },
           {
             "id": "fredriksson-fbc",
-            "pos": 10,
+            "pos": 6,
             "name": "Fredriksson FBC",
             "logoUrl": "/teams/Fredriksson.png",
-            "pj": 0,
+            "pj": 2,
+            "pg": 1,
+            "pe": 0,
+            "pp": 1,
+            "gf": 2,
+            "gc": 3,
+            "dif": -1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "olimpia",
+            "pos": 7,
+            "name": "Olimpia",
+            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
+            "pj": 2,
+            "pg": 1,
+            "pe": 0,
+            "pp": 1,
+            "gf": 1,
+            "gc": 2,
+            "dif": -1,
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "san-martin",
+            "pos": 8,
+            "name": "San Martín",
+            "logoUrl": "/teams/San Martin.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 2,
+            "gc": 3,
+            "dif": -1,
+            "pts": 1,
+            "form": [
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "sporting-cs",
+            "pos": 9,
+            "name": "Sporting CS",
+            "logoUrl": "/teams/Sporting de Bigan.png",
+            "pj": 1,
             "pg": 0,
             "pe": 0,
-            "pp": 0,
+            "pp": 1,
             "gf": 0,
-            "gc": 0,
-            "dif": 0,
+            "gc": 1,
+            "dif": -1,
             "pts": 0,
-            "form": [],
+            "form": [
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "dep-miguel-torres",
+            "pos": 10,
+            "name": "Dep. Miguel Torres",
+            "logoUrl": "/teams/Miguel Torres.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 0,
+            "pp": 2,
+            "gf": 0,
+            "gc": 4,
+            "dif": -4,
+            "pts": 0,
+            "form": [
+              "L",
+              "L"
+            ],
             "qualified": false
           }
         ],
@@ -5292,8 +5384,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f1-2",
@@ -5303,8 +5395,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-3",
@@ -5314,8 +5406,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-4",
@@ -5325,8 +5417,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-5",
@@ -5336,8 +5428,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-6",
@@ -5347,8 +5439,8 @@
             "homeTeamName": "San Martín",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-7",
@@ -5369,8 +5461,8 @@
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-9",
@@ -5380,8 +5472,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f2-10",
@@ -5391,8 +5483,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-11",
@@ -6006,164 +6098,192 @@
         "name": "Zona B",
         "teams": [
           {
-            "id": "hughes-fbc",
+            "id": "atletico-paz",
             "pos": 1,
-            "name": "Hughes FBC",
-            "logoUrl": "/teams/Hughes.png",
-            "pj": 0,
-            "pg": 0,
+            "name": "Atlético Paz",
+            "logoUrl": "/teams/Atletico Paz.png",
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "gf": 4,
+            "gc": 1,
+            "dif": 3,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
-            "id": "nuevo-alberdi",
+            "id": "bombal-jrs",
             "pos": 2,
-            "name": "Nuevo Alberdi",
-            "logoUrl": "/teams/Nuevo Alberdi.png",
-            "pj": 0,
-            "pg": 0,
+            "name": "Bombal Jrs",
+            "logoUrl": "/teams/Bombal Juniors.png",
+            "pj": 2,
+            "pg": 2,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 2,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "independiente-fc",
-            "pos": 3,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": true
-          },
-          {
-            "id": "blanco-y-negro",
-            "pos": 4,
-            "name": "Blanco y Negro",
-            "logoUrl": "/teams/Blanco y Negro.png",
-            "isBlancoYNegro": true,
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "dif": 2,
+            "pts": 6,
+            "form": [
+              "W",
+              "W"
+            ],
             "qualified": true
           },
           {
             "id": "carreras-ac",
-            "pos": 5,
+            "pos": 3,
             "name": "Carreras AC",
             "logoUrl": "/teams/Carreras.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 1,
+            "pg": 1,
             "pe": 0,
             "pp": 0,
-            "gf": 0,
+            "gf": 4,
             "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "dif": 4,
+            "pts": 3,
+            "form": [
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "firmat-fbc",
-            "pos": 6,
+            "pos": 4,
             "name": "Firmat FBC",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "L",
+              "W"
+            ],
+            "qualified": true
           },
           {
             "id": "atl-acebal",
-            "pos": 7,
+            "pos": 5,
             "name": "Atl. Acebal",
             "logoUrl": "/teams/Atletico Acebal.png",
-            "pj": 0,
-            "pg": 0,
+            "pj": 2,
+            "pg": 1,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pp": 1,
+            "gf": 2,
+            "gc": 1,
+            "dif": 1,
+            "pts": 3,
+            "form": [
+              "W",
+              "L"
+            ],
             "qualified": false
           },
           {
-            "id": "atletico-paz",
+            "id": "blanco-y-negro",
+            "pos": 6,
+            "name": "Blanco y Negro",
+            "logoUrl": "/teams/Blanco y Negro.png",
+            "isBlancoYNegro": true,
+            "pj": 1,
+            "pg": 0,
+            "pe": 1,
+            "pp": 0,
+            "gf": 1,
+            "gc": 1,
+            "dif": 0,
+            "pts": 1,
+            "form": [
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "independiente-fc",
+            "pos": 7,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 2,
+            "dif": -1,
+            "pts": 1,
+            "form": [
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "hughes-fbc",
             "pos": 8,
-            "name": "Atlético Paz",
-            "logoUrl": "/teams/Atletico Paz.png",
-            "pj": 0,
+            "name": "Hughes FBC",
+            "logoUrl": "/teams/Hughes.png",
+            "pj": 2,
             "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
-            "qualified": false
-          },
-          {
-            "id": "bombal-jrs",
-            "pos": 9,
-            "name": "Bombal Jrs",
-            "logoUrl": "/teams/Bombal Juniors.png",
-            "pj": 0,
-            "pg": 0,
-            "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
-            "pts": 0,
-            "form": [],
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 4,
+            "dif": -3,
+            "pts": 1,
+            "form": [
+              "D",
+              "L"
+            ],
             "qualified": false
           },
           {
             "id": "b-rivadavia",
-            "pos": 10,
+            "pos": 9,
             "name": "B. Rivadavia",
             "logoUrl": "/teams/Bernardino Rivadavia.png",
-            "pj": 0,
+            "pj": 2,
+            "pg": 0,
+            "pe": 1,
+            "pp": 1,
+            "gf": 1,
+            "gc": 5,
+            "dif": -4,
+            "pts": 1,
+            "form": [
+              "D",
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "nuevo-alberdi",
+            "pos": 10,
+            "name": "Nuevo Alberdi",
+            "logoUrl": "/teams/Nuevo Alberdi.png",
+            "pj": 2,
             "pg": 0,
             "pe": 0,
-            "pp": 0,
-            "gf": 0,
-            "gc": 0,
-            "dif": 0,
+            "pp": 2,
+            "gf": 1,
+            "gc": 4,
+            "dif": -3,
             "pts": 0,
-            "form": [],
+            "form": [
+              "L",
+              "L"
+            ],
             "qualified": false
           }
         ],
@@ -6176,8 +6296,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-2",
@@ -6198,8 +6318,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-4",
@@ -6209,8 +6329,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-5",
@@ -6220,8 +6340,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f2-6",
@@ -6231,8 +6351,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-7",
@@ -6242,8 +6362,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-8",
@@ -6253,8 +6373,8 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-zb-f2-9",
@@ -6264,8 +6384,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-10",
@@ -6275,8 +6395,8 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-11",
@@ -6893,11 +7013,13 @@
         "title": "Cuartos 1 (1°A vs 4°B)",
         "seed1": "1ero A",
         "seed2": "4to B",
-        "team1": "San Martín",
-        "team2": "Blanco y Negro",
+        "team1": "Eduardo Hertz",
+        "team2": "Firmat FBC",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c2",
@@ -6905,11 +7027,13 @@
         "title": "Cuartos 2 (2°A vs 3°B)",
         "seed1": "2do A",
         "seed2": "3ro B",
-        "team1": "Eduardo Hertz",
-        "team2": "Independiente FC",
+        "team1": "Sp. Bombal",
+        "team2": "Carreras AC",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c3",
@@ -6917,11 +7041,13 @@
         "title": "Cuartos 3 (1°B vs 4°A)",
         "seed1": "1ero B",
         "seed2": "4to A",
-        "team1": "Hughes FBC",
-        "team2": "Los Andes",
+        "team1": "Atlético Paz",
+        "team2": "Ítalo Argentino",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "c4",
@@ -6929,11 +7055,13 @@
         "title": "Cuartos 4 (2°B vs 3°A)",
         "seed1": "2do B",
         "seed2": "3ro A",
-        "team1": "Nuevo Alberdi",
-        "team2": "C.A. Argentino",
+        "team1": "Bombal Jrs",
+        "team2": "Los Andes",
         "score1": null,
         "score2": null,
-        "status": "programado"
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "s1",
