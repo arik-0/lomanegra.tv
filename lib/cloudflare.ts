@@ -19,6 +19,17 @@ export async function generateStreamToken(
   const keyId = process.env.CLOUDFLARE_STREAM_KEY_ID;
 
   if (!privateKeyPem || !keyId || keyId.startsWith('xxx')) {
+    // Si el UID ingresado parece un UID real de Cloudflare (32 caracteres hexadecimales)
+    // o no es un mock/placeholder, retornamos el UID directamente para que @cloudflare/stream-react
+    // lo reproduzca sin requerir firma manual
+    if (
+      liveInputUid &&
+      !liveInputUid.startsWith('mock') &&
+      !liveInputUid.startsWith('live_input_')
+    ) {
+      return liveInputUid;
+    }
+
     console.warn(
       '⚠️ Credenciales de Cloudflare Stream no configuradas. Activando modo Demo para pruebas.'
     );

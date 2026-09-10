@@ -60,6 +60,17 @@ export async function POST(req: Request) {
 
         if (dbMatch) {
           resolvedMatch = dbMatch;
+          if (dbMatch.description) {
+            const metaMatch = dbMatch.description.match(/\[META:(\{.*?\})\]/);
+            if (metaMatch) {
+              try {
+                const parsed = JSON.parse(metaMatch[1]);
+                if (parsed.is_live !== undefined) {
+                  resolvedMatch.is_live = Boolean(parsed.is_live);
+                }
+              } catch {}
+            }
+          }
           if (dbMatch.cloudflare_live_input_uid) {
             liveInputUid = dbMatch.cloudflare_live_input_uid;
           }

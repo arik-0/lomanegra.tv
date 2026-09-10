@@ -95,11 +95,18 @@ export default function StreamPlayer({
     );
   }
 
-  const isDirectUrl = token.startsWith('http');
+  // Detectar si el token es una URL de Cloudflare Stream (iframe o manifest) y extraer el UID
+  let streamSrc = token;
+  const cfMatch = token.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
+  if (cfMatch && cfMatch[1]) {
+    streamSrc = cfMatch[1];
+  }
+
+  const isDirectVideo = streamSrc.startsWith('http') && !cfMatch;
 
   return (
     <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative group font-mono">
-      {isDirectUrl ? (
+      {isDirectVideo ? (
         <>
           <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
             <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60">
@@ -121,7 +128,7 @@ export default function StreamPlayer({
             controls
             autoPlay
             playsInline
-            src={token}
+            src={streamSrc}
             onError={() => setPlaybackError(true)}
             className="w-full h-full object-contain"
           />
@@ -129,7 +136,7 @@ export default function StreamPlayer({
       ) : (
         <Stream
           controls
-          src={token}
+          src={streamSrc}
           autoplay
           onError={() => setPlaybackError(true)}
           className="w-full h-full object-contain"

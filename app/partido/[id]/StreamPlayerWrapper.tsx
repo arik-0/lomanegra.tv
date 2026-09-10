@@ -34,9 +34,9 @@ export default function StreamPlayerWrapper({
   const [loading, setLoading] = useState(true);
   const [previewMode, setPreviewMode] = useState(false);
 
-  const fetchToken = async (overridePreview?: boolean) => {
+  const fetchToken = async (overridePreview?: boolean, silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       setError(null);
 
       const activePreview = overridePreview !== undefined ? overridePreview : previewMode;
@@ -57,15 +57,24 @@ export default function StreamPlayerWrapper({
 
       setStreamData(data);
     } catch (err: any) {
-      setError(err.message);
+      if (!silent) setError(err.message);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchToken();
-  }, [matchId, guestEmail, previewMode]);
+    fetchToken(undefined, false);
+
+    // Sondeo silencioso cada 12 segundos si la transmisión no ha comenzado
+    const pollInterval = setInterval(() => {
+      if (!streamData?.isLive) {
+        fetchToken(undefined, true);
+      }
+    }, 12000);
+
+    return () => clearInterval(pollInterval);
+  }, [matchId, guestEmail, previewMode, streamData?.isLive]);
 
   if (loading) {
     return (

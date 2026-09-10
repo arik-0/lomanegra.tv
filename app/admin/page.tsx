@@ -32,6 +32,9 @@ import {
   Upload,
   ChevronDown,
   ChevronUp,
+  Copy,
+  ExternalLink,
+  HelpCircle,
 } from 'lucide-react';
 import {
   TournamentStandings,
@@ -94,6 +97,8 @@ export default function AdminPage() {
   const [streamInput, setStreamInput] = useState('');
   const [anchorLoading, setAnchorLoading] = useState(false);
   const [anchorMessage, setAnchorMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showStreamGuide, setShowStreamGuide] = useState(false);
+  const [copiedRtmp, setCopiedRtmp] = useState(false);
 
   // Modal Partido
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
@@ -239,6 +244,46 @@ export default function AdminPage() {
       setAnchorMessage({ type: 'error', text: 'Error de red al contactar el servidor.' });
     } finally {
       setAnchorLoading(false);
+    }
+  };
+
+  const handleToggleMatchLive = async (matchId: string, currentLiveStatus: boolean) => {
+    const newStatus = !currentLiveStatus;
+    // Actualización optimista inmediata en la interfaz
+    setMatches((prev) =>
+      prev.map((m) => (m.id === matchId ? { ...m, is_live: newStatus } : m))
+    );
+    try {
+      const res = await fetch('/api/admin/anchor-stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId,
+          isLive: newStatus,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAnchorMessage({
+          type: 'success',
+          text: newStatus
+            ? '¡Transmisión activada EN VIVO para los espectadores!'
+            : 'Transmisión puesta en espera (muestra pantalla previa oficial).',
+        });
+        fetchMatches();
+      } else {
+        setAnchorMessage({ type: 'error', text: data.error || 'Error cambiando estado de transmisión.' });
+      }
+    } catch {
+      setAnchorMessage({ type: 'error', text: 'Error de red al actualizar estado de transmisión.' });
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedRtmp(true);
+      setTimeout(() => setCopiedRtmp(false), 2500);
     }
   };
 
@@ -1110,16 +1155,46 @@ export default function AdminPage() {
         {adminSection === 'partidos' && (
           <div className="space-y-6">
             {/* Widget de Anclaje Rápido de Stream Cloudflare */}
-            <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-4">
-              <div className="flex items-center gap-2 text-xs font-black text-white uppercase tracking-wider border-b border-zinc-800 pb-3">
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span>Anclaje de Señal en Directo (Cloudflare Live Stream)</span>
+            <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-6 shadow-xl space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-red-950/60 border border-red-800/80 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                      Control de Transmisión en Directo (Cloudflare Stream)
+                    </h2>
+                    <p className="text-[11px] text-zinc-400">
+                      Gestiona la señal de video, pasa de Sala de Espera a EN VIVO y ancla el Live Input UID.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Badge de Estado del Partido Seleccionado */}
+                {selectedMatchId && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase">Estado:</span>
+                    {matches.find((m) => m.id === selectedMatchId)?.is_live ? (
+                      <span className="px-3 py-1 rounded-xl bg-red-950/90 border border-red-700 text-red-400 text-xs font-black uppercase flex items-center gap-2 shadow-sm shadow-red-950">
+                        <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
+                        <span>🔴 EN VIVO (Señal Abierta)</span>
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs font-bold uppercase flex items-center gap-2">
+                        <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>⏳ EN ESPERA (Pantalla Previa)</span>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <form onSubmit={handleAnchorStream} className="grid grid-cols-1 md:grid-cols-12 gap-3">
                 <div className="md:col-span-5">
-                  <label className="block text-[10px] text-zinc-500 uppercase font-bold mb-1">
-                    Seleccionar Partido a Transmitir
+                  <label className="block text-[10px] text-zinc-400 uppercase font-bold mb-1.5 flex items-center justify-between">
+                    <span>1. Seleccionar Partido</span>
+                    <span className="text-zinc-500 font-normal lowercase">({matches.length} disponibles)</span>
                   </label>
                   <select
                     value={selectedMatchId}
@@ -1133,22 +1208,23 @@ export default function AdminPage() {
                   >
                     {matches.map((m) => (
                       <option key={m.id} value={m.id} className="bg-zinc-900">
-                        {m.title} {m.is_date_confirmed ? '(Confirmado)' : '(A Confirmar)'}
+                        {m.title} {m.is_live ? '🔴 [EN VIVO]' : '⏳ [EN ESPERA]'}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div className="md:col-span-5">
-                  <label className="block text-[10px] text-zinc-500 uppercase font-bold mb-1">
-                    Live Input UID de Cloudflare
+                  <label className="block text-[10px] text-zinc-400 uppercase font-bold mb-1.5 flex items-center justify-between">
+                    <span>2. Live Input UID de Cloudflare</span>
+                    <span className="text-zinc-500 font-normal">32 dígitos o URL HLS</span>
                   </label>
                   <input
                     type="text"
                     value={streamInput}
                     onChange={(e) => setStreamInput(e.target.value)}
-                    placeholder="ej: a1b2c3d4e5f67890..."
-                    className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
+                    placeholder="ej: 2418e20253509930f7690620f4f9d2d4"
+                    className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white font-mono placeholder:text-zinc-600 focus:outline-none"
                   />
                 </div>
 
@@ -1156,23 +1232,147 @@ export default function AdminPage() {
                   <button
                     type="submit"
                     disabled={anchorLoading}
-                    className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition border border-zinc-700 flex items-center justify-center gap-1.5 shadow-md"
                   >
-                    {anchorLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <span>Anclar Stream</span>}
+                    {anchorLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 text-emerald-400" />}
+                    <span>Guardar UID</span>
                   </button>
                 </div>
               </form>
 
+              {/* Botonera de Control en Directo y Acciones Rápidas */}
+              {selectedMatchId && (
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-zinc-800/80">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Botón Switch En Vivo / En Espera */}
+                    {(() => {
+                      const currentM = matches.find((m) => m.id === selectedMatchId);
+                      const isLive = Boolean(currentM?.is_live);
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMatchLive(selectedMatchId, isLive)}
+                          className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition shadow-lg ${
+                            isLive
+                              ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-950'
+                              : 'bg-red-600 hover:bg-red-700 text-white shadow-red-950 animate-pulse'
+                          }`}
+                        >
+                          {isLive ? (
+                            <>
+                              <Clock className="w-4 h-4" />
+                              <span>Pausar Señal (Poner en Espera)</span>
+                            </>
+                          ) : (
+                            <>
+                              <Radio className="w-4 h-4" />
+                              <span>🔴 Transmitir EN VIVO Ahora</span>
+                            </>
+                          )}
+                        </button>
+                      );
+                    })()}
+
+                    {/* Botón Ver Player Oficial */}
+                    <Link
+                      href={`/partido/${selectedMatchId}`}
+                      target="_blank"
+                      className="px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4 text-red-500" />
+                      <span>Abrir Pantalla del Partido</span>
+                      <ExternalLink className="w-3 h-3 text-zinc-500" />
+                    </Link>
+                  </div>
+
+                  {/* Toggle para desplegar la Guía Cloudflare & OBS */}
+                  <button
+                    type="button"
+                    onClick={() => setShowStreamGuide((prev) => !prev)}
+                    className="text-xs font-bold text-zinc-400 hover:text-white flex items-center gap-1.5 transition py-1.5 px-3 rounded-lg bg-zinc-900/60 border border-zinc-800 cursor-pointer"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{showStreamGuide ? 'Cerrar Guía OBS / Cloudflare' : 'Guía Paso a Paso: OBS & Cloudflare'}</span>
+                    {showStreamGuide ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              )}
+
+              {/* Banner informativo de mensajes */}
               {anchorMessage && (
                 <div
-                  className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+                  className={`p-3.5 rounded-xl text-xs flex items-center justify-between gap-2 ${
                     anchorMessage.type === 'success'
                       ? 'bg-emerald-950/40 border border-emerald-800/60 text-emerald-400'
                       : 'bg-red-950/40 border border-red-800/60 text-red-400'
                   }`}
                 >
-                  {anchorMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
-                  <span>{anchorMessage.text}</span>
+                  <div className="flex items-center gap-2">
+                    {anchorMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+                    <span>{anchorMessage.text}</span>
+                  </div>
+                  <button onClick={() => setAnchorMessage(null)} className="text-zinc-500 hover:text-white">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Guía Desplegable Interactiva para el Operador */}
+              {showStreamGuide && (
+                <div className="bg-[#181922] border border-zinc-800 rounded-2xl p-5 space-y-4 text-xs font-mono animate-fade-in">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <span className="font-bold uppercase text-white flex items-center gap-2">
+                      <Tv className="w-4 h-4 text-red-500" />
+                      <span>Configuración Rápida para OBS Studio / vMix / Larix</span>
+                    </span>
+                    <span className="text-[10px] text-zinc-500 uppercase">Cloudflare Stream Live Input</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Tarjeta 1: Servidor RTMPS */}
+                    <div className="bg-[#12131a] p-3.5 rounded-xl border border-zinc-800/80 space-y-1.5">
+                      <div className="text-[10px] text-zinc-400 uppercase font-bold">1. Servidor RTMPS (URL en OBS):</div>
+                      <div className="flex items-center justify-between bg-black/50 p-2 rounded-lg border border-zinc-800 text-amber-300 select-all font-mono text-[11px]">
+                        <span className="truncate">rtmps://live.cloudflare.com:443/live/</span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard('rtmps://live.cloudflare.com:443/live/')}
+                          className="ml-2 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] flex items-center gap-1 shrink-0 cursor-pointer"
+                        >
+                          <Copy className="w-3 h-3" />
+                          <span>{copiedRtmp ? '¡Copiado!' : 'Copiar'}</span>
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-zinc-500">
+                        En OBS: Ajustes ➔ Emisión ➔ Servicio: Personalizado... ➔ Servidor.
+                      </p>
+                    </div>
+
+                    {/* Tarjeta 2: Clave de Transmisión */}
+                    <div className="bg-[#12131a] p-3.5 rounded-xl border border-zinc-800/80 space-y-1.5">
+                      <div className="text-[10px] text-zinc-400 uppercase font-bold">2. Clave de Transmisión (Stream Key):</div>
+                      <div className="bg-black/50 p-2 rounded-lg border border-zinc-800 text-zinc-400 font-mono text-[11px]">
+                        ••••••••••••••••••••••••••••••••
+                      </div>
+                      <p className="text-[10px] text-zinc-500">
+                        Copia la <strong>Stream Key</strong> desde Cloudflare Dashboard ➔ Stream ➔ Live Inputs.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-900/80 p-3.5 rounded-xl border border-zinc-800 space-y-2 text-[11px] text-zinc-300">
+                    <div className="font-bold text-white flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Flujo de Transmisión para el Operador el Día del Partido:</span>
+                    </div>
+                    <ol className="list-decimal list-inside space-y-1 text-zinc-400 pl-1">
+                      <li>Crea el <strong className="text-zinc-200">Live Input</strong> en Cloudflare Stream y copia su <strong className="text-zinc-200">UID</strong> (32 dígitos alfanuméricos).</li>
+                      <li>Pega el UID en la casilla de arriba y pulsa <strong className="text-zinc-200">"Guardar UID"</strong>.</li>
+                      <li>En OBS Studio, ingresa el Servidor RTMPS y la Clave Secreta, y pulsa <strong className="text-zinc-200">"Iniciar Transmisión"</strong>.</li>
+                      <li>Cuando los equipos salgan a la cancha, presiona el botón <strong className="text-red-400">"🔴 Transmitir EN VIVO Ahora"</strong> en este panel.</li>
+                      <li>Los compradores en su computadora o celular verán el partido en vivo en Full HD automáticamente sin recargar la página.</li>
+                    </ol>
+                  </div>
                 </div>
               )}
             </div>
@@ -1307,17 +1507,28 @@ export default function AdminPage() {
                         <span className="px-2 py-0.5 rounded font-bold uppercase bg-red-950/70 border border-red-800/80 text-red-300">
                           {m.league || 'Liga Deportiva del Sur'}
                         </span>
-                        {m.is_live ? (
-                          <span className="px-2 py-0.5 rounded font-black uppercase bg-red-950/80 border border-red-700 text-red-400 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                            <span>En Vivo</span>
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded font-bold uppercase bg-zinc-900 border border-zinc-800 text-zinc-400 flex items-center gap-1">
-                            <Clock className="w-2.5 h-2.5 text-zinc-500" />
-                            <span>En Espera</span>
-                          </span>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMatchLive(m.id, Boolean(m.is_live))}
+                          className={`px-2 py-0.5 rounded font-black uppercase text-[10px] transition flex items-center gap-1 cursor-pointer hover:scale-105 ${
+                            m.is_live
+                              ? 'bg-red-950/90 border border-red-700 text-red-400 hover:bg-red-900 shadow-sm shadow-red-950'
+                              : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
+                          }`}
+                          title={m.is_live ? 'Señal abierta. Clic para pasar a sala de espera' : 'En espera. Clic para abrir señal EN VIVO'}
+                        >
+                          {m.is_live ? (
+                            <>
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                              <span>🔴 En Vivo</span>
+                            </>
+                          ) : (
+                            <>
+                              <Clock className="w-2.5 h-2.5 text-zinc-500" />
+                              <span>⏳ En Espera</span>
+                            </>
+                          )}
+                        </button>
                       </div>
 
                       <h3 className="text-sm font-black text-white leading-snug">{m.title}</h3>
@@ -1339,6 +1550,14 @@ export default function AdminPage() {
                       </button>
 
                       <div className="flex items-center gap-1.5">
+                        <Link
+                          href={`/partido/${m.id}`}
+                          target="_blank"
+                          className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition"
+                          title="Abrir reproductor oficial de este partido"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-red-500" />
+                        </Link>
                         <button
                           onClick={() => openMatchModal(m)}
                           className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition"
