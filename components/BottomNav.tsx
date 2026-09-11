@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Radio, Calendar, Trophy, Ticket, Menu } from 'lucide-react';
+import { Radio, Calendar, Trophy, Menu } from 'lucide-react';
 
 interface BottomNavProps {
   onOpenSidebar: () => void;
@@ -16,7 +16,7 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#101116]/95 backdrop-blur-md border-t border-zinc-800/80 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_24px_rgba(0,0,0,0.6)]">
-      <div className="grid grid-cols-5 h-14">
+      <div className="grid grid-cols-4 h-14">
         {/* 1. Transmisión En Vivo */}
         <Link
           href="/"
@@ -32,21 +32,6 @@ export default function BottomNav({ onOpenSidebar }: BottomNavProps) {
           </div>
           <span className="text-[9px] font-mono uppercase tracking-wider">
             En Vivo
-          </span>
-        </Link>
-
-        {/* 2. Partido Actual / Pase */}
-        <Link
-          href="/partido/0790eca3-cc28-41bb-a4b8-8e2c0c514cdf"
-          className={`flex flex-col items-center justify-center gap-1 text-center transition-colors ${
-            isPartido
-              ? 'text-red-500 font-bold'
-              : 'text-zinc-400 hover:text-zinc-200'
-          }`}
-        >
-          <Ticket className="w-4 h-4" />
-          <span className="text-[9px] font-mono uppercase tracking-wider">
-            Pase
           </span>
         </Link>
 

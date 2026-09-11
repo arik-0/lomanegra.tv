@@ -59,9 +59,9 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   },
   {
     id: 'photo-3',
-    title: 'El 11 Titular de Fútbol Mayor en la Cancha',
+    title: 'El 11 Titular de Primera en la Cancha',
     category: 'mayor',
-    categoryLabel: 'Fútbol Mayor',
+    categoryLabel: 'Primera',
     imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80',
     date: 'Apertura 2026',
     description: 'Formación inicial lista para disputar una nueva fecha del campeonato.',
@@ -106,9 +106,9 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   },
   {
     id: 'photo-8',
-    title: 'Fútbol Mayor: Disputa Aérea en el Área Rival',
+    title: 'Primera: Disputa Aérea en el Área Rival',
     category: 'mayor',
-    categoryLabel: 'Fútbol Mayor',
+    categoryLabel: 'Primera',
     imageUrl: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=1200&q=80',
     date: 'Torneo 2026',
     description: 'Duelo físico en una pelota parada definitoria sobre el final del primer tiempo.',
@@ -142,8 +142,8 @@ const PLAYLISTS: PlaylistCard[] = [
     id: 'primera',
     title: 'PRIMERA',
     category: 'mayor',
-    categoryLabel: 'Fútbol Mayor',
-    badge: '#FÚTBOL MAYOR',
+    categoryLabel: 'Primera',
+    badge: '#PRIMERA',
     imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80',
     playlistId: 'PLjWoT0tVI1KO_atc9KlH1L32jdv3KusVB',
     playlistUrl: 'https://www.youtube.com/playlist?list=PLjWoT0tVI1KO_atc9KlH1L32jdv3KusVB',
@@ -241,7 +241,7 @@ function GaleriaContent() {
 
   const categories = [
     { id: 'todas', label: 'Todas las Fotos' },
-    { id: 'mayor', label: 'Fútbol Mayor' },
+    { id: 'mayor', label: 'Primera' },
     { id: 'hinchada', label: 'La Hinchada' },
     { id: 'festejos', label: 'Festejos & Goles' },
     { id: 'estadio', label: 'Estadio & Mística' },
@@ -390,7 +390,7 @@ function GaleriaContent() {
                       : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
                   }`}
                 >
-                  Fútbol Mayor & Reserva
+                  Primera & Reserva
                 </button>
                 <button
                   onClick={() => setActiveVideoFilter('juveniles')}

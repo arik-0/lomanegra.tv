@@ -1117,7 +1117,7 @@ export default function PosicionesPage() {
 
             {/* Píldoras de Categoría para Goleadores */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {['Todas', 'Fútbol Mayor', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
+              {['Todas', 'Primera', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedGoleadorCategory(cat)}
@@ -1148,7 +1148,10 @@ export default function PosicionesPage() {
                   {standings.goleadores
                     .filter((g) => {
                       if (selectedGoleadorCategory === 'Todas') return true;
-                      return g.category.toLowerCase().includes(selectedGoleadorCategory.toLowerCase());
+                      const selCat = selectedGoleadorCategory.toLowerCase();
+                      const gCat = g.category.toLowerCase();
+                      if (selCat === 'primera' && (gCat.includes('primera') || gCat.includes('mayor'))) return true;
+                      return gCat.includes(selCat);
                     })
                     .map((g, idx) => (
                       <tr
@@ -1193,7 +1196,7 @@ export default function PosicionesPage() {
                         {/* División */}
                         <td className="py-3 px-3 text-zinc-400 text-xs">
                           <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px]">
-                            {g.category}
+                            {g.category === 'Fútbol Mayor' ? 'Primera' : (g.category || 'Primera')}
                           </span>
                         </td>
 

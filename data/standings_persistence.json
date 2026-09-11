@@ -1493,92 +1493,7 @@
         "dateInfo": "Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra"
       }
     ],
-    "goleadores": [
-      {
-        "id": "g1",
-        "pos": 1,
-        "name": "Gonzalo Cendra",
-        "category": "Fútbol Mayor",
-        "goals": 9
-      },
-      {
-        "id": "g2",
-        "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
-      },
-      {
-        "id": "g3",
-        "pos": 3,
-        "name": "Joaquín Kraft",
-        "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
-      }
-    ],
+    "goleadores": [],
     "deporte": "futbol"
   },
   "apertura": {
@@ -3075,92 +2990,7 @@
         "dateInfo": "Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra"
       }
     ],
-    "goleadores": [
-      {
-        "id": "g1",
-        "pos": 1,
-        "name": "Gonzalo Cendra",
-        "category": "Fútbol Mayor",
-        "goals": 9
-      },
-      {
-        "id": "g2",
-        "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
-      },
-      {
-        "id": "g3",
-        "pos": 3,
-        "name": "Joaquín Kraft",
-        "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
-      }
-    ],
+    "goleadores": [],
     "deporte": "futbol"
   },
   "futbol_mayor_clausura": {
@@ -5090,88 +4920,25 @@
     ],
     "goleadores": [
       {
-        "id": "g1",
+        "id": "g-1789090417667",
         "pos": 1,
-        "name": "Gonzalo Cendra",
-        "category": "Fútbol Mayor",
-        "goals": 9
+        "name": "Markiewicz David",
+        "category": "Reserva",
+        "goals": 1
       },
       {
-        "id": "g2",
+        "id": "g-1789090430338",
         "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
+        "name": "Álvarez Leroy",
+        "category": "Reserva",
+        "goals": 1
       },
       {
-        "id": "g3",
+        "id": "g-1789090452575",
         "pos": 3,
-        "name": "Joaquín Kraft",
+        "name": "Sebastiani Franco",
         "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
+        "goals": 1
       }
     ]
   },
@@ -7102,88 +6869,25 @@
     ],
     "goleadores": [
       {
-        "id": "g1",
+        "id": "g-1789090417667",
         "pos": 1,
-        "name": "Gonzalo Cendra",
-        "category": "Fútbol Mayor",
-        "goals": 9
+        "name": "Markiewicz David",
+        "category": "Reserva",
+        "goals": 1
       },
       {
-        "id": "g2",
+        "id": "g-1789090430338",
         "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
+        "name": "Álvarez Leroy",
+        "category": "Reserva",
+        "goals": 1
       },
       {
-        "id": "g3",
+        "id": "g-1789090452575",
         "pos": 3,
-        "name": "Joaquín Kraft",
+        "name": "Sebastiani Franco",
         "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
+        "goals": 1
       }
     ]
   }

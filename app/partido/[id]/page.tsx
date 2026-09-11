@@ -150,7 +150,8 @@ export default async function MatchPage({
             (data.date && new Date(data.date).getFullYear() >= 2099);
 
           let league = data.league || 'Liga Deportiva del Sur';
-          let category = data.category || 'Fútbol Mayor';
+          let category = data.category || 'Primera';
+          if (category === 'Fútbol Mayor') category = 'Primera';
           let is_live = data.is_live !== undefined ? Boolean(data.is_live) : false;
 
           const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
@@ -159,6 +160,7 @@ export default async function MatchPage({
               const parsed = JSON.parse(metaMatch[1]);
               if (parsed.league) league = parsed.league;
               if (parsed.category) category = parsed.category;
+              if (category === 'Fútbol Mayor') category = 'Primera';
               if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
             } catch {}
           }
@@ -252,10 +254,10 @@ export default async function MatchPage({
       match = {
         id: 'b1a9c001-0000-4000-8000-000000000002',
         title: 'Blanco y Negro vs Deportivo Sarmiento',
-        description: 'Fútbol Mayor • Fecha Oficial del Torneo Apertura',
+        description: 'Primera • Fecha Oficial del Torneo Apertura',
         date: null,
         is_date_confirmed: false,
-        price: 3500,
+        price: 12000,
         cloudflare_live_input_uid: 'live_input_byn_vs_dep_sarmiento',
         image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,
@@ -267,7 +269,7 @@ export default async function MatchPage({
         description: 'Reserva e Inferiores • Próxima Fecha',
         date: null,
         is_date_confirmed: false,
-        price: 3500,
+        price: 12000,
         cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
         image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,
@@ -279,7 +281,7 @@ export default async function MatchPage({
         description: 'El gran clásico regional en vivo con relatos en directo para toda la hinchada.',
         date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
         is_date_confirmed: true,
-        price: 3500,
+        price: 12000,
         cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
         image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,

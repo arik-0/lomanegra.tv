@@ -94,7 +94,8 @@ export async function POST(req: Request) {
           id: matchId || '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
           title: 'Blanco y Negro vs I. F. C.',
           description: 'El gran clásico regional en vivo con relatos en directo para toda la hinchada.',
-          price: 3500,
+          category: 'Primera',
+          price: 12000,
           is_date_confirmed: true,
           date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
         };
@@ -177,13 +178,13 @@ export async function POST(req: Request) {
         {
           id: match.id,
           title: `Pasión Lomonegra: ${match.title}`,
-          description: `Pase oficial de transmisión en vivo HD • ${match.category || 'Fútbol Mayor'}`,
+          description: `Pase oficial de transmisión en vivo HD • ${match.category === 'Fútbol Mayor' ? 'Primera' : (match.category || 'Primera')}`,
           picture_url: match.image_url
             ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
             : `${appUrl}/logo-pasion-lomonegra.png`,
           category_id: 'sports',
           quantity: 1,
-          unit_price: Number(match.price) || 3500,
+          unit_price: Number(match.price) || 12000,
           currency_id: 'ARS',
         },
       ],

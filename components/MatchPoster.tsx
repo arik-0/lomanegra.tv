@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Image from 'next/image';
 import { getTeamLogo } from '@/lib/standingsStore';
@@ -18,7 +18,7 @@ export default function MatchPoster({
   title,
   imageUrl,
   league = 'Liga Deportiva del Sur',
-  category = 'Fútbol Mayor',
+  category = 'Primera',
   size = 'hero',
   priority = false,
 }: MatchPosterProps) {
@@ -96,7 +96,7 @@ export default function MatchPoster({
           <span>TRANSMISIÓN OFICIAL</span>
         </div>
         <div className="text-[9px] sm:text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-widest bg-black/50 px-2 py-0.5 rounded border border-white/5">
-          {category}
+          {category === 'Fútbol Mayor' ? 'Primera' : (category || 'Primera')}
         </div>
       </div>
 

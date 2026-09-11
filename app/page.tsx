@@ -73,7 +73,8 @@ export default async function HomePage() {
               (m.date && new Date(m.date).getFullYear() >= 2099);
 
             let league = m.league || 'Liga Deportiva del Sur';
-            let category = m.category || 'Fútbol Mayor';
+            let category = m.category || 'Primera';
+            if (category === 'Fútbol Mayor') category = 'Primera';
             let is_live = m.is_live !== undefined ? Boolean(m.is_live) : false;
 
             const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
@@ -82,6 +83,7 @@ export default async function HomePage() {
                 const parsed = JSON.parse(metaMatch[1]);
                 if (parsed.league) league = parsed.league;
                 if (parsed.category) category = parsed.category;
+                if (category === 'Fútbol Mayor') category = 'Primera';
                 if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
               } catch {}
             }
@@ -139,7 +141,7 @@ export default async function HomePage() {
     description: 'El gran clásico regional en vivo con relatos en directo y campo de juego.',
     date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
     is_date_confirmed: true,
-    price: 3500,
+    price: 12000,
     cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
     image_url: '/matches/blanco-y-negro-vs-san-martin.svg',
     is_active: true,
@@ -149,10 +151,10 @@ export default async function HomePage() {
     {
       id: 'b1a9c001-0000-4000-8000-000000000002',
       title: 'Blanco y Negro vs Firmat FBC',
-      description: 'Fútbol Mayor • Torneo Apertura Oficial',
+      description: 'Primera • Torneo Apertura Oficial',
       date: null,
       is_date_confirmed: false,
-      price: 3500,
+      price: 12000,
       cloudflare_live_input_uid: 'live_input_byn_vs_firmat',
       image_url: '/matches/blanco-y-negro-vs-firmat-fbc.svg',
       is_active: true,
@@ -163,7 +165,7 @@ export default async function HomePage() {
       description: 'Reserva e Inferiores • Fecha a confirmar',
       date: null,
       is_date_confirmed: false,
-      price: 3500,
+      price: 12000,
       cloudflare_live_input_uid: 'live_input_byn_vs_arg_firmat',
       image_url: '/matches/blanco-y-negro-vs-argentino-de-firmat.svg',
       is_active: true,
@@ -174,7 +176,7 @@ export default async function HomePage() {
       description: 'Torneo Regional • Clásico Interzonal',
       date: null,
       is_date_confirmed: false,
-      price: 3500,
+      price: 12000,
       cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
       image_url: '/matches/blanco-y-negro-vs-atletico-acebal.svg',
       is_active: true,
@@ -186,6 +188,8 @@ export default async function HomePage() {
     ...m,
     title: sanitizeRegionalText(m.title),
     description: sanitizeRegionalText(m.description),
+    category: m.category === 'Fútbol Mayor' ? 'Primera' : (m.category || 'Primera'),
+    price: Number(m.price) || 12000,
   }));
   const allCandidates = [...(matches || []), ...adminMatches];
   const seenIds = new Set<string>();
@@ -275,7 +279,7 @@ export default async function HomePage() {
 
                 <div>
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
-                    TRANSMISIÓN DE FÚTBOL MAYOR
+                    TRANSMISIÓN DE PRIMERA
                   </div>
                   <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-white leading-none [text-shadow:0_2px_24px_rgba(0,0,0,0.8)]">
                     {featuredMatch.title}
@@ -294,7 +298,7 @@ export default async function HomePage() {
                       Pase de Transmisión
                     </span>
                     <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white">
-                      ${Number(featuredMatch.price).toLocaleString('es-AR')}{' '}
+                      ${Number(featuredMatch.price || 12000).toLocaleString('es-AR')}{' '}
                       <span className="text-xs font-bold text-red-500">ARS</span>
                     </span>
                   </div>
@@ -463,7 +467,7 @@ export default async function HomePage() {
               PASE DIGITAL
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              $3.500 <span className="text-xs font-bold text-red-500">ARS</span>
+              ${Number(featuredMatch.price || 12000).toLocaleString('es-AR')} <span className="text-xs font-bold text-red-500">ARS</span>
             </div>
             <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 font-mono">
               Sin abono mensual
@@ -579,7 +583,7 @@ export default async function HomePage() {
                           Tarifa Pase
                         </span>
                         <span className="text-lg font-black font-mono text-white">
-                          ${Number(match.price).toLocaleString('es-AR')}{' '}
+                          ${Number(match.price || 12000).toLocaleString('es-AR')}{' '}
                           <span className="text-xs text-red-500">ARS</span>
                         </span>
                       </div>

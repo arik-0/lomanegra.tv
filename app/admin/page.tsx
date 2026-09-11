@@ -107,10 +107,10 @@ export default function AdminPage() {
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formLeague, setFormLeague] = useState('Liga Deportiva del Sur');
-  const [formCategory, setFormCategory] = useState('Fútbol Mayor');
+  const [formCategory, setFormCategory] = useState('Primera');
   const [formDate, setFormDate] = useState('');
   const [formIsDateConfirmed, setFormIsDateConfirmed] = useState(true);
-  const [formPrice, setFormPrice] = useState(3500);
+  const [formPrice, setFormPrice] = useState(12000);
   const [formStreamUid, setFormStreamUid] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formIsLive, setFormIsLive] = useState(false);
@@ -325,10 +325,10 @@ export default function AdminPage() {
       setFormTitle(match.title);
       setFormDesc(match.description || '');
       setFormLeague(match.league || 'Liga Deportiva del Sur');
-      setFormCategory(match.category || 'Fútbol Mayor');
+      setFormCategory(match.category === 'Fútbol Mayor' ? 'Primera' : (match.category || 'Primera'));
       setFormDate(match.date ? formatForDateTimeInput(new Date(match.date)) : '');
       setFormIsDateConfirmed(match.is_date_confirmed);
-      setFormPrice(match.price);
+      setFormPrice(match.price || 12000);
       setFormStreamUid(match.cloudflare_live_input_uid);
       setFormImageUrl(match.image_url || '');
       setFormIsLive(Boolean(match.is_live));
@@ -336,7 +336,7 @@ export default function AdminPage() {
       const selectedLeague =
         initialLeague || (matchLeagueFilter !== 'Todas' ? matchLeagueFilter : 'Liga Deportiva del Sur');
       const selectedCategory =
-        initialCategory || (matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Fútbol Mayor');
+        initialCategory || (matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Primera');
 
       setEditingMatch(null);
       setFormTitle('Blanco y Negro vs ');
@@ -347,7 +347,7 @@ export default function AdminPage() {
       defaultNext.setHours(15, 30, 0, 0);
       setFormDate(formatForDateTimeInput(defaultNext));
       setFormIsDateConfirmed(true);
-      setFormPrice(3500);
+      setFormPrice(12000);
       setFormStreamUid('live_input_byn');
       setFormImageUrl('');
       setFormIsLive(false);
@@ -368,10 +368,10 @@ export default function AdminPage() {
         title: formTitle.trim(),
         description: formDesc.trim() || `${formCategory.trim()} • ${formLeague.trim()}`,
         league: formLeague.trim() || 'Liga Deportiva del Sur',
-        category: formCategory.trim() || 'Fútbol Mayor',
+        category: formCategory.trim() === 'Fútbol Mayor' ? 'Primera' : (formCategory.trim() || 'Primera'),
         date: formIsDateConfirmed && formDate ? new Date(formDate).toISOString() : null,
         is_date_confirmed: formIsDateConfirmed,
-        price: Number(formPrice) || 3500,
+        price: Number(formPrice) || 12000,
         cloudflare_live_input_uid: formStreamUid.trim() || 'live_input_byn',
         image_url: formImageUrl.trim() || null,
         is_live: formIsLive,
@@ -1001,7 +1001,7 @@ export default function AdminPage() {
       id: `g-${Date.now()}`,
       pos: standings.goleadores.length + 1,
       name: 'Nuevo Jugador ByN',
-      category: adminGoleadorCategory === 'Todas' ? 'Fútbol Mayor' : adminGoleadorCategory,
+      category: adminGoleadorCategory === 'Todas' ? 'Primera' : adminGoleadorCategory,
       goals: 1,
     };
     setStandings({
@@ -1420,7 +1420,7 @@ export default function AdminPage() {
                     onClick={() =>
                       openMatchModal(
                         undefined,
-                        matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Fútbol Mayor',
+                        matchCategoryFilter !== 'Todas' ? matchCategoryFilter : 'Primera',
                         matchLeagueFilter !== 'Todas' ? matchLeagueFilter : 'Liga Deportiva del Sur'
                       )
                     }
@@ -1460,7 +1460,7 @@ export default function AdminPage() {
                       className="bg-[#12131a] border border-zinc-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-red-500"
                     >
                       <option value="Todas">Todas las Categorías</option>
-                      <option value="Fútbol Mayor">Fútbol Mayor</option>
+                      <option value="Primera">Primera</option>
                       <option value="Reserva">Reserva</option>
                       <option value="Tercera División">Tercera División</option>
                       <option value="Cuarta División">Cuarta División</option>
@@ -1481,9 +1481,13 @@ export default function AdminPage() {
                           if (mLeague.toLowerCase() !== matchLeagueFilter.toLowerCase()) return false;
                         }
                         if (matchCategoryFilter !== 'Todas') {
-                          const mCat =
-                            m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Fútbol Mayor');
-                          if (!mCat.toLowerCase().includes(matchCategoryFilter.toLowerCase())) return false;
+                          const mCat = (m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Primera')).toLowerCase();
+                          const filterCat = matchCategoryFilter.toLowerCase();
+                          if (filterCat === 'primera') {
+                            if (!mCat.includes('primera') && !mCat.includes('mayor')) return false;
+                          } else if (!mCat.includes(filterCat)) {
+                            return false;
+                          }
                         }
                         return true;
                       }).length
@@ -1502,9 +1506,13 @@ export default function AdminPage() {
                       if (mLeague.toLowerCase() !== matchLeagueFilter.toLowerCase()) return false;
                     }
                     if (matchCategoryFilter !== 'Todas') {
-                      const mCat =
-                        m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Fútbol Mayor');
-                      if (!mCat.toLowerCase().includes(matchCategoryFilter.toLowerCase())) return false;
+                      const mCat = (m.category || (m.description?.includes('Reserva') ? 'Reserva' : 'Primera')).toLowerCase();
+                      const filterCat = matchCategoryFilter.toLowerCase();
+                      if (filterCat === 'primera') {
+                        if (!mCat.includes('primera') && !mCat.includes('mayor')) return false;
+                      } else if (!mCat.includes(filterCat)) {
+                        return false;
+                      }
                     }
                     return true;
                   })
@@ -1529,7 +1537,7 @@ export default function AdminPage() {
 
                       <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
                         <span className="px-2 py-0.5 rounded font-bold uppercase bg-zinc-800 border border-zinc-700 text-zinc-300">
-                          {m.category || 'Fútbol Mayor'}
+                          {m.category === 'Fútbol Mayor' ? 'Primera' : (m.category || 'Primera')}
                         </span>
                         <span className="px-2 py-0.5 rounded font-bold uppercase bg-red-950/70 border border-red-800/80 text-red-300">
                           {m.league || 'Liga Deportiva del Sur'}
@@ -2643,7 +2651,7 @@ export default function AdminPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Selector de categoría en el admin */}
                   <div className="flex items-center p-1 rounded-xl bg-[#181922] border border-zinc-800">
-                    {['Todas', 'Fútbol Mayor', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
+                    {['Todas', 'Primera', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
                       <button
                         key={cat}
                         type="button"
@@ -2685,7 +2693,12 @@ export default function AdminPage() {
                     {standings.goleadores
                       .filter((g) => {
                         if (adminGoleadorCategory === 'Todas') return true;
-                        return g.category.toLowerCase().includes(adminGoleadorCategory.toLowerCase());
+                        const filterCat = adminGoleadorCategory.toLowerCase();
+                        const gCat = g.category.toLowerCase();
+                        if (filterCat === 'primera') {
+                          return gCat.includes('primera') || gCat.includes('mayor');
+                        }
+                        return gCat.includes(filterCat);
                       })
                       .map((g, idx) => (
                         <tr key={g.id} className="hover:bg-zinc-800/30">
@@ -2700,11 +2713,11 @@ export default function AdminPage() {
                           </td>
                           <td className="py-2.5 px-3">
                             <select
-                              value={g.category}
+                              value={g.category === 'Fútbol Mayor' ? 'Primera' : g.category}
                               onChange={(e) => handleUpdateGoleador(g.id, 'category', e.target.value)}
                               className="w-full bg-[#12131a] border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none"
                             >
-                              <option value="Fútbol Mayor">Fútbol Mayor</option>
+                              <option value="Primera">Primera</option>
                               <option value="Reserva">Reserva</option>
                               <option value="Tercera División">Tercera División</option>
                               <option value="Cuarta División">Cuarta División</option>
@@ -2806,7 +2819,7 @@ export default function AdminPage() {
                       }}
                       className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                     >
-                      <option value="Fútbol Mayor">Fútbol Mayor</option>
+                      <option value="Primera">Primera</option>
                       <option value="Reserva">Reserva</option>
                       <option value="Tercera División">Tercera División</option>
                       <option value="Cuarta División">Cuarta División</option>
@@ -2822,7 +2835,7 @@ export default function AdminPage() {
                     type="text"
                     value={formDesc}
                     onChange={(e) => setFormDesc(e.target.value)}
-                    placeholder="Fútbol Mayor • Torneo Oficial"
+                    placeholder="Primera • Torneo Oficial"
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none"
                   />
                 </div>

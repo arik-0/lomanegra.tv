@@ -39,8 +39,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       team2: 'San Martín',
       time: 'HOY 17:00',
       isLive: true,
-      category: 'Fútbol Mayor • Clásico',
-      price: '$3.500 ARS',
+      category: 'Primera • Clásico',
+      price: '$12.000 ARS',
       logo1: '/teams/Blanco y Negro.png',
       logo2: '/teams/San Martin.png',
     },
@@ -50,8 +50,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       team2: 'Firmat FBC',
       time: 'DOMINGO 16:30',
       isLive: false,
-      category: 'Fútbol Mayor • Apertura',
-      price: '$3.500 ARS',
+      category: 'Primera • Apertura',
+      price: '$12.000 ARS',
       logo1: '/teams/Blanco y Negro.png',
       logo2: '/teams/Firmat FBC.png',
     },
@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       time: 'PRÓXIMA FECHA',
       isLive: false,
       category: 'Reserva e Inferiores',
-      price: '$3.500 ARS',
+      price: '$12.000 ARS',
       logo1: '/teams/Blanco y Negro.png',
       logo2: '/teams/Argentino de Firmat.png',
     },
@@ -309,7 +309,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   <ChevronRight className="w-3.5 h-3.5 text-red-400 group-hover:translate-x-0.5 transition-transform" />
                 </div>
                 <div className="text-xs font-black text-white group-hover:text-red-400 transition-colors mb-1">
-                  Zona A & Zona B &rarr;
+                  Tablas Lomonegras &rarr;
                 </div>
                 <div className="text-[10px] text-zinc-400 leading-tight">
                   Clasificación en vivo, cruces de Play-Offs y Goleadores albinegros.
