@@ -27,6 +27,19 @@ function LoginForm() {
     setSuccessMsg(null);
 
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setErrorMsg('Ingresa un correo electrónico válido.');
+      setLoading(false);
+      return;
+    }
+
+    if (cleanPassword.length < 6) {
+      setErrorMsg('La contraseña debe tener al menos 6 caracteres.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/auth/authenticate', {
@@ -34,7 +47,7 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: cleanEmail,
-          password,
+          password: cleanPassword,
           isSignUp,
         }),
       });
@@ -47,13 +60,15 @@ function LoginForm() {
 
       localStorage.setItem('lomonegrotv_guest_email', cleanEmail);
 
-      // Sincronizar en el cliente Supabase si fuera posible
+      // Sincronizar en el cliente Supabase
       try {
         await supabase.auth.signInWithPassword({
           email: cleanEmail,
-          password: password || 'pasion2026',
+          password: cleanPassword,
         });
-      } catch {}
+      } catch (syncErr) {
+        console.warn('Sync client auth warning:', syncErr);
+      }
 
       setSuccessMsg(data.message || '¡Acceso concedido!');
       setTimeout(() => {
@@ -62,9 +77,9 @@ function LoginForm() {
       }, 500);
     } catch (err: any) {
       const msg = err.message || '';
-      if (msg.includes('Invalid login credentials')) {
+      if (msg.includes('Invalid login credentials') || msg.includes('incorrectos')) {
         setErrorMsg('Correo o contraseña incorrectos.');
-      } else if (msg.includes('Password should be at least')) {
+      } else if (msg.includes('Password should be at least') || msg.includes('6 caracteres')) {
         setErrorMsg('La contraseña debe contener al menos 6 caracteres.');
       } else {
         setErrorMsg(msg || 'Error al procesar la autenticación.');
@@ -113,23 +128,10 @@ function LoginForm() {
             <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
             <span>
               {errorMsg.toLowerCase().includes('fetch')
-                ? 'Conexión de autenticación no disponible en este momento. Puedes acceder directamente como invitado sin contraseña.'
+                ? 'Conexión de autenticación no disponible en este momento. Inténtalo nuevamente.'
                 : errorMsg}
             </span>
           </div>
-
-          {email && (
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.setItem('lomonegrotv_guest_email', email);
-                router.push(redirectTo);
-              }}
-              className="w-full mt-2 py-2 px-3 bg-white text-black font-bold text-xs rounded-lg uppercase tracking-wider hover:bg-zinc-200 transition"
-            >
-              Continuar como Invitado ({email}) &rarr;
-            </button>
-          )}
         </div>
       )}
 

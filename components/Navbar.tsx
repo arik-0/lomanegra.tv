@@ -27,14 +27,10 @@ export default function Navbar() {
           setLoading(false);
           return;
         }
-      } catch {}
-
-      if (typeof window !== 'undefined') {
-        const localEmail = localStorage.getItem('lomonegrotv_guest_email');
-        if (localEmail) {
-          setUser({ id: 'local-user', email: localEmail } as User);
-        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
       }
+      setUser(null);
       setLoading(false);
     }
     getUser();

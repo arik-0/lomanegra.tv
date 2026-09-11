@@ -43,7 +43,7 @@ export default function UserProfileModal({
     {
       id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
       title: 'Blanco y Negro vs San Martín',
-      category: 'Fútbol Mayor • Clásico Regional',
+      category: 'Primera • Clásico Regional',
       status: 'Acceso Habilitado',
       statusColor: 'emerald',
       date: 'En vivo / Transmisión Oficial',
@@ -55,7 +55,7 @@ export default function UserProfileModal({
     {
       id: 'b1a9c001-0000-4000-8000-000000000002',
       title: 'Blanco y Negro vs Firmat FBC',
-      category: 'Fútbol Mayor • Torneo Apertura',
+      category: 'Primera • Torneo Apertura',
       status: 'Pase Anticipado',
       statusColor: 'blue',
       date: 'Próxima Fecha • Estadio Albinegro',

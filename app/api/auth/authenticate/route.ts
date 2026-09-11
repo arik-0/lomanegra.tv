@@ -1,133 +1,130 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { createServerClient } from '@supabase/ssr';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
     const { email, password, isSignUp } = body;
     const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPassword = (password || '').trim();
 
     if (!cleanEmail || !cleanEmail.includes('@')) {
       return NextResponse.json({ error: 'Ingresa un correo electrónico válido.' }, { status: 400 });
     }
 
-    const cleanPassword = (password || '').trim() || 'pasion2026';
-    if (cleanPassword.length < 6) {
+    if (!cleanPassword || cleanPassword.length < 6) {
       return NextResponse.json({ error: 'La contraseña debe tener al menos 6 caracteres.' }, { status: 400 });
     }
 
     const cookieStore = cookies();
+    const serverClient = createServerSupabaseClient();
 
-    // 1. Buscar si el usuario ya existe en Supabase
-    let targetUser: any = null;
-    try {
-      const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
-      targetUser = userList?.users?.find((u) => u.email?.toLowerCase() === cleanEmail);
-    } catch (listErr) {
-      console.error('Error listando usuarios en Supabase:', listErr);
-    }
-
-    let userId: string;
-
-    if (targetUser) {
-      userId = targetUser.id;
-      // Confirmar usuario automáticamente y sincronizar contraseña
+    if (isSignUp) {
+      // 1. REGISTRO (Sign Up)
+      // Verificar si el usuario ya existe en Supabase
       try {
-        await supabaseAdmin.auth.admin.updateUserById(userId, {
-          password: cleanPassword,
-          email_confirm: true,
-          user_metadata: { email: cleanEmail },
-        });
-      } catch (updateErr) {
-        console.error('Error actualizando usuario en Supabase:', updateErr);
+        const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
+        const existingUser = userList?.users?.find((u) => u.email?.toLowerCase() === cleanEmail);
+        if (existingUser) {
+          return NextResponse.json(
+            { error: 'Ya existe una cuenta con este correo electrónico. Por favor, inicia sesión.' },
+            { status: 400 }
+          );
+        }
+      } catch (listErr) {
+        console.error('Error listando usuarios en Supabase:', listErr);
       }
-    } else {
-      // Crear usuario confirmado inmediatamente
-      try {
-        const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
-          email: cleanEmail,
-          password: cleanPassword,
-          email_confirm: true,
-          user_metadata: { email: cleanEmail },
-        });
-        if (createErr) throw createErr;
-        userId = created.user.id;
-      } catch (createErr: any) {
-        console.error('Error creando usuario en Supabase:', createErr);
-        userId = 'user-' + cleanEmail.replace(/[^a-z0-9]/gi, '-');
+
+      // Crear usuario nuevo en Supabase con su contraseña
+      const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email: cleanEmail,
+        password: cleanPassword,
+        email_confirm: true,
+        user_metadata: { email: cleanEmail },
+      });
+
+      if (createErr || !created?.user) {
+        const errMsg = createErr?.message?.toLowerCase().includes('already')
+          ? 'Ya existe una cuenta con este correo electrónico. Por favor, inicia sesión.'
+          : createErr?.message || 'Error al crear la cuenta. Inténtalo nuevamente.';
+        return NextResponse.json({ error: errMsg }, { status: 400 });
       }
-    }
 
-    // 2. Establecer sesión en el servidor con @supabase/ssr
-    const url =
-      process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')
-        ? process.env.NEXT_PUBLIC_SUPABASE_URL
-        : 'https://cyigamszhhdluqstjcut.supabase.co';
-
-    const key =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.includes('placeholder')
-        ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        : 'sb_publishable_0DiTRMSrhy3FU8Jc-gl-0A_L6_ORFWP';
-
-    const serverClient = createServerClient(url, key, {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: any) {
-          try {
-            cookieStore.set({ name, value, ...options });
-          } catch {}
-        },
-        remove(name: string, options: any) {
-          try {
-            cookieStore.set({ name, value: '', ...options });
-          } catch {}
-        },
-      },
-    });
-
-    let sessionData = null;
-    try {
-      const { data } = await serverClient.auth.signInWithPassword({
+      // Iniciar sesión en el servidor
+      const { data: signInData, error: signInErr } = await serverClient.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword,
       });
-      if (data?.session) {
-        sessionData = data.session;
-      }
-    } catch (authErr) {
-      console.error('Error en signInWithPassword:', authErr);
-    }
 
-    // 3. Establecer cookies de sesión de Pasión Lomonegra para disponibilidad inmediata
-    cookieStore.set('lomonegro_user_email', cleanEmail, {
-      httpOnly: false, // Disponible en frontend
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30, // 30 días
-      path: '/',
-    });
+      const userId = created.user.id;
 
-    cookieStore.set('lomonegro_user_id', userId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
-      path: '/',
-    });
+      cookieStore.set('lomonegro_user_email', cleanEmail, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30,
+        path: '/',
+      });
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: userId,
+      cookieStore.set('lomonegro_user_id', userId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30,
+        path: '/',
+      });
+
+      return NextResponse.json({
+        success: true,
+        user: { id: userId, email: cleanEmail },
+        session: signInData?.session || null,
+        message: '¡Cuenta creada y sesión iniciada con éxito!',
+      });
+    } else {
+      // 2. INICIO DE SESIÓN (Login)
+      // Autenticación estricta con Supabase - SIN sobreescribir contraseñas ni auto-crear usuarios
+      const { data: authData, error: authErr } = await serverClient.auth.signInWithPassword({
         email: cleanEmail,
-      },
-      session: sessionData,
-      message: isSignUp ? '¡Cuenta creada y sesión iniciada con éxito!' : '¡Sesión iniciada con éxito!',
-    });
+        password: cleanPassword,
+      });
+
+      if (authErr || !authData?.user) {
+        return NextResponse.json(
+          { error: 'Correo o contraseña incorrectos.' },
+          { status: 401 }
+        );
+      }
+
+      const userId = authData.user.id;
+
+      cookieStore.set('lomonegro_user_email', cleanEmail, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30,
+        path: '/',
+      });
+
+      cookieStore.set('lomonegro_user_id', userId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30,
+        path: '/',
+      });
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: userId,
+          email: cleanEmail,
+        },
+        session: authData.session,
+        message: '¡Sesión iniciada con éxito!',
+      });
+    }
   } catch (error: any) {
     console.error('Error general en endpoint de autenticación:', error);
     return NextResponse.json(
@@ -141,5 +138,9 @@ export async function DELETE() {
   const cookieStore = cookies();
   cookieStore.delete('lomonegro_user_email');
   cookieStore.delete('lomonegro_user_id');
+  try {
+    const serverClient = createServerSupabaseClient();
+    await serverClient.auth.signOut();
+  } catch {}
   return NextResponse.json({ success: true, message: 'Sesión cerrada.' });
 }
