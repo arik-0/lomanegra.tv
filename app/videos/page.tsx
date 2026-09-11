@@ -36,8 +36,8 @@ const PLAYLISTS: PlaylistCard[] = [
     id: 'primera',
     title: 'PRIMERA',
     category: 'mayor',
-    categoryLabel: 'Fútbol Mayor',
-    badge: '#FÚTBOL MAYOR',
+    categoryLabel: 'Primera',
+    badge: '#PRIMERA',
     imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80',
     playlistId: 'PLjWoT0tVI1KO_atc9KlH1L32jdv3KusVB',
     playlistUrl: 'https://www.youtube.com/playlist?list=PLjWoT0tVI1KO_atc9KlH1L32jdv3KusVB',
@@ -198,7 +198,7 @@ export default function VideosPage() {
                   : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
-              Fútbol Mayor & Reserva
+              Primera & Reserva
             </button>
             <button
               onClick={() => setActiveFilter('juveniles')}

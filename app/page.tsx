@@ -73,7 +73,8 @@ export default async function HomePage() {
               (m.date && new Date(m.date).getFullYear() >= 2099);
 
             let league = m.league || 'Liga Deportiva del Sur';
-            let category = m.category || 'Fútbol Mayor';
+            let category = m.category || 'Primera';
+            if (category === 'Fútbol Mayor') category = 'Primera';
             let is_live = m.is_live !== undefined ? Boolean(m.is_live) : false;
 
             const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
@@ -96,9 +97,10 @@ export default async function HomePage() {
               title: sanitizeRegionalText(m.title),
               is_date_confirmed: !isTbd,
               date: isTbd ? null : m.date,
-              description: sanitizeRegionalText(cleanDesc),
+              price: Number(m.price) || 12000,
+              description: sanitizeRegionalText(cleanDesc).replace(/f[uú]tbol\s+mayor/gi, 'Primera'),
               league: sanitizeRegionalText(league),
-              category: sanitizeRegionalText(category),
+              category: sanitizeRegionalText(category).replace(/f[uú]tbol\s+mayor/gi, 'Primera'),
               is_live,
             };
           });
@@ -132,68 +134,50 @@ export default async function HomePage() {
     }
   }
 
-  // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
+  // Datos oficiales de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
   const defaultFeaturedMatch = {
     id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-    title: 'Blanco y Negro vs San Martín',
-    description: 'El gran clásico regional en vivo con relatos en directo y campo de juego.',
-    date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    title: 'Blanco y Negro vs Atlético Acebal',
+    description: 'El gran clásico regional en vivo con relatos oficiales y cobertura multicámara.',
+    date: '2026-09-13T18:45:00.000Z',
     is_date_confirmed: true,
-    price: 3500,
-    cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
-    image_url: '/matches/blanco-y-negro-vs-san-martin.svg',
+    price: 12000,
+    cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
+    image_url: '/matches/blanco-y-negro-vs-atletico-acebal.svg',
     is_active: true,
+    league: 'Liga Deportiva del Sur',
+    category: 'Primera',
   };
 
   const defaultOtherMatches = [
     {
-      id: 'b1a9c001-0000-4000-8000-000000000002',
-      title: 'Blanco y Negro vs Firmat FBC',
-      description: 'Fútbol Mayor • Torneo Apertura Oficial',
-      date: null,
-      is_date_confirmed: false,
-      price: 3500,
-      cloudflare_live_input_uid: 'live_input_byn_vs_firmat',
-      image_url: '/matches/blanco-y-negro-vs-firmat-fbc.svg',
-      is_active: true,
-    },
-    {
-      id: 'b1a9c001-0000-4000-8000-000000000003',
-      title: 'Blanco y Negro vs Argentino de Firmat',
-      description: 'Reserva e Inferiores • Fecha a confirmar',
-      date: null,
-      is_date_confirmed: false,
-      price: 3500,
-      cloudflare_live_input_uid: 'live_input_byn_vs_arg_firmat',
-      image_url: '/matches/blanco-y-negro-vs-argentino-de-firmat.svg',
-      is_active: true,
-    },
-    {
       id: 'b1a9c001-0000-4000-8000-000000000004',
-      title: 'Blanco y Negro vs Atlético Acebal',
-      description: 'Torneo Regional • Clásico Interzonal',
+      title: 'Blanco y Negro vs Los Andes',
+      description: 'Torneo Clausura • Transmisión oficial en vivo',
       date: null,
       is_date_confirmed: false,
-      price: 3500,
-      cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
-      image_url: '/matches/blanco-y-negro-vs-atletico-acebal.svg',
+      price: 12000,
+      cloudflare_live_input_uid: 'live_input_byn_vs_los_andes',
+      image_url: '/matches/blanco-y-negro-vs-los-andes.svg',
       is_active: true,
+      league: 'Liga Deportiva del Sur',
+      category: 'Primera',
     },
   ];
 
-  // Combinar partidos de Supabase con los del almacén de administración
+  // Partidos del almacén de administración sincronizados
   const adminMatches = getStoredMatches().map((m) => ({
     ...m,
     title: sanitizeRegionalText(m.title),
-    description: sanitizeRegionalText(m.description),
+    description: sanitizeRegionalText(m.description).replace(/f[uú]tbol\s+mayor/gi, 'Primera'),
+    category: m.category === 'Fútbol Mayor' ? 'Primera' : (m.category || 'Primera'),
+    price: Number(m.price) || 12000,
   }));
-  const allCandidates = [...(matches || []), ...adminMatches];
-  const seenIds = new Set<string>();
-  const combinedMatches = allCandidates.filter((m) => {
-    if (seenIds.has(m.id)) return false;
-    seenIds.add(m.id);
-    return true;
-  });
+
+  // Si Supabase trajo datos activos, Supabase es la fuente de verdad y no re-insertamos partidos eliminados
+  const combinedMatches = (matches && matches.length > 0)
+    ? matches
+    : adminMatches;
 
   // Filtrar exclusivamente partidos activos de Pasión Lomonegra
   const validMatches = (combinedMatches.length > 0 ? combinedMatches : [defaultFeaturedMatch, ...defaultOtherMatches]).filter(
@@ -275,7 +259,7 @@ export default async function HomePage() {
 
                 <div>
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
-                    TRANSMISIÓN DE FÚTBOL MAYOR
+                    TRANSMISIÓN DE PRIMERA
                   </div>
                   <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-white leading-none [text-shadow:0_2px_24px_rgba(0,0,0,0.8)]">
                     {featuredMatch.title}
@@ -463,7 +447,7 @@ export default async function HomePage() {
               PASE DIGITAL
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              $3.500 <span className="text-xs font-bold text-red-500">ARS</span>
+              ${Number(featuredMatch.price || 12000).toLocaleString('es-AR')} <span className="text-xs font-bold text-red-500">ARS</span>
             </div>
             <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 font-mono">
               Sin abono mensual
