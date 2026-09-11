@@ -105,10 +105,11 @@ export default function MatchViewClient({
         verifyPaymentTransaction(emailToVerify, paymentId);
         return;
       } else {
-        // Si solo estaba ?payment=success sin ID de transacción, limpiar URL sin mostrar error
+        // Si solo estaba ?payment=success sin ID de transacción, limpiar URL y apagar el spinner
         try {
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch {}
+        setVerifyingPayment(false);
       }
     }
 

@@ -7,8 +7,12 @@ if (typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
+const MP_ACCESS_TOKEN =
+  process.env.MP_ACCESS_TOKEN ||
+  'APP_USR-986783594759193-091018-1c247a8e6ab68cc9d78064011e59e75a-1162474788';
+
 const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN || '',
+  accessToken: MP_ACCESS_TOKEN,
 });
 
 export async function POST(req: Request) {

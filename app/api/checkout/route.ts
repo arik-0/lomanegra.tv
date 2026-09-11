@@ -6,8 +6,16 @@ if (typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
+const MP_ACCESS_TOKEN =
+  process.env.MP_ACCESS_TOKEN ||
+  'APP_USR-986783594759193-091018-1c247a8e6ab68cc9d78064011e59e75a-1162474788';
+
+const NEXT_PUBLIC_MP_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_MP_PUBLIC_KEY ||
+  'APP_USR-d6013f89-b30a-48d2-af94-0b02c0ed89d9';
+
 const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN || '',
+  accessToken: MP_ACCESS_TOKEN,
 });
 
 export async function POST(req: Request) {
@@ -159,22 +167,7 @@ export async function POST(req: Request) {
 
     const returnUrlParam = user ? '' : `&guest_email=${encodeURIComponent(payerEmail)}`;
 
-    // Si las credenciales de Mercado Pago están en placeholder, responder en 0ms
-    const isMockMp =
-      !process.env.MP_ACCESS_TOKEN ||
-      process.env.MP_ACCESS_TOKEN.includes('xxxx');
-
-    if (isMockMp) {
-      return NextResponse.json({
-        preferenceId: 'mock_pref_' + Date.now(),
-        init_point: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
-        sandbox_init_point: `${appUrl}/partido/${match.id}?payment=success${returnUrlParam}`,
-        publicKey: process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '',
-        isMock: true,
-      });
-    }
-
-    const isTestToken = process.env.MP_ACCESS_TOKEN?.startsWith('TEST-');
+    const isTestToken = MP_ACCESS_TOKEN.startsWith('TEST-');
 
     // 3. Crear preferencia en Mercado Pago Checkout Pro oficial
     const isHttps = appUrl.startsWith('https://');
