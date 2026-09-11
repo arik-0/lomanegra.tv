@@ -31,53 +31,75 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'matches' | 'events'>('matches');
 
-  // Partidos oficiales de la agenda (sincronizados con los 20 clubes reales)
-  const matches = [
+  // Partidos oficiales de la agenda (sincronizados con los partidos reales)
+  const defaultSidebarMatches = [
     {
       id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
       team1: 'Blanco y Negro',
-      team2: 'San Martín',
-      time: 'HOY 17:00',
-      isLive: true,
-      category: 'Primera • Clásico',
-      price: '$12.000 ARS',
-      logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/San Martin.png',
-    },
-    {
-      id: 'b1a9c001-0000-4000-8000-000000000002',
-      team1: 'Blanco y Negro',
-      team2: 'Firmat FBC',
-      time: 'DOMINGO 16:30',
+      team2: 'Atlético Acebal',
+      time: 'DOMINGO 15:45 HS',
       isLive: false,
-      category: 'Primera • Apertura',
+      category: 'Primera • Liga Deportiva del Sur',
       price: '$12.000 ARS',
       logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Firmat FBC.png',
-    },
-    {
-      id: 'b1a9c001-0000-4000-8000-000000000003',
-      team1: 'Blanco y Negro',
-      team2: 'Argentino de Firmat',
-      time: 'PRÓXIMA FECHA',
-      isLive: false,
-      category: 'Reserva e Inferiores',
-      price: '$12.000 ARS',
-      logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Argentino de Firmat.png',
+      logo2: '/teams/Atletico Acebal.png',
     },
     {
       id: 'b1a9c001-0000-4000-8000-000000000004',
       team1: 'Blanco y Negro',
-      team2: 'Atlético Acebal',
+      team2: 'Los Andes',
       time: 'A CONFIRMAR',
       isLive: false,
-      category: 'Torneo Regional Interzonal',
-      price: '$3.500 ARS',
+      category: 'Primera • Torneo Clausura',
+      price: '$12.000 ARS',
       logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Atletico Acebal.png',
+      logo2: '/teams/Los Andes.png',
     },
   ];
+
+  const [matches, setMatches] = useState(defaultSidebarMatches);
+
+  useEffect(() => {
+    fetch('/api/admin/matches')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.matches && data.matches.length > 0) {
+          const mapped = data.matches.map((m: any) => {
+            const parts = (m.title || '').split(/vs/i);
+            const t1 = parts[0]?.trim() || 'Blanco y Negro';
+            const t2 = parts[1]?.trim() || 'Rival';
+            let timeStr = 'A CONFIRMAR';
+            if (m.is_date_confirmed && m.date) {
+              const d = new Date(m.date);
+              timeStr = `${d.toLocaleDateString('es-AR', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                timeZone: 'America/Argentina/Buenos_Aires',
+              }).toUpperCase()} ${d.toLocaleTimeString('es-AR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'America/Argentina/Buenos_Aires',
+              })} HS`;
+            }
+            return {
+              id: m.id,
+              team1: t1,
+              team2: t2,
+              time: m.is_live ? 'EN VIVO' : timeStr,
+              isLive: Boolean(m.is_live),
+              category: `${m.category || 'Primera'} • ${m.league || 'Liga Deportiva del Sur'}`,
+              price: `$${Number(m.price || 12000).toLocaleString('es-AR')} ARS`,
+              logo1: getTeamLogo(t1) || '/teams/Blanco y Negro.png',
+              logo2: getTeamLogo(t2) || '/teams/ifc.png',
+            };
+          });
+          setMatches(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
 
 

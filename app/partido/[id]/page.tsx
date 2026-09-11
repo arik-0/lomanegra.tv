@@ -250,40 +250,28 @@ export default async function MatchPage({
     const fromStore = getStoredMatches().find((m) => m.id === params.id);
     if (fromStore) {
       match = fromStore;
-    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000002') {
+    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000004') {
       match = {
-        id: 'b1a9c001-0000-4000-8000-000000000002',
-        title: 'Blanco y Negro vs Deportivo Sarmiento',
-        description: 'Primera • Fecha Oficial del Torneo Apertura',
+        id: 'b1a9c001-0000-4000-8000-000000000004',
+        title: 'Blanco y Negro vs Los Andes',
+        description: 'Torneo Clausura • Fecha 4 • Transmisión oficial en vivo',
         date: null,
         is_date_confirmed: false,
         price: 12000,
-        cloudflare_live_input_uid: 'live_input_byn_vs_dep_sarmiento',
-        image_url: '/matches/blanco-y-negro-vs-ifc.png',
-        is_active: true,
-      };
-    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000003') {
-      match = {
-        id: 'b1a9c001-0000-4000-8000-000000000003',
-        title: 'Blanco y Negro vs San Martín (ST)',
-        description: 'Reserva e Inferiores • Próxima Fecha',
-        date: null,
-        is_date_confirmed: false,
-        price: 12000,
-        cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
-        image_url: '/matches/blanco-y-negro-vs-ifc.png',
+        cloudflare_live_input_uid: 'live_input_byn_vs_los_andes',
+        image_url: null,
         is_active: true,
       };
     } else {
       match = {
         id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-        title: 'Blanco y Negro vs I. F. C.',
-        description: 'El gran clásico regional en vivo con relatos en directo para toda la hinchada.',
-        date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+        title: 'Blanco y Negro vs Atlético Acebal',
+        description: 'Primera • Liga Deportiva del Sur',
+        date: '2026-09-13T18:45:00.000Z',
         is_date_confirmed: true,
         price: 12000,
-        cloudflare_live_input_uid: 'live_input_byn_vs_ifc',
-        image_url: '/matches/blanco-y-negro-vs-ifc.png',
+        cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
+        image_url: null,
         is_active: true,
       };
     }

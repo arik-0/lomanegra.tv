@@ -254,10 +254,17 @@ export default function MatchViewClient({
 
   const isDateConfirmed = match.is_date_confirmed !== false && !!match.date;
   const matchDate = isDateConfirmed && match.date
-    ? new Date(match.date).toLocaleString('es-AR', {
-        dateStyle: 'full',
-        timeStyle: 'short',
-      })
+    ? `${new Date(match.date).toLocaleDateString('es-AR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        timeZone: 'America/Argentina/Buenos_Aires',
+      })} - ${new Date(match.date).toLocaleTimeString('es-AR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'America/Argentina/Buenos_Aires',
+      })} HS`
     : 'Fecha y horario a confirmar';
 
   return (

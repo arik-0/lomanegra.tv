@@ -55,7 +55,8 @@ function decodeMatchFields(m: any): MatchData {
     (m.date && new Date(m.date).getFullYear() >= 2099);
 
   let league = m.league || 'Liga Deportiva del Sur';
-  let category = m.category || 'Fútbol Mayor';
+  let category = m.category || 'Primera';
+  if (category === 'Fútbol Mayor') category = 'Primera';
   let isLive = m.is_live !== undefined ? Boolean(m.is_live) : false;
 
   const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
@@ -64,6 +65,7 @@ function decodeMatchFields(m: any): MatchData {
       const parsed = JSON.parse(metaMatch[1]);
       if (parsed.league) league = parsed.league;
       if (parsed.category) category = parsed.category;
+      if (category === 'Fútbol Mayor') category = 'Primera';
       if (parsed.is_live !== undefined) isLive = Boolean(parsed.is_live);
     } catch {}
   }
@@ -79,7 +81,7 @@ function decodeMatchFields(m: any): MatchData {
     description: sanitizeRegionalText(cleanDesc),
     date: isTbd ? null : m.date,
     is_date_confirmed: !isTbd,
-    price: Number(m.price) || 3500,
+    price: Number(m.price) || 12000,
     cloudflare_live_input_uid: m.cloudflare_live_input_uid || 'live_input_byn',
     image_url: m.image_url || '/matches/blanco-y-negro-vs-ifc.png',
     is_active: m.is_active !== undefined ? Boolean(m.is_active) : true,
@@ -145,7 +147,11 @@ export async function POST(req: Request) {
     let matchDate: string;
     if (isDateConfirmed && body.date) {
       try {
-        matchDate = new Date(body.date).toISOString();
+        const rawDate = String(body.date).trim();
+        const dateWithTz = rawDate.includes('Z') || rawDate.includes('+') || rawDate.includes('-03:00')
+          ? rawDate
+          : `${rawDate}:00-03:00`;
+        matchDate = new Date(dateWithTz).toISOString();
       } catch {
         matchDate = new Date(Date.now() + 24 * 3600 * 1000).toISOString();
       }
@@ -154,9 +160,9 @@ export async function POST(req: Request) {
     }
 
     const cleanTitle = sanitizeRegionalText(body.title || 'Blanco y Negro vs Rival');
-    const rawDesc = sanitizeRegionalText(body.description || 'Fútbol Mayor • Torneo Oficial');
+    const rawDesc = sanitizeRegionalText(body.description || 'Primera • Torneo Oficial');
     const league = body.league ? sanitizeRegionalText(body.league) : 'Liga Deportiva del Sur';
-    const category = body.category ? sanitizeRegionalText(body.category) : 'Fútbol Mayor';
+    const category = body.category ? sanitizeRegionalText(body.category) : 'Primera';
     const isLive = body.is_live !== undefined ? Boolean(body.is_live) : false;
 
     const dbDescription = encodeDescription(rawDesc, isDateConfirmed, league, category, isLive);
@@ -167,7 +173,7 @@ export async function POST(req: Request) {
       description: rawDesc.replace(/\[META:\{.*?\}\]/g, '').replace('[A CONFIRMAR]', '').trim(),
       date: isDateConfirmed ? matchDate : null,
       is_date_confirmed: isDateConfirmed,
-      price: Number(body.price) || 3500,
+      price: Number(body.price) || 12000,
       cloudflare_live_input_uid: body.cloudflare_live_input_uid || 'live_input_byn',
       image_url: body.image_url || '/matches/blanco-y-negro-vs-ifc.png',
       is_active: body.is_active !== undefined ? Boolean(body.is_active) : true,
@@ -245,7 +251,11 @@ export async function PATCH(req: Request) {
     payload.description = encodeDescription(descToUse, isDateConfirmed, leagueToUse, catToUse, isLiveToUse);
 
     if (updates.date) {
-      payload.date = new Date(updates.date).toISOString();
+      const rawDate = String(updates.date).trim();
+      const dateWithTz = rawDate.includes('Z') || rawDate.includes('+') || rawDate.includes('-03:00')
+        ? rawDate
+        : `${rawDate}:00-03:00`;
+      payload.date = new Date(dateWithTz).toISOString();
     } else if (isDateConfirmed === false) {
       payload.date = '2099-12-31T23:59:59.000Z';
     }

@@ -137,53 +137,35 @@ export default async function HomePage() {
   // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
   const defaultFeaturedMatch = {
     id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-    title: 'Blanco y Negro vs San Martín',
-    description: 'El gran clásico regional en vivo con relatos en directo y campo de juego.',
-    date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    title: 'Blanco y Negro vs Atlético Acebal',
+    description: 'Primera • Liga Deportiva del Sur',
+    date: '2026-09-13T18:45:00.000Z',
     is_date_confirmed: true,
     price: 12000,
-    cloudflare_live_input_uid: 'live_input_byn_vs_san_martin',
-    image_url: '/matches/blanco-y-negro-vs-san-martin.svg',
+    cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
+    image_url: null,
     is_active: true,
+    category: 'Primera',
+    league: 'Liga Deportiva del Sur',
   };
 
   const defaultOtherMatches = [
     {
-      id: 'b1a9c001-0000-4000-8000-000000000002',
-      title: 'Blanco y Negro vs Firmat FBC',
-      description: 'Primera • Torneo Apertura Oficial',
-      date: null,
-      is_date_confirmed: false,
-      price: 12000,
-      cloudflare_live_input_uid: 'live_input_byn_vs_firmat',
-      image_url: '/matches/blanco-y-negro-vs-firmat-fbc.svg',
-      is_active: true,
-    },
-    {
-      id: 'b1a9c001-0000-4000-8000-000000000003',
-      title: 'Blanco y Negro vs Argentino de Firmat',
-      description: 'Reserva e Inferiores • Fecha a confirmar',
-      date: null,
-      is_date_confirmed: false,
-      price: 12000,
-      cloudflare_live_input_uid: 'live_input_byn_vs_arg_firmat',
-      image_url: '/matches/blanco-y-negro-vs-argentino-de-firmat.svg',
-      is_active: true,
-    },
-    {
       id: 'b1a9c001-0000-4000-8000-000000000004',
-      title: 'Blanco y Negro vs Atlético Acebal',
-      description: 'Torneo Regional • Clásico Interzonal',
+      title: 'Blanco y Negro vs Los Andes',
+      description: 'Torneo Clausura • Fecha 4 • Transmisión oficial en vivo',
       date: null,
       is_date_confirmed: false,
       price: 12000,
-      cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
-      image_url: '/matches/blanco-y-negro-vs-atletico-acebal.svg',
+      cloudflare_live_input_uid: 'live_input_byn_vs_los_andes',
+      image_url: null,
       is_active: true,
+      category: 'Primera',
+      league: 'Liga Deportiva del Sur',
     },
   ];
 
-  // Combinar partidos de Supabase con los del almacén de administración
+  // Combinar partidos de Supabase o del almacén de administración
   const adminMatches = getStoredMatches().map((m) => ({
     ...m,
     title: sanitizeRegionalText(m.title),
@@ -191,16 +173,24 @@ export default async function HomePage() {
     category: m.category === 'Fútbol Mayor' ? 'Primera' : (m.category || 'Primera'),
     price: Number(m.price) || 12000,
   }));
-  const allCandidates = [...(matches || []), ...adminMatches];
+
+  // Si Supabase tiene partidos válidos, esa es la ÚNICA fuente de verdad para la cartelera
+  const candidateList =
+    matches && matches.length > 0
+      ? matches
+      : adminMatches.length > 0
+      ? adminMatches
+      : [defaultFeaturedMatch, ...defaultOtherMatches];
+
   const seenIds = new Set<string>();
-  const combinedMatches = allCandidates.filter((m) => {
+  const combinedMatches = candidateList.filter((m) => {
     if (seenIds.has(m.id)) return false;
     seenIds.add(m.id);
     return true;
   });
 
   // Filtrar exclusivamente partidos activos de Pasión Lomonegra
-  const validMatches = (combinedMatches.length > 0 ? combinedMatches : [defaultFeaturedMatch, ...defaultOtherMatches]).filter(
+  const validMatches = combinedMatches.filter(
     (m) =>
       m.is_active !== false &&
       !m.title.toLowerCase().includes('boca juniors vs river') &&
@@ -439,6 +429,7 @@ export default async function HomePage() {
                     weekday: 'short',
                     day: '2-digit',
                     month: 'short',
+                    timeZone: 'America/Argentina/Buenos_Aires',
                   }).toUpperCase()}
                 </div>
                 <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
@@ -446,6 +437,7 @@ export default async function HomePage() {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false,
+                    timeZone: 'America/Argentina/Buenos_Aires',
                   })}{' '}
                   <span className="text-xs sm:text-sm font-bold text-red-500">HS</span>
                 </div>
@@ -551,10 +543,18 @@ export default async function HomePage() {
                           <div className="flex items-center gap-1.5 text-zinc-400 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-md text-[10px]">
                             <Calendar className="w-3 h-3 text-red-500" />
                             <span>
-                              {matchDate.toLocaleString('es-AR', {
-                                dateStyle: 'medium',
-                                timeStyle: 'short',
-                              })}
+                              {matchDate.toLocaleDateString('es-AR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                timeZone: 'America/Argentina/Buenos_Aires',
+                              })}{' '}
+                              {matchDate.toLocaleTimeString('es-AR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                                timeZone: 'America/Argentina/Buenos_Aires',
+                              })} HS
                             </span>
                           </div>
                         ) : (

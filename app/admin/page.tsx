@@ -310,12 +310,32 @@ export default function AdminPage() {
   };
 
   const formatForDateTimeInput = (dateObj: Date) => {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const hours = String(dateObj.getHours()).padStart(2, '0');
-    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Argentina/Buenos_Aires',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      const parts = formatter.formatToParts(dateObj);
+      const y = parts.find((p) => p.type === 'year')?.value;
+      const m = parts.find((p) => p.type === 'month')?.value;
+      const d = parts.find((p) => p.type === 'day')?.value;
+      let h = parts.find((p) => p.type === 'hour')?.value || '00';
+      if (h === '24') h = '00';
+      const min = parts.find((p) => p.type === 'minute')?.value || '00';
+      return `${y}-${m}-${d}T${h}:${min}`;
+    } catch {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
   };
 
   const openMatchModal = (match?: Match, initialCategory?: string, initialLeague?: string) => {
@@ -364,12 +384,20 @@ export default function AdminPage() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
 
+      let matchIsoDate: string | null = null;
+      if (formIsDateConfirmed && formDate) {
+        const dateStr = formDate.includes('Z') || formDate.includes('+') || formDate.includes('-03:00')
+          ? formDate
+          : `${formDate}:00-03:00`;
+        matchIsoDate = new Date(dateStr).toISOString();
+      }
+
       const payload = {
         title: formTitle.trim(),
         description: formDesc.trim() || `${formCategory.trim()} • ${formLeague.trim()}`,
         league: formLeague.trim() || 'Liga Deportiva del Sur',
         category: formCategory.trim() === 'Fútbol Mayor' ? 'Primera' : (formCategory.trim() || 'Primera'),
-        date: formIsDateConfirmed && formDate ? new Date(formDate).toISOString() : null,
+        date: matchIsoDate,
         is_date_confirmed: formIsDateConfirmed,
         price: Number(formPrice) || 12000,
         cloudflare_live_input_uid: formStreamUid.trim() || 'live_input_byn',
@@ -1569,9 +1597,23 @@ export default function AdminPage() {
                       <h3 className="text-sm font-black text-white leading-snug">{m.title}</h3>
                       <p className="text-xs text-zinc-400 line-clamp-2">{m.description || 'Sin descripción'}</p>
 
-                      <div className="text-[10px] text-zinc-500 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{m.is_date_confirmed && m.date ? new Date(m.date).toLocaleString('es-AR') : 'Fecha pendiente'}</span>
+                      <div className="text-[10px] text-zinc-400 flex items-center gap-1 font-mono">
+                        <Clock className="w-3 h-3 text-zinc-500" />
+                        <span>
+                          {m.is_date_confirmed && m.date
+                            ? `${new Date(m.date).toLocaleDateString('es-AR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                timeZone: 'America/Argentina/Buenos_Aires',
+                              })}, ${new Date(m.date).toLocaleTimeString('es-AR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false,
+                                timeZone: 'America/Argentina/Buenos_Aires',
+                              })} HS`
+                            : 'Fecha pendiente'}
+                        </span>
                       </div>
                     </div>
 
