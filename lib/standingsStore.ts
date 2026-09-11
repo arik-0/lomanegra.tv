@@ -1572,26 +1572,26 @@ const rawDefaultStandings: TournamentStandings = {
   ],
   // Goleadores EXCLUSIVOS del Club Atlético Blanco y Negro divididos por categoría (sin partidos jugados)
   goleadores: [
-    // Primera División
+    // Fútbol Mayor
     {
       id: 'g1',
       pos: 1,
       name: 'Gonzalo Cendra',
-      category: 'Primera',
+      category: 'Fútbol Mayor',
       goals: 9,
     },
     {
       id: 'g2',
       pos: 2,
       name: 'Facundo Sánchez',
-      category: 'Primera',
+      category: 'Fútbol Mayor',
       goals: 7,
     },
     {
       id: 'g3',
       pos: 3,
       name: 'Joaquín Kraft',
-      category: 'Primera',
+      category: 'Fútbol Mayor',
       goals: 5,
     },
     // Reserva

@@ -55,8 +55,7 @@ function decodeMatchFields(m: any): MatchData {
     (m.date && new Date(m.date).getFullYear() >= 2099);
 
   let league = m.league || 'Liga Deportiva del Sur';
-  let category = m.category || 'Primera';
-  if (category === 'Fútbol Mayor') category = 'Primera';
+  let category = m.category || 'Fútbol Mayor';
   let isLive = m.is_live !== undefined ? Boolean(m.is_live) : false;
 
   const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
@@ -64,7 +63,7 @@ function decodeMatchFields(m: any): MatchData {
     try {
       const parsed = JSON.parse(metaMatch[1]);
       if (parsed.league) league = parsed.league;
-      if (parsed.category) category = parsed.category === 'Fútbol Mayor' ? 'Primera' : parsed.category;
+      if (parsed.category) category = parsed.category;
       if (parsed.is_live !== undefined) isLive = Boolean(parsed.is_live);
     } catch {}
   }
@@ -77,12 +76,12 @@ function decodeMatchFields(m: any): MatchData {
   return {
     id: m.id,
     title: sanitizeRegionalText(m.title || ''),
-    description: sanitizeRegionalText(cleanDesc).replace(/f[uú]tbol\s+mayor/gi, 'Primera'),
+    description: sanitizeRegionalText(cleanDesc),
     date: isTbd ? null : m.date,
     is_date_confirmed: !isTbd,
-    price: Number(m.price) || 12000,
+    price: Number(m.price) || 3500,
     cloudflare_live_input_uid: m.cloudflare_live_input_uid || 'live_input_byn',
-    image_url: m.image_url || '/matches/blanco-y-negro-vs-atletico-acebal.svg',
+    image_url: m.image_url || '/matches/blanco-y-negro-vs-ifc.png',
     is_active: m.is_active !== undefined ? Boolean(m.is_active) : true,
     is_live: isLive,
     league: sanitizeRegionalText(league),
@@ -155,10 +154,9 @@ export async function POST(req: Request) {
     }
 
     const cleanTitle = sanitizeRegionalText(body.title || 'Blanco y Negro vs Rival');
-    const rawDesc = sanitizeRegionalText(body.description || 'Primera • Torneo Oficial');
+    const rawDesc = sanitizeRegionalText(body.description || 'Fútbol Mayor • Torneo Oficial');
     const league = body.league ? sanitizeRegionalText(body.league) : 'Liga Deportiva del Sur';
-    let category = body.category ? sanitizeRegionalText(body.category) : 'Primera';
-    if (category === 'Fútbol Mayor') category = 'Primera';
+    const category = body.category ? sanitizeRegionalText(body.category) : 'Fútbol Mayor';
     const isLive = body.is_live !== undefined ? Boolean(body.is_live) : false;
 
     const dbDescription = encodeDescription(rawDesc, isDateConfirmed, league, category, isLive);
@@ -169,9 +167,9 @@ export async function POST(req: Request) {
       description: rawDesc.replace(/\[META:\{.*?\}\]/g, '').replace('[A CONFIRMAR]', '').trim(),
       date: isDateConfirmed ? matchDate : null,
       is_date_confirmed: isDateConfirmed,
-      price: Number(body.price) || 12000,
+      price: Number(body.price) || 3500,
       cloudflare_live_input_uid: body.cloudflare_live_input_uid || 'live_input_byn',
-      image_url: body.image_url || '/matches/blanco-y-negro-vs-atletico-acebal.svg',
+      image_url: body.image_url || '/matches/blanco-y-negro-vs-ifc.png',
       is_active: body.is_active !== undefined ? Boolean(body.is_active) : true,
       is_live: isLive,
       league,

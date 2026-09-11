@@ -256,7 +256,7 @@ export default function PosicionesPage() {
                 LIGA DEPORTIVA DEL SUR // BYD
               </div>
               <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                <span>Tablas Lomonegras & Play-Offs</span>
+                <span>Tablas & Play-Offs</span>
                 <span className="text-xs font-mono font-bold px-2.5 py-1 bg-red-950/70 border border-red-800 text-red-400 rounded-md">
                   OFICIAL 2026
                 </span>
@@ -1117,7 +1117,7 @@ export default function PosicionesPage() {
 
             {/* Píldoras de Categoría para Goleadores */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {['Todas', 'Primera', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
+              {['Todas', 'Fútbol Mayor', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedGoleadorCategory(cat)}
@@ -1148,9 +1148,6 @@ export default function PosicionesPage() {
                   {standings.goleadores
                     .filter((g) => {
                       if (selectedGoleadorCategory === 'Todas') return true;
-                      if (selectedGoleadorCategory === 'Primera') {
-                        return g.category.toLowerCase().includes('primer') || g.category.toLowerCase().includes('mayor');
-                      }
                       return g.category.toLowerCase().includes(selectedGoleadorCategory.toLowerCase());
                     })
                     .map((g, idx) => (
@@ -1196,7 +1193,7 @@ export default function PosicionesPage() {
                         {/* División */}
                         <td className="py-3 px-3 text-zinc-400 text-xs">
                           <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px]">
-                            {g.category === 'Fútbol Mayor' ? 'Primera' : g.category}
+                            {g.category}
                           </span>
                         </td>
 

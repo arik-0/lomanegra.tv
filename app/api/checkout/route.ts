@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { getStoredMatches } from '@/lib/adminStore';
 
 if (typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -74,30 +73,30 @@ export async function POST(req: Request) {
       }
     }
 
-    // Si no se encontró en Supabase, buscar en el almacén de administración
-    if (!match) {
-      const stored = getStoredMatches().find((m) => m.id === matchId);
-      if (stored) {
-        match = stored;
-      }
-    }
-
-    // Fallback de alta velocidad si no está en la base de datos ni en el almacén
+    // Fallback de alta velocidad si no está en la base de datos
     if (!match) {
       if (matchId === '07ced47c-9f9a-4bce-a073-2c8e84b3de67') {
         return NextResponse.json(
           { error: 'Las entradas para este partido no están habilitadas: la fecha aún está a confirmar.' },
           { status: 400 }
         );
+      } else if (matchId === 'de261139-f0e7-43d3-bd24-f2f9a7262fdf') {
+        match = {
+          id: matchId,
+          title: 'Atlético Acebal vs Blanco y Negro',
+          description: 'Liga Deportiva del Sur • Semifinal en vivo HD',
+          price: 4500,
+          is_date_confirmed: true,
+          date: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+        };
       } else {
         match = {
           id: matchId || '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-          title: 'Blanco y Negro vs Atlético Acebal',
+          title: 'Blanco y Negro vs I. F. C.',
           description: 'El gran clásico regional en vivo con relatos en directo para toda la hinchada.',
-          price: 12000,
+          price: 3500,
           is_date_confirmed: true,
-          date: '2026-09-13T18:45:00.000Z',
-          category: 'Primera',
+          date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
         };
       }
     }
@@ -178,13 +177,13 @@ export async function POST(req: Request) {
         {
           id: match.id,
           title: `Pasión Lomonegra: ${match.title}`,
-          description: `Pase oficial de transmisión en vivo HD • ${match.category === 'Fútbol Mayor' ? 'Primera' : (match.category || 'Primera')}`,
+          description: `Pase oficial de transmisión en vivo HD • ${match.category || 'Fútbol Mayor'}`,
           picture_url: match.image_url
             ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
             : `${appUrl}/logo-pasion-lomonegra.png`,
           category_id: 'sports',
           quantity: 1,
-          unit_price: Number(match.price) || 12000,
+          unit_price: Number(match.price) || 3500,
           currency_id: 'ARS',
         },
       ],

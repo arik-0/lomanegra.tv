@@ -31,29 +31,51 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'matches' | 'events'>('matches');
 
-  // Partidos oficiales de la agenda (sincronizados con los partidos activos)
+  // Partidos oficiales de la agenda (sincronizados con los 20 clubes reales)
   const matches = [
     {
       id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
       team1: 'Blanco y Negro',
-      team2: 'Atlético Acebal',
-      time: 'Dom 18:45 hs',
-      isLive: false,
-      category: 'Primera • Clásico Regional',
-      price: '$12.000 ARS',
+      team2: 'San Martín',
+      time: 'HOY 17:00',
+      isLive: true,
+      category: 'Fútbol Mayor • Clásico',
+      price: '$3.500 ARS',
       logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Atletico Acebal.png',
+      logo2: '/teams/San Martin.png',
+    },
+    {
+      id: 'b1a9c001-0000-4000-8000-000000000002',
+      team1: 'Blanco y Negro',
+      team2: 'Firmat FBC',
+      time: 'DOMINGO 16:30',
+      isLive: false,
+      category: 'Fútbol Mayor • Apertura',
+      price: '$3.500 ARS',
+      logo1: '/teams/Blanco y Negro.png',
+      logo2: '/teams/Firmat FBC.png',
+    },
+    {
+      id: 'b1a9c001-0000-4000-8000-000000000003',
+      team1: 'Blanco y Negro',
+      team2: 'Argentino de Firmat',
+      time: 'PRÓXIMA FECHA',
+      isLive: false,
+      category: 'Reserva e Inferiores',
+      price: '$3.500 ARS',
+      logo1: '/teams/Blanco y Negro.png',
+      logo2: '/teams/Argentino de Firmat.png',
     },
     {
       id: 'b1a9c001-0000-4000-8000-000000000004',
       team1: 'Blanco y Negro',
-      team2: 'Los Andes',
+      team2: 'Atlético Acebal',
       time: 'A CONFIRMAR',
       isLive: false,
-      category: 'Primera • Torneo Clausura',
-      price: '$12.000 ARS',
+      category: 'Torneo Regional Interzonal',
+      price: '$3.500 ARS',
       logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Los Andes.png',
+      logo2: '/teams/Atletico Acebal.png',
     },
   ];
 
@@ -199,7 +221,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Tablas Lomonegras
+              Tablas
             </button>
           </div>
         </div>
@@ -270,7 +292,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-500">
-                  Tablas Lomonegras
+                  Tablas de Posiciones
                 </span>
                 <Trophy className="w-3.5 h-3.5 text-amber-500" />
               </div>
