@@ -58,7 +58,7 @@ export default function UserProfileModal({
       category: 'Primera • Torneo Apertura',
       status: 'Pase Anticipado',
       statusColor: 'blue',
-      date: 'Próxima Fecha • Estadio Albinegro',
+      date: 'Próxima Fecha • Estadio Lomonegro',
       logo1: '/teams/Blanco y Negro.png',
       logo2: '/teams/Firmat FBC.png',
       link: '/partido/b1a9c001-0000-4000-8000-000000000002',

@@ -334,7 +334,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   Tablas Lomonegras &rarr;
                 </div>
                 <div className="text-[10px] text-zinc-400 leading-tight">
-                  Clasificación en vivo, cruces de Play-Offs y Goleadores albinegros.
+                  Clasificación en vivo, cruces de Play-Offs y Goleadores lomonegros.
                 </div>
               </Link>
 

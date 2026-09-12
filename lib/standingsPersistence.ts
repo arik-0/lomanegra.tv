@@ -4,6 +4,7 @@ if (typeof process !== 'undefined') {
 
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { supabaseAdmin } from './supabase/admin';
 import {
   TournamentStandings,
@@ -38,8 +39,13 @@ export function normalizeTournamentKey(
   const tor = t === 'clausura' || t === 'segundo' ? 'clausura' : 'apertura';
 
   let cat = (categoria || (isHockey ? 'primera_hockey' : 'mayor')).toLowerCase().trim();
-  if (cat === 'primera' || cat === 'futbol mayor') cat = 'mayor';
+  if (cat === 'primera' || cat === 'futbol mayor' || cat === 'primera division') {
+    cat = isHockey ? 'primera_hockey' : 'mayor';
+  }
   if (cat === 'primera hockey' || cat === 'hockey primera') cat = 'primera_hockey';
+  if (isHockey && !cat.endsWith('_hockey')) {
+    cat = `${cat}_hockey`;
+  }
 
   return `${dep}_${cat}_${tor}`;
 }
@@ -56,50 +62,86 @@ const PERSISTENCE_FILE = path.join(DATA_DIR, 'standings_persistence.json');
 
 export const SYSTEM_MATCH_ID_APERTURA = '00000000-0000-0000-0000-0000000000a1';
 export const SYSTEM_MATCH_ID_CLAUSURA = '00000000-0000-0000-0000-0000000000c1';
+export const SYSTEM_MATCH_ID_MASTER = '00000000-0000-0000-0000-000000000000';
+
+export function keyToUUID(key: string): string {
+  if (key === 'futbol_mayor_apertura' || key === 'apertura') {
+    return SYSTEM_MATCH_ID_APERTURA;
+  }
+  if (key === 'futbol_mayor_clausura' || key === 'clausura') {
+    return SYSTEM_MATCH_ID_CLAUSURA;
+  }
+  const hash = crypto.createHash('md5').update('standings:' + key).digest('hex');
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    hash.slice(12, 16),
+    hash.slice(16, 20),
+    hash.slice(20, 32),
+  ].join('-');
+}
+
+function sanitizeStandings(st: any, key?: string): TournamentStandings {
+  if (!st || typeof st !== 'object') {
+    return createDefaultStandings('futbol', 'mayor', 'apertura');
+  }
+  return {
+    ...st,
+    zones: Array.isArray(st.zones) ? st.zones : [],
+    playoffs: Array.isArray(st.playoffs) ? st.playoffs : [],
+    goleadores: Array.isArray(st.goleadores) ? st.goleadores : [],
+  };
+}
 
 // Cargar desde Supabase
 async function loadFromSupabase(): Promise<Record<string, TournamentStandings> | null> {
   try {
-    // 1. Intentar leer de la tabla dedicada 'public.standings'
-    const { data: standingsRows, error: sErr } = await supabaseAdmin
-      .from('standings')
-      .select('*');
-
-    if (!sErr && standingsRows && standingsRows.length > 0) {
-      const storeMap: Record<string, TournamentStandings> = {};
-      for (const row of standingsRows) {
-        if (row.id && row.data) {
-          storeMap[row.id] = row.data;
-        }
-      }
-      if (Object.keys(storeMap).length > 0) {
-        return storeMap;
-      }
-    }
-
-    // 2. Si no hay tabla dedicada, leer de los registros del sistema en 'public.matches'
     const { data: matchRows, error: mErr } = await supabaseAdmin
       .from('matches')
       .select('id, title, description')
-      .in('id', [SYSTEM_MATCH_ID_APERTURA, SYSTEM_MATCH_ID_CLAUSURA]);
+      .like('title', '__SYSTEM_STANDINGS_%');
 
     if (!mErr && matchRows && matchRows.length > 0) {
       const storeMap: Record<string, TournamentStandings> = {};
-      for (const row of matchRows) {
+
+      // 1. Cargar primero la copia maestra si existe
+      const masterRow = matchRows.find((r) => r.title === '__SYSTEM_STANDINGS_STORE_ALL__');
+      if (masterRow && masterRow.description) {
         try {
-          if (row.id === SYSTEM_MATCH_ID_APERTURA && row.description) {
-            const ap = JSON.parse(row.description);
-            storeMap['futbol_mayor_apertura'] = ap;
-            storeMap['apertura'] = ap;
-          } else if (row.id === SYSTEM_MATCH_ID_CLAUSURA && row.description) {
-            const cl = JSON.parse(row.description);
-            storeMap['futbol_mayor_clausura'] = cl;
-            storeMap['clausura'] = cl;
+          const parsedMaster = JSON.parse(masterRow.description);
+          if (parsedMaster && typeof parsedMaster === 'object') {
+            for (const [k, v] of Object.entries(parsedMaster)) {
+              storeMap[k] = sanitizeStandings(v, k);
+            }
           }
         } catch (e) {
-          console.error('[StandingsPersistence] Error parseando JSON de match row:', e);
+          console.error('[StandingsPersistence] Error parseando master row:', e);
         }
       }
+
+      // 2. Cargar todas las filas individuales (tienen prioridad)
+      for (const row of matchRows) {
+        if (!row.description || row.title === '__SYSTEM_STANDINGS_STORE_ALL__') continue;
+        try {
+          const parsed = sanitizeStandings(JSON.parse(row.description));
+          if (row.id === SYSTEM_MATCH_ID_APERTURA || row.title === '__SYSTEM_STANDINGS_APERTURA__') {
+            storeMap['futbol_mayor_apertura'] = parsed;
+            storeMap['apertura'] = parsed;
+          } else if (row.id === SYSTEM_MATCH_ID_CLAUSURA || row.title === '__SYSTEM_STANDINGS_CLAUSURA__') {
+            storeMap['futbol_mayor_clausura'] = parsed;
+            storeMap['clausura'] = parsed;
+          } else {
+            const key = row.title
+              .replace(/^__SYSTEM_STANDINGS_/, '')
+              .replace(/__$/, '')
+              .toLowerCase();
+            storeMap[key] = parsed;
+          }
+        } catch (e) {
+          console.error('[StandingsPersistence] Error parseando match row:', row.title, e);
+        }
+      }
+
       if (Object.keys(storeMap).length > 0) {
         return storeMap;
       }
@@ -110,39 +152,51 @@ async function loadFromSupabase(): Promise<Record<string, TournamentStandings> |
   return null;
 }
 
-// Guardar en Supabase
-async function saveToSupabase(key: string, standings: TournamentStandings) {
+// Guardar en Supabase (todas las categorías persisten permanentemente)
+async function saveToSupabase(
+  key: string,
+  standings: TournamentStandings,
+  fullStore?: Record<string, TournamentStandings>
+) {
   try {
-    // 1. Intentar upsert en tabla dedicada 'public.standings'
-    try {
-      await supabaseAdmin.from('standings').upsert({
-        id: key,
-        data: standings,
-        updated_at: new Date().toISOString(),
-      });
-    } catch {}
+    const id = keyToUUID(key);
+    const title =
+      key === 'futbol_mayor_apertura' || key === 'apertura'
+        ? '__SYSTEM_STANDINGS_APERTURA__'
+        : key === 'futbol_mayor_clausura' || key === 'clausura'
+        ? '__SYSTEM_STANDINGS_CLAUSURA__'
+        : `__SYSTEM_STANDINGS_${key.toUpperCase()}__`;
 
-    // 2. Si es fútbol mayor apertura/clausura, guardar en match row del sistema
-    if (key === 'futbol_mayor_apertura' || key === 'apertura') {
-      await supabaseAdmin.from('matches').upsert({
-        id: SYSTEM_MATCH_ID_APERTURA,
-        title: '__SYSTEM_STANDINGS_APERTURA__',
+    // 1. Guardar fila del torneo
+    await supabaseAdmin.from('matches').upsert(
+      {
+        id,
+        title,
         description: JSON.stringify(standings),
         date: '2099-12-31T23:59:59.000Z',
         price: 0,
         cloudflare_live_input_uid: 'system',
         is_active: false,
-      }, { onConflict: 'id' });
-    } else if (key === 'futbol_mayor_clausura' || key === 'clausura') {
-      await supabaseAdmin.from('matches').upsert({
-        id: SYSTEM_MATCH_ID_CLAUSURA,
-        title: '__SYSTEM_STANDINGS_CLAUSURA__',
-        description: JSON.stringify(standings),
-        date: '2099-12-31T23:59:59.000Z',
-        price: 0,
-        cloudflare_live_input_uid: 'system',
-        is_active: false,
-      }, { onConflict: 'id' });
+      },
+      { onConflict: 'id' }
+    );
+
+    // 2. Si se proveyó el almacén global completo, guardar copia de respaldo maestra
+    if (fullStore && Object.keys(fullStore).length > 0) {
+      try {
+        await supabaseAdmin.from('matches').upsert(
+          {
+            id: SYSTEM_MATCH_ID_MASTER,
+            title: '__SYSTEM_STANDINGS_STORE_ALL__',
+            description: JSON.stringify(fullStore),
+            date: '2099-12-31T23:59:59.000Z',
+            price: 0,
+            cloudflare_live_input_uid: 'system',
+            is_active: false,
+          },
+          { onConflict: 'id' }
+        );
+      } catch {}
     }
   } catch (err) {
     console.error('[StandingsPersistence] Excepción guardando en Supabase:', err);
@@ -179,7 +233,7 @@ function loadFromPersistenceFile(): Record<string, TournamentStandings> | null {
 let initPromise: Promise<void> | null = null;
 
 export async function ensureGlobalStore(): Promise<Record<string, TournamentStandings>> {
-  if (globalThis.globalTournamentsStore) {
+  if (globalThis.globalTournamentsStore && Object.keys(globalThis.globalTournamentsStore).length > 0) {
     return globalThis.globalTournamentsStore;
   }
 
@@ -187,20 +241,20 @@ export async function ensureGlobalStore(): Promise<Record<string, TournamentStan
     initPromise = (async () => {
       // 1. Cargar desde Supabase como fuente primaria
       const fromSupabase = await loadFromSupabase();
-      if (fromSupabase) {
-        globalThis.globalTournamentsStore = fromSupabase;
-        saveToPersistenceFile(fromSupabase);
-        return;
-      }
-
-      // 2. Cargar desde archivo local
       const fromDisk = loadFromPersistenceFile();
-      if (fromDisk) {
-        globalThis.globalTournamentsStore = fromDisk;
+
+      const mergedStore: Record<string, TournamentStandings> = {
+        ...(fromDisk || {}),
+        ...(fromSupabase || {}),
+      };
+
+      if (Object.keys(mergedStore).length > 0) {
+        globalThis.globalTournamentsStore = mergedStore;
+        saveToPersistenceFile(mergedStore);
         return;
       }
 
-      // 3. Fallback con estructuras iniciales
+      // 2. Fallback con estructuras iniciales
       const initialStore: Record<string, TournamentStandings> = {
         apertura: JSON.parse(JSON.stringify(defaultAperturaStandings)),
         clausura: JSON.parse(JSON.stringify(defaultClausuraStandings)),
@@ -209,8 +263,8 @@ export async function ensureGlobalStore(): Promise<Record<string, TournamentStan
       };
       globalThis.globalTournamentsStore = initialStore;
       saveToPersistenceFile(initialStore);
-      saveToSupabase('apertura', initialStore.apertura).catch(() => {});
-      saveToSupabase('clausura', initialStore.clausura).catch(() => {});
+      saveToSupabase('apertura', initialStore.apertura, initialStore).catch(() => {});
+      saveToSupabase('clausura', initialStore.clausura, initialStore).catch(() => {});
     })();
   }
 
@@ -265,7 +319,7 @@ export async function getStandings(
 
   store[key] = generated;
   saveToPersistenceFile(store);
-  saveToSupabase(key, generated).catch(() => {});
+  saveToSupabase(key, generated, store).catch(() => {});
 
   return generated;
 }
@@ -349,8 +403,8 @@ export async function updateStandings(
   // Guardar copia local en disco
   saveToPersistenceFile(store);
 
-  // Persistir en Supabase
-  await saveToSupabase(key, synced);
+  // Persistir en Supabase tanto el torneo como el respaldo maestro
+  await saveToSupabase(key, synced, store);
 
   return synced;
 }
@@ -387,7 +441,7 @@ export async function resetStandings(
 
   saveToPersistenceFile(store);
 
-  await saveToSupabase(key, store[key]);
+  await saveToSupabase(key, store[key], store);
   return store[key];
 }
 

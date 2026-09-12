@@ -39,7 +39,7 @@ interface GalleryItem {
 const GALLERY_PHOTOS: GalleryItem[] = [
   {
     id: 'photo-1',
-    title: 'La Hinchada Albinegra Copando la Tribuna',
+    title: 'La Hinchada Lomonegra Copando la Tribuna',
     category: 'hinchada',
     categoryLabel: 'La Hinchada',
     imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80',
@@ -78,7 +78,7 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   },
   {
     id: 'photo-5',
-    title: 'Concentración y Humo Albinegro en el Ingreso',
+    title: 'Concentración y Humo Lomonegro en el Ingreso',
     category: 'hinchada',
     categoryLabel: 'La Hinchada',
     imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1200&q=80',
@@ -183,7 +183,7 @@ const PLAYLISTS: PlaylistCard[] = [
     imageUrl: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=1200&q=80',
     playlistId: 'PLjWoT0tVI1KOj9TYKaqRLMqewRmDVAm1S',
     playlistUrl: 'https://www.youtube.com/playlist?list=PLjWoT0tVI1KOj9TYKaqRLMqewRmDVAm1S',
-    description: 'Partidos y momentos claves de las divisiones inferiores formativas albinegras.',
+    description: 'Partidos y momentos claves de las divisiones inferiores formativas lomonegras.',
     videoCountText: 'Playlist Oficial • Cuarta',
   },
   {

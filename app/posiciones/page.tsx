@@ -120,22 +120,36 @@ export default function PosicionesPage() {
   const allTeamsAnnual = useMemo(() => {
     const teamsMap = new Map<string, TeamStandingsRow & { zoneName: string }>();
 
+    if (!standings || !Array.isArray(standings.zones)) {
+      return [];
+    }
+
     for (const zone of standings.zones) {
+      if (!zone || !Array.isArray(zone.teams)) continue;
       for (const team of zone.teams) {
+        if (!team || !team.name) continue;
         const existing = teamsMap.get(team.name);
         if (existing) {
-          existing.pts += team.pts;
-          existing.pj += team.pj;
-          existing.pg += team.pg;
-          existing.pe += team.pe;
-          existing.pp += team.pp;
-          existing.gf += team.gf;
-          existing.gc += team.gc;
-          existing.dif = existing.gf - existing.gc;
+          existing.pts = (existing.pts || 0) + (team.pts || 0);
+          existing.pj = (existing.pj || 0) + (team.pj || 0);
+          existing.pg = (existing.pg || 0) + (team.pg || 0);
+          existing.pe = (existing.pe || 0) + (team.pe || 0);
+          existing.pp = (existing.pp || 0) + (team.pp || 0);
+          existing.gf = (existing.gf || 0) + (team.gf || 0);
+          existing.gc = (existing.gc || 0) + (team.gc || 0);
+          existing.dif = (existing.gf || 0) - (existing.gc || 0);
         } else {
           teamsMap.set(team.name, {
             ...team,
-            zoneName: zone.name,
+            pts: team.pts || 0,
+            pj: team.pj || 0,
+            pg: team.pg || 0,
+            pe: team.pe || 0,
+            pp: team.pp || 0,
+            gf: team.gf || 0,
+            gc: team.gc || 0,
+            dif: (team.gf || 0) - (team.gc || 0),
+            zoneName: zone.name || 'Zona',
           });
         }
       }
@@ -155,7 +169,7 @@ export default function PosicionesPage() {
       pos: idx + 1,
       qualified: idx < 8,
     }));
-  }, [standings.zones]);
+  }, [standings?.zones]);
 
   const allTeamsPromedios = useMemo(() => {
     const list = allTeamsAnnual.map((t) => {
@@ -181,16 +195,17 @@ export default function PosicionesPage() {
   }, [allTeamsAnnual]);
 
   // Llaves de Play-offs: 16avos, 8vos, Cuartos, Semis y Final
-  const dieciseisMatches = standings.playoffs.filter((m) => m.round === '16avos');
-  const octavosMatches = standings.playoffs.filter((m) => m.round === '8vos');
-  const cuartosMatches = standings.playoffs.filter((m) => m.round === 'cuartos');
-  const semiMatches = standings.playoffs.filter((m) => m.round === 'semifinal');
-  const finalMatch = standings.playoffs.find((m) => m.round === 'final');
+  const currentPlayoffs = standings?.playoffs || [];
+  const dieciseisMatches = currentPlayoffs.filter((m) => m?.round === '16avos');
+  const octavosMatches = currentPlayoffs.filter((m) => m?.round === '8vos');
+  const cuartosMatches = currentPlayoffs.filter((m) => m?.round === 'cuartos');
+  const semiMatches = currentPlayoffs.filter((m) => m?.round === 'semifinal');
+  const finalMatch = currentPlayoffs.find((m) => m?.round === 'final');
 
   // Fechas del torneo ordenadas (Fecha 1 a Fecha 9)
   const allTournamentRounds = Array.from(
     new Set(
-      standings.zones.flatMap((z) => (z.fixtures || []).map((f) => f.roundName || 'Fecha 1'))
+      (standings?.zones || []).flatMap((z) => (z?.fixtures || []).map((f) => f?.roundName || 'Fecha 1'))
     )
   ).sort((a, b) => {
     const numA = parseInt(a.replace(/\D/g, '')) || 0;
@@ -376,10 +391,10 @@ export default function PosicionesPage() {
               </div>
               <div>
                 <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
-                  Tablas de Posiciones {standings.zones.length > 1 ? '(Por Zonas)' : ''}
+                  Tablas de Posiciones {(standings?.zones?.length || 0) > 1 ? '(Por Zonas)' : ''}
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  {categoryLabels[selectedCategoria]} &bull; {selectedTorneo === 'clausura' || selectedTorneo === 'segundo' ? 'Torneo Clausura' : 'Torneo Apertura'} {selectedYear}
+                  {categoryLabels[selectedCategoria] || selectedCategoria} &bull; {selectedTorneo === 'clausura' || selectedTorneo === 'segundo' ? 'Torneo Clausura' : 'Torneo Apertura'} {selectedYear}
                 </div>
               </div>
             </div>
@@ -391,8 +406,8 @@ export default function PosicionesPage() {
           </div>
 
           {/* Grid de Tablas por Zonas (Zona A, Zona B, etc.) */}
-          <div className={`grid grid-cols-1 ${standings.zones.length > 1 ? 'lg:grid-cols-2' : ''} gap-6`}>
-            {standings.zones.map((zone) => (
+          <div className={`grid grid-cols-1 ${(standings?.zones?.length || 0) > 1 ? 'lg:grid-cols-2' : ''} gap-6`}>
+            {(standings?.zones || []).map((zone) => (
               <div
                 key={zone.id}
                 className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-4 sm:p-5 shadow-xl overflow-hidden"
@@ -575,7 +590,7 @@ export default function PosicionesPage() {
                 >
                   Todas las Zonas
                 </button>
-                {standings.zones.map((z) => (
+                {(standings?.zones || []).map((z) => (
                   <button
                     key={z.id}
                     type="button"
@@ -615,7 +630,7 @@ export default function PosicionesPage() {
 
             {/* Partidos de la Fecha Seleccionada */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {standings.zones
+              {(standings?.zones || [])
                 .filter((z) => selectedPublicZone === 'todas' || z.id === selectedPublicZone)
                 .map((zone) => {
                   const matchesInRound = (zone.fixtures || []).filter(
@@ -1110,7 +1125,7 @@ export default function PosicionesPage() {
                   </div>
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  Ranking oficial de artilleros albinegros por categoría
+                  Ranking oficial de artilleros lomonegros por categoría
                 </div>
               </div>
             </div>
@@ -1145,11 +1160,11 @@ export default function PosicionesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
-                  {standings.goleadores
+                  {(standings?.goleadores || [])
                     .filter((g) => {
                       if (selectedGoleadorCategory === 'Todas') return true;
                       const selCat = selectedGoleadorCategory.toLowerCase();
-                      const gCat = g.category.toLowerCase();
+                      const gCat = (g?.category || '').toLowerCase();
                       if (selCat === 'primera' && (gCat.includes('primera') || gCat.includes('mayor'))) return true;
                       return gCat.includes(selCat);
                     })
@@ -1183,7 +1198,7 @@ export default function PosicionesPage() {
                           )}
                         </td>
 
-                        {/* Jugador con insignia albinegra */}
+                        {/* Jugador con insignia lomonegra */}
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-white border border-black inline-block shrink-0" />
