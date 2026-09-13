@@ -109,9 +109,12 @@ export default function PosicionesPage() {
     cuarta: 'Cuarta División',
     quinta: 'Quinta División',
     primera_hockey: 'Primera División',
+    sub19_hockey: 'Sub-19',
+    sub16_hockey: 'Sub-16',
+    sub13_hockey: 'Sub-13',
+    mas30_hockey: '+30',
     reserva_hockey: 'Reserva',
     sub18_hockey: 'Sub-18',
-    sub16_hockey: 'Sub-16',
     sub14_hockey: 'Sub-14',
     sub12_hockey: 'Sub-12',
   };
@@ -268,7 +271,9 @@ export default function PosicionesPage() {
                 <span>Volver a la transmisión en vivo</span>
               </Link>
               <div className="text-[10px] uppercase tracking-[0.25em] text-red-500 font-bold">
-                LIGA DEPORTIVA DEL SUR // BYD
+                {selectedDeporte === 'futbol'
+                  ? 'LIGA DEPORTIVA DEL SUR // BYD'
+                  : 'LIGA DE CLUBES UNIDOS POR EL HOCKEY (LCUH) // BYD'}
               </div>
               <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                 <span>Tablas & Play-Offs</span>
@@ -394,7 +399,7 @@ export default function PosicionesPage() {
                   Tablas de Posiciones {(standings?.zones?.length || 0) > 1 ? '(Por Zonas)' : ''}
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  {categoryLabels[selectedCategoria] || selectedCategoria} &bull; {selectedTorneo === 'clausura' || selectedTorneo === 'segundo' ? 'Torneo Clausura' : 'Torneo Apertura'} {selectedYear}
+                  {categoryLabels[selectedCategoria] || selectedCategoria} &bull; {selectedDeporte === 'futbol' ? (selectedTorneo === 'clausura' || selectedTorneo === 'segundo' ? 'Torneo Clausura' : 'Torneo Apertura') : 'Torneo 2026'} {selectedYear}
                 </div>
               </div>
             </div>

@@ -43,6 +43,10 @@ export function normalizeTournamentKey(
     cat = isHockey ? 'primera_hockey' : 'mayor';
   }
   if (cat === 'primera hockey' || cat === 'hockey primera') cat = 'primera_hockey';
+  if (cat === 'sub19' || cat === 'sub 19' || cat === 'sub-19') cat = 'sub19_hockey';
+  if (cat === 'sub16' || cat === 'sub 16' || cat === 'sub-16') cat = 'sub16_hockey';
+  if (cat === 'sub13' || cat === 'sub 13' || cat === 'sub-13') cat = 'sub13_hockey';
+  if (cat === 'mas30' || cat === '+30' || cat === 'mas 30' || cat === 'mas_30' || cat === 'mayores 30') cat = 'mas30_hockey';
   if (isHockey && !cat.endsWith('_hockey')) {
     cat = `${cat}_hockey`;
   }
