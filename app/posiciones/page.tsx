@@ -55,7 +55,11 @@ export default function PosicionesPage() {
 
   const [selectedDeporte, setSelectedDeporte] = useState<DeporteType>('futbol');
   const [selectedYear, setSelectedYear] = useState<string>('2026');
-  const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>('apertura');
+  // Torneo por defecto según el mes: Apertura (feb-jul), Clausura (ago-ene)
+  const [selectedTorneo, setSelectedTorneo] = useState<TorneoType>(() => {
+    const month = new Date().getMonth() + 1; // 1=ene ... 12=dic
+    return month >= 8 || month <= 1 ? 'clausura' : 'apertura';
+  });
   const [selectedCategoria, setSelectedCategoria] = useState<CategoriaType>('mayor');
   const [isPlayoffOpen, setIsPlayoffOpen] = useState(true);
 
@@ -100,6 +104,8 @@ export default function PosicionesPage() {
       }
     }
     loadStandings();
+    // Resetear filtro de goleadores al cambiar deporte o categoría
+    setSelectedGoleadorCategory('Todas');
   }, [selectedDeporte, selectedCategoria, selectedTorneo]);
 
   const categoryLabels: Record<string, string> = {
@@ -1114,8 +1120,9 @@ export default function PosicionesPage() {
           )}
         </section>
         {/* ============================================================================== */}
-        {/* 4. SECCIÓN 3 DEL BOCETO: GOLEADORES DE BLANCO Y NEGRO (POR CATEGORÍA)         */}
+        {/* 4. SECCIÓN 3 DEL BOCETO: GOLEADORES DE LA TABLA SELECCIONADA                  */}
         {/* ============================================================================== */}
+        {(standings?.goleadores || []).length > 0 && (
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
             <div className="flex items-center gap-2.5">
@@ -1124,33 +1131,44 @@ export default function PosicionesPage() {
               </div>
               <div>
                 <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                  <span>Goleadores de Blanco y Negro</span>
-                  <div className="w-5 h-5 relative shrink-0 inline-block">
-                    <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
-                  </div>
+                  <span>Goleadores</span>
+                  {selectedDeporte === 'futbol' && (
+                    <div className="w-5 h-5 relative shrink-0 inline-block">
+                      <Image src="/teams/blanco-y-negro.png" alt="Blanco y Negro" fill className="object-contain" />
+                    </div>
+                  )}
                 </h2>
                 <div className="text-[10px] text-zinc-400">
-                  Ranking oficial de artilleros lomonegros por categoría
+                  {selectedDeporte === 'futbol'
+                    ? `Ranking de artilleros lomonegros • ${categoryLabels[selectedCategoria] || 'Primera División'}`
+                    : `Ranking de goleadoras • ${categoryLabels[selectedCategoria] || selectedCategoria}`}
                 </div>
               </div>
             </div>
 
-            {/* Píldoras de Categoría para Goleadores */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {['Todas', 'Primera', 'Reserva', 'Tercera División', 'Cuarta División', 'Quinta División'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedGoleadorCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition uppercase tracking-wider border ${
-                    selectedGoleadorCategory === cat
-                      ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-950/60'
-                      : 'bg-[#181922] text-zinc-400 border-zinc-800 hover:text-white'
-                  }`}
-                >
-                  {cat.replace(' División', '')}
-                </button>
-              ))}
-            </div>
+            {/* Píldoras de filtro — solo para fútbol donde hay múltiples categorías en la misma tabla */}
+            {selectedDeporte === 'futbol' && (() => {
+              const cats = Array.from(new Set((standings?.goleadores || []).map((g) => g.category).filter(Boolean)));
+              if (cats.length <= 1) return null;
+              const pills = ['Todas', ...cats];
+              return (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {pills.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedGoleadorCategory(cat)}
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition uppercase tracking-wider border ${
+                        selectedGoleadorCategory === cat
+                          ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-950/60'
+                          : 'bg-[#181922] text-zinc-400 border-zinc-800 hover:text-white'
+                      }`}
+                    >
+                      {cat === 'Fútbol Mayor' ? 'Primera' : cat.replace(' División', '')}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 sm:p-7 shadow-xl overflow-hidden">
@@ -1160,7 +1178,7 @@ export default function PosicionesPage() {
                   <tr className="border-b border-zinc-800/90 text-zinc-500 text-[10px] uppercase font-bold tracking-wider">
                     <th className="py-2.5 px-3 w-12 text-center">#</th>
                     <th className="py-2.5 px-3 min-w-[200px]">Jugador</th>
-                    <th className="py-2.5 px-3 text-zinc-400">División</th>
+                    <th className="py-2.5 px-3 text-zinc-400">{selectedDeporte === 'hockey' ? 'Club' : 'División'}</th>
                     <th className="py-2.5 px-4 text-center w-28 text-white font-black bg-zinc-800/30">Goles</th>
                   </tr>
                 </thead>
@@ -1171,7 +1189,7 @@ export default function PosicionesPage() {
                       const selCat = selectedGoleadorCategory.toLowerCase();
                       const gCat = (g?.category || '').toLowerCase();
                       if (selCat === 'primera' && (gCat.includes('primera') || gCat.includes('mayor'))) return true;
-                      return gCat.includes(selCat);
+                      return gCat === selCat || gCat.includes(selCat);
                     })
                     .map((g, idx) => (
                       <tr
@@ -1203,7 +1221,7 @@ export default function PosicionesPage() {
                           )}
                         </td>
 
-                        {/* Jugador con insignia lomonegra */}
+                        {/* Jugador */}
                         <td className="py-3 px-3">
                           <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-white border border-black inline-block shrink-0" />
@@ -1213,14 +1231,14 @@ export default function PosicionesPage() {
                           </div>
                         </td>
 
-                        {/* División */}
+                        {/* División / Club */}
                         <td className="py-3 px-3 text-zinc-400 text-xs">
                           <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px]">
                             {g.category === 'Fútbol Mayor' ? 'Primera' : (g.category || 'Primera')}
                           </span>
                         </td>
 
-                        {/* Goles (Destacado sin Partidos Jugados) */}
+                        {/* Goles */}
                         <td className="py-3 px-4 text-center font-mono font-black text-base text-red-400 bg-red-950/20">
                           {g.goals}
                         </td>
@@ -1228,9 +1246,11 @@ export default function PosicionesPage() {
                     ))}
                 </tbody>
               </table>
+
             </div>
           </div>
         </section>
+        )}
       </>
     )}
 
