@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import StreamPlayer from '@/components/StreamPlayer';
 import StreamPlaceholder from '@/components/StreamPlaceholder';
 import { Loader2 } from 'lucide-react';
@@ -22,6 +22,11 @@ interface StreamResponse {
   matchDate?: string;
 }
 
+// Intervalo de sondeo cuando está en espera: 12 segundos
+const POLL_WAITING_MS = 12000;
+// Intervalo de sondeo cuando está en vivo (detección de caída): 30 segundos
+const POLL_LIVE_MS = 30000;
+
 export default function StreamPlayerWrapper({
   matchId,
   guestEmail,
@@ -33,8 +38,10 @@ export default function StreamPlayerWrapper({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [previewMode, setPreviewMode] = useState(false);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
+  const isLiveRef = useRef(false);
 
-  const fetchToken = async (overridePreview?: boolean, silent = false) => {
+  const fetchToken = useCallback(async (overridePreview?: boolean, silent = false) => {
     try {
       if (!silent) setLoading(true);
       setError(null);
@@ -56,25 +63,43 @@ export default function StreamPlayerWrapper({
       }
 
       setStreamData(data);
+      return data as StreamResponse;
     } catch (err: any) {
       if (!silent) setError(err.message);
+      return null;
     } finally {
       if (!silent) setLoading(false);
     }
-  };
+  }, [matchId, guestEmail, previewMode]);
+
+  // Sondeo dinámico: ajusta el intervalo según si está en vivo o en espera
+  const startPolling = useCallback((currentlyLive: boolean) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    isLiveRef.current = currentlyLive;
+    const interval = currentlyLive ? POLL_LIVE_MS : POLL_WAITING_MS;
+
+    pollRef.current = setInterval(async () => {
+      const result = await fetchToken(undefined, true);
+      if (!result) return;
+      const nowLive = Boolean(result.isLive && result.token);
+      // Si cambió de estado, reiniciar con nuevo intervalo
+      if (nowLive !== isLiveRef.current) {
+        startPolling(nowLive);
+      }
+    }, interval);
+  }, [fetchToken]);
 
   useEffect(() => {
-    fetchToken(undefined, false);
+    // Carga inicial
+    fetchToken(undefined, false).then((result) => {
+      const nowLive = Boolean(result?.isLive && result?.token);
+      startPolling(nowLive);
+    });
 
-    // Sondeo silencioso cada 12 segundos si la transmisión no ha comenzado
-    const pollInterval = setInterval(() => {
-      if (!streamData?.isLive) {
-        fetchToken(undefined, true);
-      }
-    }, 12000);
-
-    return () => clearInterval(pollInterval);
-  }, [matchId, guestEmail, previewMode, streamData?.isLive]);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [matchId, guestEmail, previewMode]);
 
   if (loading) {
     return (
@@ -90,7 +115,7 @@ export default function StreamPlayerWrapper({
     );
   }
 
-  // Si no hay transmisión activa o está en espera, mostrar el StreamPlaceholder interactivo
+  // Mostrar placeholder si no hay señal activa
   const shouldShowPlaceholder =
     error ||
     !streamData ||
@@ -119,9 +144,9 @@ export default function StreamPlayerWrapper({
   }
 
   return (
-    <StreamPlayer 
-      token={streamData.token!} 
-      sessionId={streamData.sessionId} 
+    <StreamPlayer
+      token={streamData.token!}
+      sessionId={streamData.sessionId}
       guestEmail={guestEmail}
       matchTitle={matchTitle || streamData.matchTitle}
       matchDate={matchDate || streamData.matchDate}
@@ -132,3 +157,5 @@ export default function StreamPlayerWrapper({
     />
   );
 }
+
+
