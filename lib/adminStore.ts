@@ -24,7 +24,7 @@ export const initialAdminMatches: MatchData[] = [
     date: '2026-09-13T18:45:00.000Z',
     is_date_confirmed: true,
     price: 12000,
-    cloudflare_live_input_uid: '465cbf95482c042491bca5b69708e97c',
+    cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
     image_url: null,
     is_active: true,
     league: 'Liga Deportiva del Sur',
