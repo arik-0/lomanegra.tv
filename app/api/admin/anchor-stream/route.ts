@@ -15,7 +15,12 @@ export async function POST(req: Request) {
 
     const updates: any = {};
     if (streamUid !== undefined && streamUid !== null) {
-      updates.cloudflare_live_input_uid = String(streamUid).trim();
+      let cleanUid = String(streamUid).trim();
+      const cfMatch = cleanUid.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
+      if (cfMatch && cfMatch[1]) {
+        cleanUid = cfMatch[1];
+      }
+      updates.cloudflare_live_input_uid = cleanUid;
     }
     if (isLive !== undefined && isLive !== null) {
       updates.is_live = Boolean(isLive);

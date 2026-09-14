@@ -150,15 +150,16 @@ export async function POST(req: Request) {
 
     // Determinar si la transmisión está activa y emitiendo
     // Un partido está en vivo si el operador lo activó expresamente (is_live: true)
-    // o si tiene una URL de emisión directa http/https válida o Cloudflare configurado
+    // o si tiene una URL de emisión directa http/https válida, o un UID de Cloudflare real
     const hasDirectUrl = liveInputUid.startsWith('http://') || liveInputUid.startsWith('https://');
+    const isRealCfUid = /^[a-f0-9]{32}$/i.test(liveInputUid.trim());
     const hasCloudflareKeys =
       Boolean(process.env.CLOUDFLARE_STREAM_KEY_ID) &&
       !process.env.CLOUDFLARE_STREAM_KEY_ID?.startsWith('xxx');
 
     const isBroadcasting = Boolean(
       resolvedMatch?.is_live === true ||
-      (resolvedMatch?.is_live !== false && (hasDirectUrl || (hasCloudflareKeys && !liveInputUid.startsWith('live_input_')))) ||
+      (resolvedMatch?.is_live !== false && (hasDirectUrl || isRealCfUid || (hasCloudflareKeys && !liveInputUid.startsWith('live_input_')))) ||
       (previewMode === true && isAdmin)
     );
 
