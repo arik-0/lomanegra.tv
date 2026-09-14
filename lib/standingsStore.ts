@@ -1775,104 +1775,104 @@ export function createDefaultStandings(
   if (categoria === 'sub19_hockey') {
     playoffMod = 'cuartos';
     hockeyTeams = [
-      { id: 'h-s19-byn', pos: 1, name: 'C. Blanco y Negro', isBlancoYNegro: true, pj: 10, pg: 9, pe: 1, pp: 0, gf: 87, gc: 4, dif: 83, pts: 28, form: ['W', 'W', 'W', 'W', 'W'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
-      { id: 'h-s19-cae', pos: 2, name: 'C. A. Empalme', pj: 12, pg: 8, pe: 3, pp: 1, gf: 77, gc: 16, dif: 61, pts: 27, form: ['W', 'W', 'D', 'W', 'W'], qualified: true },
-      { id: 'h-s19-caeh', pos: 3, name: 'C. A. Eduardo Hertz', pj: 11, pg: 8, pe: 1, pp: 2, gf: 54, gc: 13, dif: 41, pts: 25, form: ['W', 'W', 'L', 'W', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
-      { id: 'h-s19-caa', pos: 4, name: 'C. A. Acebal', pj: 10, pg: 5, pe: 4, pp: 1, gf: 33, gc: 17, dif: 16, pts: 19, form: ['D', 'W', 'D', 'W', 'D'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
-      { id: 'h-s19-cap', pos: 5, name: 'C. A. Paz', pj: 11, pg: 4, pe: 3, pp: 4, gf: 35, gc: 24, dif: 11, pts: 15, form: ['W', 'D', 'L', 'W', 'L'], qualified: true, logoUrl: '/teams/Atletico Paz.png' },
+      { id: 'h-s19-byn', pos: 1, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 10, pg: 9, pe: 1, pp: 0, gf: 87, gc: 4, dif: 83, pts: 28, form: ['W', 'W', 'W', 'W', 'W'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+      { id: 'h-s19-cae', pos: 2, name: 'Atletico Empalme', pj: 12, pg: 8, pe: 3, pp: 1, gf: 77, gc: 16, dif: 61, pts: 27, form: ['W', 'W', 'D', 'W', 'W'], qualified: true },
+      { id: 'h-s19-caeh', pos: 3, name: 'Eduardo Hertz', pj: 11, pg: 8, pe: 1, pp: 2, gf: 54, gc: 13, dif: 41, pts: 25, form: ['W', 'W', 'L', 'W', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
+      { id: 'h-s19-caa', pos: 4, name: 'Atletico Acebal', pj: 10, pg: 5, pe: 4, pp: 1, gf: 33, gc: 17, dif: 16, pts: 19, form: ['D', 'W', 'D', 'W', 'D'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
+      { id: 'h-s19-cap', pos: 5, name: 'Atletico Paz', pj: 11, pg: 4, pe: 3, pp: 4, gf: 35, gc: 24, dif: 11, pts: 15, form: ['W', 'D', 'L', 'W', 'L'], qualified: true, logoUrl: '/teams/Atletico Paz.png' },
       { id: 'h-s19-adf', pos: 6, name: 'Alianza Dep. Fuentes', pj: 12, pg: 4, pe: 2, pp: 6, gf: 18, gc: 62, dif: -44, pts: 14, form: ['L', 'W', 'L', 'D', 'L'], qualified: true },
-      { id: 'h-s19-cas', pos: 7, name: 'C. A. Soldini', pj: 12, pg: 2, pe: 2, pp: 8, gf: 25, gc: 47, dif: -22, pts: 8, form: ['L', 'L', 'D', 'L', 'L'], qualified: true },
-      { id: 'h-s19-cla', pos: 8, name: 'C. Los Andes', pj: 12, pg: 1, pe: 0, pp: 11, gf: 7, gc: 87, dif: -80, pts: 3, form: ['L', 'L', 'L', 'L', 'L'], qualified: true, logoUrl: '/teams/Los Andes.png' },
-      { id: 'h-s19-uac', pos: 9, name: 'U. A. C. (Zav) / N. U. (Per)', pj: 10, pg: 0, pe: 2, pp: 8, gf: 8, gc: 74, dif: -66, pts: 2, form: ['L', 'L', 'D', 'L', 'D'], qualified: false },
+      { id: 'h-s19-cas', pos: 7, name: 'Atletico Soldini', pj: 12, pg: 2, pe: 2, pp: 8, gf: 25, gc: 47, dif: -22, pts: 8, form: ['L', 'L', 'D', 'L', 'L'], qualified: true },
+      { id: 'h-s19-cla', pos: 8, name: 'Los Andes', pj: 12, pg: 1, pe: 0, pp: 11, gf: 7, gc: 87, dif: -80, pts: 3, form: ['L', 'L', 'L', 'L', 'L'], qualified: true, logoUrl: '/teams/Los Andes.png' },
+      { id: 'h-s19-uac', pos: 9, name: 'Unidad (Zavalla/Pereyra)', pj: 10, pg: 0, pe: 2, pp: 8, gf: 8, gc: 74, dif: -66, pts: 2, form: ['L', 'L', 'D', 'L', 'D'], qualified: false },
     ];
     hockeyGoleadores = [
-      { id: 'hg-s19-1', pos: 1, name: 'Stecklein Martina', category: 'C. A. Empalme', goals: 40 },
-      { id: 'hg-s19-2', pos: 2, name: 'Roncoroni Elena', category: 'C. Blanco y Negro', goals: 23 },
-      { id: 'hg-s19-3', pos: 3, name: 'Marturano Paulina', category: 'C. Blanco y Negro', goals: 17 },
-      { id: 'hg-s19-4', pos: 4, name: 'Bottazzi Morena', category: 'C. Blanco y Negro', goals: 17 },
-      { id: 'hg-s19-5', pos: 5, name: 'Silovich Paulina', category: 'C. A. Eduardo Hertz', goals: 16 },
-      { id: 'hg-s19-6', pos: 6, name: 'Marturano Azul', category: 'C. Blanco y Negro', goals: 16 },
+      { id: 'hg-s19-1', pos: 1, name: 'Stecklein Martina', category: 'Atletico Empalme', goals: 40 },
+      { id: 'hg-s19-2', pos: 2, name: 'Roncoroni Elena', category: 'Blanco y Negro', goals: 23 },
+      { id: 'hg-s19-3', pos: 3, name: 'Marturano Paulina', category: 'Blanco y Negro', goals: 17 },
+      { id: 'hg-s19-4', pos: 4, name: 'Bottazzi Morena', category: 'Blanco y Negro', goals: 17 },
+      { id: 'hg-s19-5', pos: 5, name: 'Silovich Paulina', category: 'Eduardo Hertz', goals: 16 },
+      { id: 'hg-s19-6', pos: 6, name: 'Marturano Azul', category: 'Blanco y Negro', goals: 16 },
     ];
   } else if (categoria === 'sub16_hockey') {
     playoffMod = 'semifinal';
     hockeyTeams = [
-      { id: 'h-s16-caeh', pos: 1, name: 'C. A. Eduardo Hertz', pj: 8, pg: 6, pe: 2, pp: 0, gf: 28, gc: 5, dif: 23, pts: 20, form: ['W', 'W', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
-      { id: 'h-s16-cas', pos: 2, name: 'C. A. Soldini', pj: 9, pg: 5, pe: 3, pp: 1, gf: 19, gc: 13, dif: 6, pts: 18, form: ['W', 'D', 'W', 'W', 'D'], qualified: true },
-      { id: 'h-s16-byn', pos: 3, name: 'C. Blanco y Negro', isBlancoYNegro: true, pj: 7, pg: 5, pe: 1, pp: 1, gf: 22, gc: 6, dif: 16, pts: 16, form: ['W', 'W', 'D', 'W', 'L'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
-      { id: 'h-s16-caa', pos: 4, name: 'C. A. Acebal', pj: 7, pg: 3, pe: 1, pp: 3, gf: 14, gc: 10, dif: 4, pts: 10, form: ['L', 'W', 'L', 'W', 'D'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
-      { id: 'h-s16-cae', pos: 5, name: 'C. A. Empalme', pj: 8, pg: 2, pe: 3, pp: 3, gf: 14, gc: 15, dif: -1, pts: 9, form: ['D', 'D', 'L', 'W', 'L'], qualified: false },
-      { id: 'h-s16-cai', pos: 6, name: 'C. A. Independiente (Ric)', pj: 9, pg: 2, pe: 0, pp: 7, gf: 12, gc: 22, dif: -10, pts: 6, form: ['L', 'L', 'W', 'L', 'L'], qualified: false },
-      { id: 'h-s16-uac', pos: 7, name: 'U. A. C. (Zav) / N. U. (Per)', pj: 8, pg: 0, pe: 0, pp: 8, gf: 4, gc: 42, dif: -38, pts: 0, form: ['L', 'L', 'L', 'L', 'L'], qualified: false },
+      { id: 'h-s16-caeh', pos: 1, name: 'Eduardo Hertz', pj: 8, pg: 6, pe: 2, pp: 0, gf: 28, gc: 5, dif: 23, pts: 20, form: ['W', 'W', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
+      { id: 'h-s16-cas', pos: 2, name: 'Atletico Soldini', pj: 9, pg: 5, pe: 3, pp: 1, gf: 19, gc: 13, dif: 6, pts: 18, form: ['W', 'D', 'W', 'W', 'D'], qualified: true },
+      { id: 'h-s16-byn', pos: 3, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 7, pg: 5, pe: 1, pp: 1, gf: 22, gc: 6, dif: 16, pts: 16, form: ['W', 'W', 'D', 'W', 'L'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+      { id: 'h-s16-caa', pos: 4, name: 'Atletico Acebal', pj: 7, pg: 3, pe: 1, pp: 3, gf: 14, gc: 10, dif: 4, pts: 10, form: ['L', 'W', 'L', 'W', 'D'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
+      { id: 'h-s16-cae', pos: 5, name: 'Atletico Empalme', pj: 8, pg: 2, pe: 3, pp: 3, gf: 14, gc: 15, dif: -1, pts: 9, form: ['D', 'D', 'L', 'W', 'L'], qualified: false },
+      { id: 'h-s16-cai', pos: 6, name: 'Independiente (Ricardone)', pj: 9, pg: 2, pe: 0, pp: 7, gf: 12, gc: 22, dif: -10, pts: 6, form: ['L', 'L', 'W', 'L', 'L'], qualified: false },
+      { id: 'h-s16-uac', pos: 7, name: 'Unidad (Zavalla/Pereyra)', pj: 8, pg: 0, pe: 0, pp: 8, gf: 4, gc: 42, dif: -38, pts: 0, form: ['L', 'L', 'L', 'L', 'L'], qualified: false },
     ];
     hockeyGoleadores = [
-      { id: 'hg-s16-1', pos: 1, name: 'Roncoroni Elena', category: 'C. Blanco y Negro', goals: 14 },
-      { id: 'hg-s16-2', pos: 2, name: 'Colell Jazmin', category: 'C. A. Empalme', goals: 9 },
-      { id: 'hg-s16-3', pos: 3, name: 'Gonzalez Luciana', category: 'C. A. Soldini', goals: 8 },
-      { id: 'hg-s16-4', pos: 4, name: 'Marena Franchesca', category: 'C. A. Eduardo Hertz', goals: 7 },
+      { id: 'hg-s16-1', pos: 1, name: 'Roncoroni Elena', category: 'Blanco y Negro', goals: 14 },
+      { id: 'hg-s16-2', pos: 2, name: 'Colell Jazmin', category: 'Atletico Empalme', goals: 9 },
+      { id: 'hg-s16-3', pos: 3, name: 'Gonzalez Luciana', category: 'Atletico Soldini', goals: 8 },
+      { id: 'hg-s16-4', pos: 4, name: 'Marena Franchesca', category: 'Eduardo Hertz', goals: 7 },
     ];
   } else if (categoria === 'sub13_hockey') {
     playoffMod = 'cuartos';
     hockeyTeams = [
       { id: 'h-s13-adf', pos: 1, name: 'Alianza Dep. Fuentes', pj: 14, pg: 13, pe: 0, pp: 1, gf: 77, gc: 7, dif: 70, pts: 39, form: ['W', 'W', 'W', 'W', 'W'], qualified: true },
-      { id: 'h-s13-caeh', pos: 2, name: 'C. A. Eduardo Hertz', pj: 12, pg: 9, pe: 1, pp: 2, gf: 62, gc: 9, dif: 53, pts: 28, form: ['W', 'W', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
-      { id: 'h-s13-caa', pos: 3, name: 'C. A. Acebal', pj: 12, pg: 9, pe: 1, pp: 2, gf: 45, gc: 10, dif: 35, pts: 28, form: ['W', 'W', 'D', 'W', 'W'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
-      { id: 'h-s13-byn', pos: 4, name: 'C. Blanco y Negro', isBlancoYNegro: true, pj: 12, pg: 6, pe: 3, pp: 3, gf: 31, gc: 13, dif: 18, pts: 21, form: ['W', 'D', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
-      { id: 'h-s13-cae', pos: 5, name: 'C. A. Empalme', pj: 13, pg: 6, pe: 2, pp: 5, gf: 19, gc: 17, dif: 2, pts: 20, form: ['L', 'W', 'D', 'W', 'L'], qualified: true },
-      { id: 'h-s13-cas', pos: 6, name: 'C. A. Soldini', pj: 13, pg: 5, pe: 3, pp: 5, gf: 40, gc: 27, dif: 13, pts: 18, form: ['W', 'L', 'D', 'W', 'L'], qualified: true },
-      { id: 'h-s13-cai', pos: 7, name: 'C. A. Independiente (Ric)', pj: 13, pg: 4, pe: 2, pp: 7, gf: 18, gc: 31, dif: -13, pts: 14, form: ['L', 'L', 'W', 'D', 'L'], qualified: true },
-      { id: 'h-s13-ifc', pos: 8, name: 'Independiente F. C. (Big)', pj: 14, pg: 3, pe: 2, pp: 9, gf: 14, gc: 32, dif: -18, pts: 11, form: ['L', 'W', 'L', 'L', 'D'], qualified: true, logoUrl: '/teams/ifc.png' },
-      { id: 'h-s13-uac', pos: 9, name: 'U. A. C. (Zav) / N. U. (Per)', pj: 13, pg: 2, pe: 0, pp: 11, gf: 12, gc: 50, dif: -38, pts: 6, form: ['L', 'L', 'L', 'L', 'W'], qualified: false },
-      { id: 'h-s13-cap', pos: 10, name: 'C. A. Paz', pj: 12, pg: 0, pe: 0, pp: 12, gf: 0, gc: 122, dif: -122, pts: 0, form: ['L', 'L', 'L', 'L', 'L'], qualified: false, logoUrl: '/teams/Atletico Paz.png' },
+      { id: 'h-s13-caeh', pos: 2, name: 'Eduardo Hertz', pj: 12, pg: 9, pe: 1, pp: 2, gf: 62, gc: 9, dif: 53, pts: 28, form: ['W', 'W', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
+      { id: 'h-s13-caa', pos: 3, name: 'Atletico Acebal', pj: 12, pg: 9, pe: 1, pp: 2, gf: 45, gc: 10, dif: 35, pts: 28, form: ['W', 'W', 'D', 'W', 'W'], qualified: true, logoUrl: '/teams/Atletico Acebal.png' },
+      { id: 'h-s13-byn', pos: 4, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 12, pg: 6, pe: 3, pp: 3, gf: 31, gc: 13, dif: 18, pts: 21, form: ['W', 'D', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+      { id: 'h-s13-cae', pos: 5, name: 'Atletico Empalme', pj: 13, pg: 6, pe: 2, pp: 5, gf: 19, gc: 17, dif: 2, pts: 20, form: ['L', 'W', 'D', 'W', 'L'], qualified: true },
+      { id: 'h-s13-cas', pos: 6, name: 'Atletico Soldini', pj: 13, pg: 5, pe: 3, pp: 5, gf: 40, gc: 27, dif: 13, pts: 18, form: ['W', 'L', 'D', 'W', 'L'], qualified: true },
+      { id: 'h-s13-cai', pos: 7, name: 'Independiente (Ricardone)', pj: 13, pg: 4, pe: 2, pp: 7, gf: 18, gc: 31, dif: -13, pts: 14, form: ['L', 'L', 'W', 'D', 'L'], qualified: true },
+      { id: 'h-s13-ifc', pos: 8, name: 'Independiente de Bigand', pj: 14, pg: 3, pe: 2, pp: 9, gf: 14, gc: 32, dif: -18, pts: 11, form: ['L', 'W', 'L', 'L', 'D'], qualified: true, logoUrl: '/teams/ifc.png' },
+      { id: 'h-s13-uac', pos: 9, name: 'Unidad (Zavalla/Pereyra)', pj: 13, pg: 2, pe: 0, pp: 11, gf: 12, gc: 50, dif: -38, pts: 6, form: ['L', 'L', 'L', 'L', 'W'], qualified: false },
+      { id: 'h-s13-cap', pos: 10, name: 'Atletico Paz', pj: 12, pg: 0, pe: 0, pp: 12, gf: 0, gc: 122, dif: -122, pts: 0, form: ['L', 'L', 'L', 'L', 'L'], qualified: false, logoUrl: '/teams/Atletico Paz.png' },
     ];
     hockeyGoleadores = [
-      { id: 'hg-s13-1', pos: 1, name: 'Baez Emilia', category: 'C. A. Eduardo Hertz', goals: 33 },
-      { id: 'hg-s13-2', pos: 2, name: 'Rivero Genesis Mora', category: 'C. A. Acebal', goals: 26 },
+      { id: 'hg-s13-1', pos: 1, name: 'Baez Emilia', category: 'Eduardo Hertz', goals: 33 },
+      { id: 'hg-s13-2', pos: 2, name: 'Rivero Genesis Mora', category: 'Atletico Acebal', goals: 26 },
       { id: 'hg-s13-3', pos: 3, name: 'Francioni Julia', category: 'Alianza Dep. Fuentes', goals: 21 },
       { id: 'hg-s13-4', pos: 4, name: 'Nuñez Juyma', category: 'Alianza Dep. Fuentes', goals: 18 },
-      { id: 'hg-s13-5', pos: 5, name: 'Sabanes Angeles', category: 'C. A. Eduardo Hertz', goals: 16 },
-      { id: 'hg-s13-6', pos: 6, name: 'Ojeda Julia', category: 'C. Blanco y Negro', goals: 11 },
-      { id: 'hg-s13-7', pos: 7, name: 'Fuentes Pilar', category: 'C. Blanco y Negro', goals: 11 },
+      { id: 'hg-s13-5', pos: 5, name: 'Sabanes Angeles', category: 'Eduardo Hertz', goals: 16 },
+      { id: 'hg-s13-6', pos: 6, name: 'Ojeda Julia', category: 'Blanco y Negro', goals: 11 },
+      { id: 'hg-s13-7', pos: 7, name: 'Fuentes Pilar', category: 'Blanco y Negro', goals: 11 },
     ];
   } else if (categoria === 'mas30_hockey') {
     playoffMod = 'semifinal';
     hockeyTeams = [
-      { id: 'h-m30-ifc', pos: 1, name: 'Independiente F. C. (Big)', pj: 8, pg: 6, pe: 2, pp: 0, gf: 15, gc: 3, dif: 12, pts: 20, form: ['W', 'W', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/ifc.png' },
-      { id: 'h-m30-cla', pos: 2, name: 'C. Los Andes', pj: 8, pg: 4, pe: 2, pp: 2, gf: 18, gc: 6, dif: 12, pts: 14, form: ['W', 'D', 'W', 'L', 'W'], qualified: true, logoUrl: '/teams/Los Andes.png' },
-      { id: 'h-m30-byn', pos: 3, name: 'C. Blanco y Negro', isBlancoYNegro: true, pj: 6, pg: 3, pe: 2, pp: 1, gf: 9, gc: 4, dif: 5, pts: 11, form: ['W', 'W', 'D', 'D', 'L'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
-      { id: 'h-m30-caeh', pos: 4, name: 'C. A. Eduardo Hertz', pj: 6, pg: 2, pe: 2, pp: 2, gf: 7, gc: 5, dif: 2, pts: 8, form: ['L', 'D', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
-      { id: 'h-m30-caa', pos: 5, name: 'C. A. Acebal', pj: 6, pg: 1, pe: 1, pp: 4, gf: 2, gc: 7, dif: -5, pts: 4, form: ['L', 'L', 'L', 'D', 'W'], qualified: false, logoUrl: '/teams/Atletico Acebal.png' },
-      { id: 'h-m30-cae', pos: 6, name: 'C. A. Empalme', pj: 8, pg: 0, pe: 1, pp: 7, gf: 1, gc: 27, dif: -26, pts: 1, form: ['L', 'L', 'D', 'L', 'L'], qualified: false },
+      { id: 'h-m30-ifc', pos: 1, name: 'Independiente de Bigand', pj: 8, pg: 6, pe: 2, pp: 0, gf: 15, gc: 3, dif: 12, pts: 20, form: ['W', 'W', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/ifc.png' },
+      { id: 'h-m30-cla', pos: 2, name: 'Los Andes', pj: 8, pg: 4, pe: 2, pp: 2, gf: 18, gc: 6, dif: 12, pts: 14, form: ['W', 'D', 'W', 'L', 'W'], qualified: true, logoUrl: '/teams/Los Andes.png' },
+      { id: 'h-m30-byn', pos: 3, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 6, pg: 3, pe: 2, pp: 1, gf: 9, gc: 4, dif: 5, pts: 11, form: ['W', 'W', 'D', 'D', 'L'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+      { id: 'h-m30-caeh', pos: 4, name: 'Eduardo Hertz', pj: 6, pg: 2, pe: 2, pp: 2, gf: 7, gc: 5, dif: 2, pts: 8, form: ['L', 'D', 'W', 'D', 'W'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
+      { id: 'h-m30-caa', pos: 5, name: 'Atletico Acebal', pj: 6, pg: 1, pe: 1, pp: 4, gf: 2, gc: 7, dif: -5, pts: 4, form: ['L', 'L', 'L', 'D', 'W'], qualified: false, logoUrl: '/teams/Atletico Acebal.png' },
+      { id: 'h-m30-cae', pos: 6, name: 'Atletico Empalme', pj: 8, pg: 0, pe: 1, pp: 7, gf: 1, gc: 27, dif: -26, pts: 1, form: ['L', 'L', 'D', 'L', 'L'], qualified: false },
     ];
     hockeyGoleadores = [
-      { id: 'hg-m30-1', pos: 1, name: 'Bomba Micaela', category: 'C. Blanco y Negro', goals: 7 },
-      { id: 'hg-m30-2', pos: 2, name: 'Sarradell Rocio', category: 'C. Los Andes', goals: 5 },
-      { id: 'hg-m30-3', pos: 3, name: 'Farina Paola', category: 'Independiente F. C. (Big)', goals: 5 },
-      { id: 'hg-m30-4', pos: 4, name: 'Pozzi Lilen', category: 'Independiente F. C. (Big)', goals: 4 },
+      { id: 'hg-m30-1', pos: 1, name: 'Bomba Micaela', category: 'Blanco y Negro', goals: 7 },
+      { id: 'hg-m30-2', pos: 2, name: 'Sarradell Rocio', category: 'Los Andes', goals: 5 },
+      { id: 'hg-m30-3', pos: 3, name: 'Farina Paola', category: 'Independiente de Bigand', goals: 5 },
+      { id: 'hg-m30-4', pos: 4, name: 'Pozzi Lilen', category: 'Independiente de Bigand', goals: 4 },
     ];
   } else {
     // Por defecto: Primera División de Hockey (primera_hockey)
     playoffMod = 'cuartos';
     hockeyTeams = [
-      { id: 'h-cae', pos: 1, name: 'C. A. Empalme', pj: 15, pg: 12, pe: 1, pp: 2, gf: 34, gc: 12, dif: 22, pts: 37, form: ['W', 'W', 'W', 'D', 'W'], qualified: true },
-      { id: 'h-caeh', pos: 2, name: 'C. A. Eduardo Hertz', pj: 13, pg: 10, pe: 2, pp: 1, gf: 29, gc: 7, dif: 22, pts: 32, form: ['W', 'W', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
-      { id: 'h-byn', pos: 3, name: 'C. Blanco y Negro', isBlancoYNegro: true, pj: 14, pg: 8, pe: 5, pp: 1, gf: 28, gc: 6, dif: 22, pts: 29, form: ['W', 'W', 'D', 'W', 'D'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
-      { id: 'h-ifc', pos: 4, name: 'Independiente F. C. (Big)', pj: 14, pg: 8, pe: 4, pp: 2, gf: 32, gc: 12, dif: 20, pts: 28, form: ['W', 'D', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/ifc.png' },
-      { id: 'h-cla', pos: 5, name: 'C. Los Andes', pj: 13, pg: 5, pe: 5, pp: 3, gf: 24, gc: 10, dif: 14, pts: 20, form: ['D', 'W', 'D', 'D', 'L'], qualified: true, logoUrl: '/teams/Los Andes.png' },
-      { id: 'h-uac', pos: 6, name: 'Unidos A. C. (Zav)', pj: 14, pg: 4, pe: 3, pp: 7, gf: 11, gc: 22, dif: -11, pts: 15, form: ['L', 'W', 'L', 'L', 'D'], qualified: true },
-      { id: 'h-cap', pos: 7, name: 'C. A. Paz', pj: 14, pg: 4, pe: 2, pp: 8, gf: 10, gc: 24, dif: -14, pts: 14, form: ['L', 'L', 'W', 'L', 'L'], qualified: true, logoUrl: '/teams/Atletico Paz.png' },
-      { id: 'h-cai', pos: 8, name: 'C. A. Independiente (Ric)', pj: 13, pg: 3, pe: 3, pp: 7, gf: 9, gc: 30, dif: -21, pts: 12, form: ['L', 'D', 'L', 'W', 'L'], qualified: true },
-      { id: 'h-cau', pos: 9, name: 'C. A. Unión (Alv)', pj: 13, pg: 3, pe: 2, pp: 8, gf: 8, gc: 17, dif: -9, pts: 11, form: ['L', 'L', 'D', 'L', 'W'], qualified: false },
+      { id: 'h-cae', pos: 1, name: 'Atletico Empalme', pj: 15, pg: 12, pe: 1, pp: 2, gf: 34, gc: 12, dif: 22, pts: 37, form: ['W', 'W', 'W', 'D', 'W'], qualified: true },
+      { id: 'h-caeh', pos: 2, name: 'Eduardo Hertz', pj: 13, pg: 10, pe: 2, pp: 1, gf: 29, gc: 7, dif: 22, pts: 32, form: ['W', 'W', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/Eduardo Hertz.png' },
+      { id: 'h-byn', pos: 3, name: 'Blanco y Negro', isBlancoYNegro: true, pj: 14, pg: 8, pe: 5, pp: 1, gf: 28, gc: 6, dif: 22, pts: 29, form: ['W', 'W', 'D', 'W', 'D'], qualified: true, logoUrl: '/teams/Blanco y Negro.png' },
+      { id: 'h-ifc', pos: 4, name: 'Independiente de Bigand', pj: 14, pg: 8, pe: 4, pp: 2, gf: 32, gc: 12, dif: 20, pts: 28, form: ['W', 'D', 'W', 'W', 'D'], qualified: true, logoUrl: '/teams/ifc.png' },
+      { id: 'h-cla', pos: 5, name: 'Los Andes', pj: 13, pg: 5, pe: 5, pp: 3, gf: 24, gc: 10, dif: 14, pts: 20, form: ['D', 'W', 'D', 'D', 'L'], qualified: true, logoUrl: '/teams/Los Andes.png' },
+      { id: 'h-uac', pos: 6, name: 'Unidos (Zavalla)', pj: 14, pg: 4, pe: 3, pp: 7, gf: 11, gc: 22, dif: -11, pts: 15, form: ['L', 'W', 'L', 'L', 'D'], qualified: true },
+      { id: 'h-cap', pos: 7, name: 'Atletico Paz', pj: 14, pg: 4, pe: 2, pp: 8, gf: 10, gc: 24, dif: -14, pts: 14, form: ['L', 'L', 'W', 'L', 'L'], qualified: true, logoUrl: '/teams/Atletico Paz.png' },
+      { id: 'h-cai', pos: 8, name: 'Independiente (Ricardone)', pj: 13, pg: 3, pe: 3, pp: 7, gf: 9, gc: 30, dif: -21, pts: 12, form: ['L', 'D', 'L', 'W', 'L'], qualified: true },
+      { id: 'h-cau', pos: 9, name: 'Atletico Union (Alvear)', pj: 13, pg: 3, pe: 2, pp: 8, gf: 8, gc: 17, dif: -9, pts: 11, form: ['L', 'L', 'D', 'L', 'W'], qualified: false },
       { id: 'h-adf', pos: 10, name: 'Alianza Dep. Fuentes', pj: 14, pg: 1, pe: 1, pp: 12, gf: 8, gc: 32, dif: -24, pts: 4, form: ['L', 'L', 'L', 'L', 'D'], qualified: false },
-      { id: 'h-caa', pos: 11, name: 'C. A. Acebal', pj: 9, pg: 1, pe: 0, pp: 8, gf: 4, gc: 25, dif: -21, pts: 3, form: ['L', 'L', 'L', 'L', 'W'], qualified: false, logoUrl: '/teams/Atletico Acebal.png' },
+      { id: 'h-caa', pos: 11, name: 'Atletico Acebal', pj: 9, pg: 1, pe: 0, pp: 8, gf: 4, gc: 25, dif: -21, pts: 3, form: ['L', 'L', 'L', 'L', 'W'], qualified: false, logoUrl: '/teams/Atletico Acebal.png' },
     ];
     hockeyGoleadores = [
-      { id: 'hg-p1', pos: 1, name: 'Baez Luisina', category: 'Independiente F. C. (Big)', goals: 18 },
-      { id: 'hg-p2', pos: 2, name: 'Legrestti Maria Victoria', category: 'C. A. Empalme', goals: 12 },
-      { id: 'hg-p3', pos: 3, name: 'Acuña Sofia', category: 'C. Blanco y Negro', goals: 10 },
-      { id: 'hg-p4', pos: 4, name: 'Benko Valentina', category: 'C. Blanco y Negro', goals: 8 },
-      { id: 'hg-p5', pos: 5, name: 'Stecklein Martina', category: 'C. A. Empalme', goals: 7 },
-      { id: 'hg-p6', pos: 6, name: 'Cocconi Bianca', category: 'C. Los Andes', goals: 7 },
-      { id: 'hg-p7', pos: 7, name: 'Segatore Maria Noelia', category: 'C. Blanco y Negro', goals: 7 },
+      { id: 'hg-p1', pos: 1, name: 'Baez Luisina', category: 'Independiente de Bigand', goals: 18 },
+      { id: 'hg-p2', pos: 2, name: 'Legrestti Maria Victoria', category: 'Atletico Empalme', goals: 12 },
+      { id: 'hg-p3', pos: 3, name: 'Acuña Sofia', category: 'Blanco y Negro', goals: 10 },
+      { id: 'hg-p4', pos: 4, name: 'Benko Valentina', category: 'Blanco y Negro', goals: 8 },
+      { id: 'hg-p5', pos: 5, name: 'Stecklein Martina', category: 'Atletico Empalme', goals: 7 },
+      { id: 'hg-p6', pos: 6, name: 'Cocconi Bianca', category: 'Los Andes', goals: 7 },
+      { id: 'hg-p7', pos: 7, name: 'Segatore Maria Noelia', category: 'Blanco y Negro', goals: 7 },
     ];
   }
 

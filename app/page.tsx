@@ -201,12 +201,12 @@ export default async function HomePage() {
   const activeMatches = validMatches.length > 0 ? validMatches : [defaultFeaturedMatch, ...defaultOtherMatches];
   const now = Date.now();
 
-  // Buscar todos los partidos confirmados con fecha futura o en curso (hasta 3 horas de iniciados)
+  // Buscar todos los partidos confirmados con fecha futura o en curso (hasta 12 horas de iniciados)
   // y ordenarlos cronológicamente: el más próximo siempre queda primero
   const upcomingConfirmedMatches = activeMatches
     .filter((m) => m.is_date_confirmed !== false && m.date)
     .map((m) => ({ ...m, timestamp: new Date(m.date!).getTime() }))
-    .filter((m) => !isNaN(m.timestamp) && m.timestamp + 3 * 3600 * 1000 >= now)
+    .filter((m) => !isNaN(m.timestamp) && m.timestamp + 12 * 3600 * 1000 >= now)
     .sort((a, b) => a.timestamp - b.timestamp);
 
   // Si no hay partidos confirmados próximos, buscar uno "A Confirmar"
