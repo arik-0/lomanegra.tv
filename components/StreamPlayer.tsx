@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Stream } from '@cloudflare/stream-react';
 import { Lock, RefreshCw, ShieldAlert, ArrowLeft } from 'lucide-react';
 import StreamPlaceholder from '@/components/StreamPlaceholder';
 
@@ -111,43 +110,45 @@ export default function StreamPlayer({
 
   const isDirectVideo = streamSrc.startsWith('http') && !cfMatch;
 
+  // Construir la URL del iframe oficial de Cloudflare Stream
+  const cfCustomer = customerCode || '2p5v30ml6gk9homd';
+  const iframeSrc = `https://customer-${cfCustomer}.cloudflarestream.com/${streamSrc}/iframe?autoplay=true&preload=auto`;
+
   return (
     <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative group font-mono">
-      {isDirectVideo ? (
-        <>
-          <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-            <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60">
-              <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
-              <span>SEÑAL EN DIRECTO // 1080p HD</span>
-            </div>
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 pointer-events-none">
+        <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60 pointer-events-auto">
+          <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+          <span>SEÑAL EN DIRECTO // HD</span>
+        </div>
 
-            {onBackToPlaceholder && (
-              <button
-                onClick={onBackToPlaceholder}
-                className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                <span>Pantalla de Espera</span>
-              </button>
-            )}
-          </div>
-          <video
-            controls
-            autoPlay
-            playsInline
-            src={streamSrc}
-            onError={() => setPlaybackError(true)}
-            className="w-full h-full object-contain"
-          />
-        </>
-      ) : (
-        <Stream
+        {onBackToPlaceholder && (
+          <button
+            onClick={onBackToPlaceholder}
+            className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition pointer-events-auto"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            <span>Pantalla de Espera</span>
+          </button>
+        )}
+      </div>
+
+      {isDirectVideo ? (
+        <video
           controls
+          autoPlay
+          playsInline
           src={streamSrc}
-          customerCode={customerCode}
-          autoplay
           onError={() => setPlaybackError(true)}
           className="w-full h-full object-contain"
+        />
+      ) : (
+        <iframe
+          src={iframeSrc}
+          title={matchTitle || "Transmisión en Vivo"}
+          className="w-full h-full border-0"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+          allowFullScreen
         />
       )}
     </div>
