@@ -89,12 +89,13 @@ function sanitizeStandings(st: any, key?: string): TournamentStandings {
   if (!st || typeof st !== 'object') {
     return createDefaultStandings('futbol', 'mayor', 'apertura');
   }
-  return {
+  const clean: TournamentStandings = {
     ...st,
     zones: Array.isArray(st.zones) ? st.zones : [],
     playoffs: Array.isArray(st.playoffs) ? st.playoffs : [],
     goleadores: Array.isArray(st.goleadores) ? st.goleadores : [],
   };
+  return syncPlayoffMatches(clean);
 }
 
 // Cargar desde Supabase

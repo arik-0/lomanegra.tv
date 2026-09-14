@@ -783,77 +783,118 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
   if (!playoffs || playoffs.length === 0) return playoffs;
 
   const getWinner = (m?: PlayoffMatch): string | null => {
-    if (!m || !m.team1 || !m.team2 || m.team1 === 'A definir' || m.team2 === 'A definir') return null;
-    if (m.winner === 1) return m.team1;
-    if (m.winner === 2) return m.team2;
+    if (!m || !m.team1 || !m.team2) return null;
+    const t1 = m.team1.trim();
+    const t2 = m.team2.trim();
+    if (!t1 || !t2 || t1 === 'A definir' || t2 === 'A definir' || t1.startsWith('Ganador') || t2.startsWith('Ganador')) return null;
+    if (m.winner === 1) return t1;
+    if (m.winner === 2) return t2;
     if (m.score1 !== null && m.score2 !== null) {
-      if (m.score1 > m.score2) return m.team1;
-      if (m.score2 > m.score1) return m.team2;
+      if (m.score1 > m.score2) return t1;
+      if (m.score2 > m.score1) return t2;
       if (typeof m.penalties1 === 'number' && typeof m.penalties2 === 'number') {
-        if (m.penalties1 > m.penalties2) return m.team1;
-        if (m.penalties2 > m.penalties1) return m.team2;
+        if (m.penalties1 > m.penalties2) return t1;
+        if (m.penalties2 > m.penalties1) return t2;
       }
     }
     return null;
   };
 
-  const matchMap = new Map<string, PlayoffMatch>();
-  playoffs.forEach((m) => matchMap.set(m.id, { ...m }));
+  const octavos = playoffs.filter((m) => m.round === '8vos');
+  const cuartos = playoffs.filter((m) => m.round === 'cuartos');
+  const semis = playoffs.filter((m) => m.round === 'semifinal');
+  const finals = playoffs.filter((m) => m.round === 'final');
 
   // 1. De 8vos a Cuartos
-  for (let i = 1; i <= 4; i++) {
-    const cId = `c${i}`;
-    const cuarto = matchMap.get(cId);
-    if (cuarto) {
-      const w1 = getWinner(matchMap.get(`o${i * 2 - 1}`));
-      const w2 = getWinner(matchMap.get(`o${i * 2}`));
-      if (w1 && (!cuarto.seed1 || cuarto.seed1.toLowerCase().includes('ganador') || cuarto.team1 === 'A definir')) {
-        cuarto.team1 = w1;
+  if (octavos.length === 4 && cuartos.length === 4) {
+    // Formato LDDS (Reclasificación / 4 cruces de Octavos)
+    for (let i = 0; i < 4; i++) {
+      const c = cuartos[i];
+      const oct = octavos[i];
+      const defaultSeed = `Ganador Octavos ${i + 1}`;
+      if (!c.seed2 || c.seed2.trim() === '') {
+        c.seed2 = defaultSeed;
       }
-      if (w2 && (!cuarto.seed2 || cuarto.seed2.toLowerCase().includes('ganador') || cuarto.team2 === 'A definir')) {
-        cuarto.team2 = w2;
+      const w = getWinner(oct);
+      if (w) {
+        c.team2 = w;
+      } else if (!c.team2 || c.team2.trim() === '' || c.team2 === 'A definir') {
+        c.team2 = c.seed2 || defaultSeed;
+      }
+    }
+  } else if (octavos.length >= 8 && cuartos.length >= 4) {
+    // Formato estándar de 8 cruces de Octavos
+    for (let i = 0; i < 4; i++) {
+      const c = cuartos[i];
+      const oct1 = octavos[i * 2];
+      const oct2 = octavos[i * 2 + 1];
+      const w1 = getWinner(oct1);
+      const w2 = getWinner(oct2);
+      if (w1) {
+        c.team1 = w1;
+      } else if (!c.team1 || c.team1.trim() === '' || c.team1 === 'A definir') {
+        c.team1 = c.seed1 || `Ganador Octavos ${i * 2 + 1}`;
+      }
+      if (w2) {
+        c.team2 = w2;
+      } else if (!c.team2 || c.team2.trim() === '' || c.team2 === 'A definir') {
+        c.team2 = c.seed2 || `Ganador Octavos ${i * 2 + 2}`;
       }
     }
   }
 
   // 2. De Cuartos a Semifinal
-  const s1 = matchMap.get('s1');
-  if (s1) {
-    const w1 = getWinner(matchMap.get('c1'));
-    const w2 = getWinner(matchMap.get('c2'));
-    if (w1 && (!s1.seed1 || s1.seed1.toLowerCase().includes('ganador') || s1.team1 === 'A definir')) {
-      s1.team1 = w1;
-    }
-    if (w2 && (!s1.seed2 || s1.seed2.toLowerCase().includes('ganador') || s1.team2 === 'A definir')) {
-      s1.team2 = w2;
-    }
-  }
-  const s2 = matchMap.get('s2');
-  if (s2) {
-    const w1 = getWinner(matchMap.get('c3'));
-    const w2 = getWinner(matchMap.get('c4'));
-    if (w1 && (!s2.seed1 || s2.seed1.toLowerCase().includes('ganador') || s2.team1 === 'A definir')) {
-      s2.team1 = w1;
-    }
-    if (w2 && (!s2.seed2 || s2.seed2.toLowerCase().includes('ganador') || s2.team2 === 'A definir')) {
-      s2.team2 = w2;
-    }
+  if (cuartos.length >= 4 && semis.length >= 2) {
+    // Semifinal 1 (C1 vs C2)
+    const s1 = semis[0];
+    const wC1 = getWinner(cuartos[0]);
+    const wC2 = getWinner(cuartos[1]);
+    if (!s1.seed1 || s1.seed1.trim() === '') s1.seed1 = 'Ganador Cuartos 1';
+    if (!s1.seed2 || s1.seed2.trim() === '') s1.seed2 = 'Ganador Cuartos 2';
+    if (wC1) s1.team1 = wC1;
+    else if (!s1.team1 || s1.team1.trim() === '' || s1.team1 === 'A definir') s1.team1 = s1.seed1;
+
+    if (wC2) s1.team2 = wC2;
+    else if (!s1.team2 || s1.team2.trim() === '' || s1.team2 === 'A definir') s1.team2 = s1.seed2;
+
+    // Semifinal 2 (C3 vs C4)
+    const s2 = semis[1];
+    const wC3 = getWinner(cuartos[2]);
+    const wC4 = getWinner(cuartos[3]);
+    if (!s2.seed1 || s2.seed1.trim() === '') s2.seed1 = 'Ganador Cuartos 3';
+    if (!s2.seed2 || s2.seed2.trim() === '') s2.seed2 = 'Ganador Cuartos 4';
+    if (wC3) s2.team1 = wC3;
+    else if (!s2.team1 || s2.team1.trim() === '' || s2.team1 === 'A definir') s2.team1 = s2.seed1;
+
+    if (wC4) s2.team2 = wC4;
+    else if (!s2.team2 || s2.team2.trim() === '' || s2.team2 === 'A definir') s2.team2 = s2.seed2;
   }
 
   // 3. De Semifinal a Gran Final
-  const f1 = matchMap.get('f1');
-  if (f1) {
-    const w1 = getWinner(matchMap.get('s1'));
-    const w2 = getWinner(matchMap.get('s2'));
-    if (w1 && (!f1.seed1 || f1.seed1.toLowerCase().includes('ganador') || f1.team1 === 'A definir')) {
-      f1.team1 = w1;
-    }
-    if (w2 && (!f1.seed2 || f1.seed2.toLowerCase().includes('ganador') || f1.team2 === 'A definir')) {
-      f1.team2 = w2;
-    }
+  if (semis.length >= 2 && finals.length >= 1) {
+    const f1 = finals[0];
+    const wS1 = getWinner(semis[0]);
+    const wS2 = getWinner(semis[1]);
+    if (!f1.seed1 || f1.seed1.trim() === '') f1.seed1 = 'Ganador Semifinal 1';
+    if (!f1.seed2 || f1.seed2.trim() === '') f1.seed2 = 'Ganador Semifinal 2';
+    if (wS1) f1.team1 = wS1;
+    else if (!f1.team1 || f1.team1.trim() === '' || f1.team1 === 'A definir') f1.team1 = f1.seed1;
+
+    if (wS2) f1.team2 = wS2;
+    else if (!f1.team2 || f1.team2.trim() === '' || f1.team2 === 'A definir') f1.team2 = f1.seed2;
   }
 
-  return Array.from(matchMap.values());
+  // Asegurar que NINGÚN partido tenga team1 o team2 como string vacío
+  playoffs.forEach((m) => {
+    if (!m.team1 || m.team1.trim() === '') {
+      m.team1 = m.seed1 || 'A definir';
+    }
+    if (!m.team2 || m.team2.trim() === '') {
+      m.team2 = m.seed2 || 'A definir';
+    }
+  });
+
+  return playoffs;
 }
 
 // Sincroniza dinámicamente los cruces de PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final)
@@ -862,41 +903,67 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
   if (!standings) return standings;
   const currentPlayoffs = standings.playoffs || [];
 
-  if (!standings.zones || standings.zones.length === 0) {
-    return { ...standings, playoffs: advancePlayoffWinners(currentPlayoffs) };
-  }
+  const octavos = currentPlayoffs.filter((m) => m.round === '8vos');
 
   // Si no hay cuartos definidos por defecto, proveer los cruces reglamentarios estándar
   const defaultCuartosSeeds: Record<string, { seed1: string; seed2: string; title: string }> = {
-    c1: { seed1: '1ero A', seed2: '4to B', title: 'Cuartos 1 (1°A vs 4°B)' },
-    c2: { seed1: '2do A', seed2: '3ro B', title: 'Cuartos 2 (2°A vs 3°B)' },
-    c3: { seed1: '1ero B', seed2: '4to A', title: 'Cuartos 3 (1°B vs 4°A)' },
-    c4: { seed1: '2do B', seed2: '3ro A', title: 'Cuartos 4 (2°B vs 3°A)' },
+    c1: {
+      seed1: '1ero A',
+      seed2: octavos.length === 4 ? 'Ganador Octavos 1' : '4to B',
+      title: 'Cuartos 1',
+    },
+    c2: {
+      seed1: octavos.length === 4 ? '2do B' : '2do A',
+      seed2: octavos.length === 4 ? 'Ganador Octavos 2' : '3ro B',
+      title: 'Cuartos 2',
+    },
+    c3: {
+      seed1: octavos.length === 4 ? '2do A' : '1ero B',
+      seed2: octavos.length === 4 ? 'Ganador Octavos 3' : '4to A',
+      title: 'Cuartos 3',
+    },
+    c4: {
+      seed1: octavos.length === 4 ? '1ero B' : '2do B',
+      seed2: octavos.length === 4 ? 'Ganador Octavos 4' : '3ro A',
+      title: 'Cuartos 4',
+    },
   };
 
-  const updatedPlayoffs = currentPlayoffs.map((m) => {
+  const updatedPlayoffs = currentPlayoffs.map((m, idx) => {
     let seed1 = m.seed1;
     let seed2 = m.seed2;
     let title = m.title;
 
-    if (!seed1 && !seed2 && defaultCuartosSeeds[m.id]) {
-      seed1 = defaultCuartosSeeds[m.id].seed1;
-      seed2 = defaultCuartosSeeds[m.id].seed2;
-      title = defaultCuartosSeeds[m.id].title;
+    if (m.round === 'cuartos') {
+      const def = defaultCuartosSeeds[m.id] || Object.values(defaultCuartosSeeds)[idx % 4];
+      if (!seed1 || seed1.trim() === '') seed1 = def?.seed1 || '1ero A';
+      if (!seed2 || seed2.trim() === '') seed2 = def?.seed2 || (octavos.length === 4 ? `Ganador Octavos ${idx + 1}` : '4to B');
+      if (!title || title.trim() === '') title = def?.title || `Cuartos ${idx + 1}`;
+    } else if (m.round === 'semifinal') {
+      if (!seed1 || seed1.trim() === '') seed1 = m.id === 's2' ? 'Ganador Cuartos 3' : 'Ganador Cuartos 1';
+      if (!seed2 || seed2.trim() === '') seed2 = m.id === 's2' ? 'Ganador Cuartos 4' : 'Ganador Cuartos 2';
+    } else if (m.round === 'final') {
+      if (!seed1 || seed1.trim() === '') seed1 = 'Ganador Semifinal 1';
+      if (!seed2 || seed2.trim() === '') seed2 = 'Ganador Semifinal 2';
     }
 
     let team1 = m.team1;
     let team2 = m.team2;
 
-    if (seed1 && !seed1.toLowerCase().includes('ganador')) {
-      const resolved = resolvePlayoffSeed(seed1, standings.zones);
-      if (resolved) team1 = resolved;
+    if (standings.zones && standings.zones.length > 0) {
+      if (seed1 && !seed1.toLowerCase().includes('ganador')) {
+        const resolved = resolvePlayoffSeed(seed1, standings.zones);
+        if (resolved) team1 = resolved;
+      }
+
+      if (seed2 && !seed2.toLowerCase().includes('ganador')) {
+        const resolved = resolvePlayoffSeed(seed2, standings.zones);
+        if (resolved) team2 = resolved;
+      }
     }
 
-    if (seed2 && !seed2.toLowerCase().includes('ganador')) {
-      const resolved = resolvePlayoffSeed(seed2, standings.zones);
-      if (resolved) team2 = resolved;
-    }
+    if (!team1 || team1.trim() === '') team1 = seed1 || 'A definir';
+    if (!team2 || team2.trim() === '') team2 = seed2 || 'A definir';
 
     const teamsChanged = team1 !== m.team1 || team2 !== m.team2;
 

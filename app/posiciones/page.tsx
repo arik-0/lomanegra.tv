@@ -921,10 +921,10 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team1) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
+                                <Image src={getTeamLogo(m.team1)!} alt={m.team1} fill className="object-contain" unoptimized />
                               </div>
                             )}
-                            <span className="text-xs truncate">{m.team1}</span>
+                            <span className="text-xs truncate">{m.team1 || m.seed1 || 'A definir'}</span>
                           </div>
                           <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                             {m.score1 !== null ? m.score1 : '-'}
@@ -936,10 +936,10 @@ export default function PosicionesPage() {
                           <div className="flex items-center gap-1.5 truncate">
                             {getTeamLogo(m.team2) && (
                               <div className="w-4 h-4 relative shrink-0">
-                                <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
+                                <Image src={getTeamLogo(m.team2)!} alt={m.team2} fill className="object-contain" unoptimized />
                               </div>
                             )}
-                            <span className="text-xs truncate">{m.team2}</span>
+                            <span className="text-xs truncate">{m.team2 || m.seed2 || 'A definir'}</span>
                           </div>
                           <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                             {m.score2 !== null ? m.score2 : '-'}
@@ -974,10 +974,10 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team1) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
+                              <Image src={getTeamLogo(m.team1)!} alt={m.team1} fill className="object-contain" unoptimized />
                             </div>
                           )}
-                          <span className="text-xs truncate">{m.team1}</span>
+                          <span className="text-xs truncate">{m.team1 || m.seed1 || 'A definir'}</span>
                         </div>
                         <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                           {m.score1 !== null ? m.score1 : '-'}
@@ -989,10 +989,10 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team2) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
+                              <Image src={getTeamLogo(m.team2)!} alt={m.team2} fill className="object-contain" unoptimized />
                             </div>
                           )}
-                          <span className="text-xs truncate">{m.team2}</span>
+                          <span className="text-xs truncate">{m.team2 || m.seed2 || 'A definir'}</span>
                         </div>
                         <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                           {m.score2 !== null ? m.score2 : '-'}
@@ -1026,10 +1026,10 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team1) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team1)} alt={m.team1} fill className="object-contain" unoptimized />
+                              <Image src={getTeamLogo(m.team1)!} alt={m.team1} fill className="object-contain" unoptimized />
                             </div>
                           )}
-                          <span className="text-xs truncate">{m.team1}</span>
+                          <span className="text-xs truncate">{m.team1 || m.seed1 || 'A definir'}</span>
                         </div>
                         <span className={`text-xs font-mono font-bold ${m.winner === 1 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                           {m.score1 !== null ? m.score1 : '-'}
@@ -1041,10 +1041,10 @@ export default function PosicionesPage() {
                         <div className="flex items-center gap-1.5 truncate">
                           {getTeamLogo(m.team2) && (
                             <div className="w-4 h-4 relative shrink-0">
-                              <Image src={getTeamLogo(m.team2)} alt={m.team2} fill className="object-contain" unoptimized />
+                              <Image src={getTeamLogo(m.team2)!} alt={m.team2} fill className="object-contain" unoptimized />
                             </div>
                           )}
-                          <span className="text-xs truncate">{m.team2}</span>
+                          <span className="text-xs truncate">{m.team2 || m.seed2 || 'A definir'}</span>
                         </div>
                         <span className={`text-xs font-mono font-bold ${m.winner === 2 ? 'text-emerald-400' : 'text-zinc-500'}`}>
                           {m.score2 !== null ? m.score2 : '-'}
@@ -1076,11 +1076,19 @@ export default function PosicionesPage() {
 
                       {/* Equipo 1 */}
                       <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 relative shrink-0">
-                            <Image src={getTeamLogo(finalMatch.team1) || '/teams/blanco-y-negro.png'} alt={finalMatch.team1} fill className="object-contain" unoptimized />
-                          </div>
-                          <span className="text-xs font-black text-white">{finalMatch.team1}</span>
+                        <div className="flex items-center gap-2 truncate">
+                          {getTeamLogo(finalMatch.team1) ? (
+                            <div className="w-6 h-6 relative shrink-0">
+                              <Image src={getTeamLogo(finalMatch.team1)!} alt={finalMatch.team1} fill className="object-contain" unoptimized />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-400">
+                              <Trophy className="w-3.5 h-3.5" />
+                            </div>
+                          )}
+                          <span className="text-xs font-black text-white truncate">
+                            {finalMatch.team1 || finalMatch.seed1 || 'A definir'}
+                          </span>
                         </div>
                         <span className="text-base font-mono font-black text-amber-400">
                           {finalMatch.score1 !== null ? finalMatch.score1 : '-'}
@@ -1093,11 +1101,19 @@ export default function PosicionesPage() {
 
                       {/* Equipo 2 */}
                       <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 relative shrink-0">
-                            <Image src={getTeamLogo(finalMatch.team2) || '/teams/San Martin.png'} alt={finalMatch.team2} fill className="object-contain" unoptimized />
-                          </div>
-                          <span className="text-xs font-black text-white">{finalMatch.team2}</span>
+                        <div className="flex items-center gap-2 truncate">
+                          {getTeamLogo(finalMatch.team2) ? (
+                            <div className="w-6 h-6 relative shrink-0">
+                              <Image src={getTeamLogo(finalMatch.team2)!} alt={finalMatch.team2} fill className="object-contain" unoptimized />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0 text-amber-400">
+                              <Trophy className="w-3.5 h-3.5" />
+                            </div>
+                          )}
+                          <span className="text-xs font-black text-white truncate">
+                            {finalMatch.team2 || finalMatch.seed2 || 'A definir'}
+                          </span>
                         </div>
                         <span className="text-base font-mono font-black text-amber-400">
                           {finalMatch.score2 !== null ? finalMatch.score2 : '-'}
