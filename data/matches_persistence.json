@@ -10,7 +10,8 @@
     "image_url": null,
     "is_active": true,
     "league": "Liga Deportiva del Sur",
-    "category": "Primera"
+    "category": "Primera",
+    "is_live": true
   },
   {
     "id": "b1a9c001-0000-4000-8000-000000000004",
