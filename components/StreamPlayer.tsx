@@ -23,6 +23,7 @@ export default function StreamPlayer({
 }: StreamPlayerProps) {
   const [concurrencyError, setConcurrencyError] = useState<string | null>(null);
   const [playbackError, setPlaybackError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -122,6 +123,15 @@ export default function StreamPlayer({
           <span>SEÑAL EN DIRECTO // HD</span>
         </div>
 
+        <button
+          onClick={() => setReloadKey((prev) => prev + 1)}
+          className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition pointer-events-auto shadow-md active:scale-95"
+          title="Recargar señal si acabas de iniciar transmisión en OBS"
+        >
+          <RefreshCw className="w-3 h-3 text-emerald-400" />
+          <span>Recargar Señal</span>
+        </button>
+
         {onBackToPlaceholder && (
           <button
             onClick={onBackToPlaceholder}
@@ -144,6 +154,7 @@ export default function StreamPlayer({
         />
       ) : (
         <iframe
+          key={reloadKey}
           src={iframeSrc}
           title={matchTitle || "Transmisión en Vivo"}
           className="w-full h-full border-0"
