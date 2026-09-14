@@ -16,6 +16,12 @@ export async function POST(req: Request) {
     const updates: any = {};
     if (streamUid !== undefined && streamUid !== null) {
       let cleanUid = String(streamUid).trim();
+      if (cleanUid.startsWith('/partido/') || cleanUid.includes('/partido/')) {
+        return NextResponse.json(
+          { error: 'Has ingresado la ruta web del partido (/partido/...). En este campo debes colocar el Live Input UID de Cloudflare de 32 dígitos (ej: 465cbf95482c042491bca5b69708e97c).' },
+          { status: 400 }
+        );
+      }
       const cfMatch = cleanUid.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
       if (cfMatch && cfMatch[1]) {
         cleanUid = cfMatch[1];
