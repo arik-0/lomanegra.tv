@@ -95,8 +95,15 @@ export default function StreamPlayer({
     );
   }
 
-  // Detectar si el token es una URL de Cloudflare Stream (iframe o manifest) y extraer el UID
+  // Detectar si el token es una URL de Cloudflare Stream (iframe o manifest) y extraer el UID y customerCode
   let streamSrc = token;
+  let customerCode: string | undefined = undefined;
+
+  const customerMatch = token.match(/customer-([a-zA-Z0-9]+)\.cloudflarestream\.com/);
+  if (customerMatch && customerMatch[1]) {
+    customerCode = customerMatch[1];
+  }
+
   const cfMatch = token.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
   if (cfMatch && cfMatch[1]) {
     streamSrc = cfMatch[1];
@@ -137,6 +144,7 @@ export default function StreamPlayer({
         <Stream
           controls
           src={streamSrc}
+          customerCode={customerCode}
           autoplay
           onError={() => setPlaybackError(true)}
           className="w-full h-full object-contain"
