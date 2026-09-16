@@ -95,7 +95,7 @@ function sanitizeStandings(st: any, key?: string): TournamentStandings {
     playoffs: Array.isArray(st.playoffs) ? st.playoffs : [],
     goleadores: Array.isArray(st.goleadores) ? st.goleadores : [],
   };
-  return syncPlayoffMatches(clean);
+  return clean;
 }
 
 // Cargar desde Supabase

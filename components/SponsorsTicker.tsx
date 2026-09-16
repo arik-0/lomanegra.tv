@@ -2,28 +2,11 @@
 
 import Image from 'next/image';
 
-interface SponsorItem {
-  name: string;
-  category: string;
-  isPrimary?: boolean;
-  logo?: string;
-}
+import { SPONSORS } from '@/lib/sponsorsData';
 
 export default function SponsorsTicker() {
-  const sponsors: SponsorItem[] = [
-    { name: 'QUILMES', category: 'Sponsor Titular', isPrimary: true, logo: '/sponsors/quilmes.svg' },
-    { name: 'ADIDAS', category: 'Indumentaria Oficial', isPrimary: true, logo: '/sponsors/adidas.svg' },
-    { name: 'YPF', category: 'Energía Oficial', isPrimary: true, logo: '/sponsors/ypf.svg' },
-    { name: 'COCA-COLA', category: 'Hidratación Oficial', isPrimary: true, logo: '/sponsors/coca-cola.svg' },
-    { name: 'BBVA', category: 'Banca Oficial', isPrimary: false, logo: '/sponsors/bbva.svg' },
-    { name: 'FLYBONDI', category: 'Conectividad Oficial', isPrimary: false, logo: '/sponsors/flybondi.svg' },
-    { name: 'NALDO', category: 'Auspicio Comercial', isPrimary: false },
-    { name: 'GOBIERNO REGIONAL', category: 'Apoyo Institucional', isPrimary: false },
-    { name: 'COOP. ELÉCTRICA SAN JOSÉ', category: 'Auspicio Regional', isPrimary: false },
-  ];
-
   // Duplicar el array para crear un bucle continuo sin cortes
-  const marqueeItems = [...sponsors, ...sponsors];
+  const marqueeItems = [...SPONSORS, ...SPONSORS];
 
   return (
     <div className="relative w-full overflow-hidden bg-[#07070a] border-y border-white/[0.08] py-2.5 my-2">
@@ -46,6 +29,7 @@ export default function SponsorsTicker() {
                   alt={item.name}
                   fill
                   className="object-contain filter brightness-90 contrast-125"
+                  unoptimized
                 />
               </div>
             ) : (

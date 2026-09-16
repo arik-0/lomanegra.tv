@@ -1068,12 +1068,6 @@ export default function PosicionesPage() {
                 <div className="my-auto">
                   {finalMatch ? (
                     <div className="bg-gradient-to-br from-amber-950/30 via-[#181924] to-[#12131a] border-2 border-amber-500/60 rounded-2xl p-4 shadow-[0_8px_30px_rgba(245,158,11,0.15)] relative overflow-hidden">
-                      <div className="text-center mb-2">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-950/80 border border-amber-700 px-2 py-0.5 rounded-full">
-                          POR EL TÍTULO DE CAMPEÓN
-                        </span>
-                      </div>
-
                       {/* Equipo 1 */}
                       <div className="flex items-center justify-between py-2 px-2.5 rounded-xl bg-black/40 border border-white/[0.06] mb-2">
                         <div className="flex items-center gap-2 truncate">
@@ -1156,7 +1150,7 @@ export default function PosicionesPage() {
                 </h2>
                 <div className="text-[10px] text-zinc-400">
                   {selectedDeporte === 'futbol'
-                    ? `Ranking de artilleros lomonegros • ${categoryLabels[selectedCategoria] || 'Primera División'}`
+                    ? `Ranking de goleadores lomonegros • ${categoryLabels[selectedCategoria] || 'Primera División'}`
                     : `Ranking de goleadoras • ${categoryLabels[selectedCategoria] || selectedCategoria}`}
                 </div>
               </div>
@@ -1164,9 +1158,18 @@ export default function PosicionesPage() {
 
             {/* Píldoras de filtro — solo para fútbol donde hay múltiples categorías en la misma tabla */}
             {selectedDeporte === 'futbol' && (() => {
-              const cats = Array.from(new Set((standings?.goleadores || []).map((g) => g.category).filter(Boolean)));
-              if (cats.length <= 1) return null;
-              const pills = ['Todas', ...cats];
+              const rawCats = (standings?.goleadores || []).map((g) => g.category).filter(Boolean);
+              const normalizedCats = Array.from(
+                new Set(
+                  rawCats.map((c) =>
+                    c.toLowerCase().includes('mayor') || c.toLowerCase().includes('primera')
+                      ? 'Primera'
+                      : c.replace(' División', '').trim()
+                  )
+                )
+              );
+              if (normalizedCats.length <= 1) return null;
+              const pills = ['Todas', ...normalizedCats];
               return (
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                   {pills.map((cat) => (
@@ -1179,7 +1182,7 @@ export default function PosicionesPage() {
                           : 'bg-[#181922] text-zinc-400 border-zinc-800 hover:text-white'
                       }`}
                     >
-                      {cat === 'Fútbol Mayor' ? 'Primera' : cat.replace(' División', '')}
+                      {cat}
                     </button>
                   ))}
                 </div>

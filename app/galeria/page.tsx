@@ -228,6 +228,24 @@ function GaleriaContent() {
   const searchParams = useSearchParams();
   const initialSection = searchParams.get('tab') === 'videos' ? 'videos' : 'fotos';
 
+  // Colecciones dinámicas de fotos y playlists
+  const [photos, setPhotos] = useState<GalleryItem[]>(GALLERY_PHOTOS);
+  const [playlists, setPlaylists] = useState<PlaylistCard[]>(PLAYLISTS);
+
+  useEffect(() => {
+    fetch('/api/gallery')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
+          setPhotos(data.photos);
+        }
+        if (data.playlists && Array.isArray(data.playlists) && data.playlists.length > 0) {
+          setPlaylists(data.playlists);
+        }
+      })
+      .catch((err) => console.error('Error fetching gallery:', err));
+  }, []);
+
   // Sección principal: Fotos vs Playlists/Videos
   const [section, setSection] = useState<'fotos' | 'videos'>(initialSection);
 
@@ -250,13 +268,13 @@ function GaleriaContent() {
 
   const filteredPhotos =
     activeCategory === 'todas'
-      ? GALLERY_PHOTOS
-      : GALLERY_PHOTOS.filter((p) => p.category === activeCategory);
+      ? photos
+      : photos.filter((p) => p.category === activeCategory);
 
   const filteredPlaylists =
     activeVideoFilter === 'todas'
-      ? PLAYLISTS
-      : PLAYLISTS.filter((p) => p.category === activeVideoFilter);
+      ? playlists
+      : playlists.filter((p) => p.category === activeVideoFilter);
 
   // Navegación con teclado en Lightbox de Fotos y Modal de Videos
   useEffect(() => {

@@ -35,7 +35,10 @@ import {
   Copy,
   ExternalLink,
   HelpCircle,
+  Camera,
 } from 'lucide-react';
+import AdminGalleryManager from '@/components/admin/AdminGalleryManager';
+import AdminClubsManager from '@/components/admin/AdminClubsManager';
 import {
   TournamentStandings,
   defaultStandings,
@@ -81,8 +84,8 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  // Pestaña activa del dashboard: 'partidos' o 'tablas'
-  const [adminSection, setAdminSection] = useState<'partidos' | 'tablas'>('partidos');
+  // Pestaña activa del dashboard: 'partidos', 'tablas', 'galeria' o 'clubes'
+  const [adminSection, setAdminSection] = useState<'partidos' | 'tablas' | 'galeria' | 'clubes'>('partidos');
 
   // ==========================================
   // ESTADO: PARTIDOS (ABM, LIGAS Y CATEGORÍAS)
@@ -1168,6 +1171,28 @@ export default function AdminPage() {
               >
                 <Trophy className="w-3.5 h-3.5 text-amber-400" />
                 <span>Tablas & Zonas</span>
+              </button>
+              <button
+                onClick={() => setAdminSection('galeria')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  adminSection === 'galeria'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Camera className="w-3.5 h-3.5 text-red-400" />
+                <span>Galería & Videos</span>
+              </button>
+              <button
+                onClick={() => setAdminSection('clubes')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  adminSection === 'clubes'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Gestión de Clubes</span>
               </button>
             </div>
 
@@ -2511,22 +2536,24 @@ export default function AdminPage() {
                           <div className="grid grid-cols-11 gap-1.5 items-center">
                             <input
                               type="text"
+                              list="datalist-seeds"
                               value={m.seed1 || ''}
                               onChange={(e) => handleUpdatePlayoff(m.id, 'seed1', e.target.value)}
                               placeholder="1ero A"
                               className="col-span-5 bg-[#181922] border border-zinc-800 focus:border-amber-500 rounded px-2 py-1 text-xs text-center font-mono font-bold text-amber-300 focus:outline-none placeholder:text-zinc-600"
-                              title="Casillero Semilla Equipo 1 (ej: 1ero A, 1A, 2do B)"
+                              title="Casillero Semilla Equipo 1 (ej: 1ero, 1ero A, 2do B, Ganador Cuartos 1)"
                             />
 
                             <span className="col-span-1 text-center text-[10px] text-zinc-500 font-black">VS</span>
 
                             <input
                               type="text"
+                              list="datalist-seeds"
                               value={m.seed2 || ''}
                               onChange={(e) => handleUpdatePlayoff(m.id, 'seed2', e.target.value)}
                               placeholder="2do B"
                               className="col-span-5 bg-[#181922] border border-zinc-800 focus:border-amber-500 rounded px-2 py-1 text-xs text-center font-mono font-bold text-amber-300 focus:outline-none placeholder:text-zinc-600"
-                              title="Casillero Semilla Equipo 2 (ej: 2do B, 4to B, 8vo B)"
+                              title="Casillero Semilla Equipo 2 (ej: 4to, 2do B, 4to B, Ganador Cuartos 2)"
                             />
                           </div>
                         </div>
@@ -2792,6 +2819,63 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* ============================================================================ */}
+        {/* SECCIÓN 3: GESTIÓN DE GALERÍA & PLAYLISTS                                     */}
+        {/* ============================================================================ */}
+        {adminSection === 'galeria' && <AdminGalleryManager />}
+
+        {/* ============================================================================ */}
+        {/* SECCIÓN 4: GESTIÓN DE CLUBES, NOMBRES & ESCUDOS                               */}
+        {/* ============================================================================ */}
+        {adminSection === 'clubes' && <AdminClubsManager />}
+
+        {/* Datalist de semillas sugeridas para play-offs */}
+        <datalist id="datalist-seeds">
+          {/* Posiciones de Tabla General (sin zona) */}
+          <option value="1ero" />
+          <option value="2do" />
+          <option value="3ro" />
+          <option value="4to" />
+          <option value="5to" />
+          <option value="6to" />
+          <option value="7mo" />
+          <option value="8vo" />
+          <option value="9no" />
+          <option value="10mo" />
+          <option value="11vo" />
+          <option value="12vo" />
+          <option value="16vo" />
+          {/* Posiciones de Zona A */}
+          <option value="1ero A" />
+          <option value="2do A" />
+          <option value="3ro A" />
+          <option value="4to A" />
+          <option value="5to A" />
+          <option value="6to A" />
+          <option value="7mo A" />
+          <option value="8vo A" />
+          {/* Posiciones de Zona B */}
+          <option value="1ero B" />
+          <option value="2do B" />
+          <option value="3ro B" />
+          <option value="4to B" />
+          <option value="5to B" />
+          <option value="6to B" />
+          <option value="7mo B" />
+          <option value="8vo B" />
+          {/* Avance de rondas */}
+          <option value="Ganador Octavos 1" />
+          <option value="Ganador Octavos 2" />
+          <option value="Ganador Octavos 3" />
+          <option value="Ganador Octavos 4" />
+          <option value="Ganador Cuartos 1" />
+          <option value="Ganador Cuartos 2" />
+          <option value="Ganador Cuartos 3" />
+          <option value="Ganador Cuartos 4" />
+          <option value="Ganador Semifinal 1" />
+          <option value="Ganador Semifinal 2" />
+        </datalist>
 
         {/* ============================================================================ */}
         {/* MODAL CREAR / EDITAR PARTIDO                                                  */}
