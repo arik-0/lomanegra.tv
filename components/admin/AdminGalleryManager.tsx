@@ -32,8 +32,8 @@ export default function AdminGalleryManager() {
 
   // Estado formulario nueva foto
   const [newPhotoTitle, setNewPhotoTitle] = useState('');
-  const [newPhotoCategory, setNewPhotoCategory] = useState<string>('mayor');
-  const [newPhotoCategoryLabel, setNewPhotoCategoryLabel] = useState('Primera');
+  const [newPhotoCategory, setNewPhotoCategory] = useState<string>('plantel_mayor');
+  const [newPhotoCategoryLabel, setNewPhotoCategoryLabel] = useState('Plantel Mayor');
   const [newPhotoImageUrl, setNewPhotoImageUrl] = useState('');
   const [newPhotoDate, setNewPhotoDate] = useState('Torneo Clausura 2026');
   const [newPhotoDesc, setNewPhotoDesc] = useState('');
@@ -379,25 +379,21 @@ export default function AdminGalleryManager() {
                       const cat = e.target.value;
                       setNewPhotoCategory(cat);
                       const labels: Record<string, string> = {
-                        mayor: 'Primera',
-                        reserva: 'Reserva',
-                        tercera: 'Tercera',
-                        cuarta: 'Cuarta',
-                        quinta: 'Quinta',
+                        plantel_mayor: 'Plantel Mayor',
+                        inferiores: 'Inferiores',
                         hockey: 'Hockey',
-                        hinchada: 'La Hinchada',
+                        eventos: 'Eventos',
+                        predio: 'Predio',
                       };
-                      setNewPhotoCategoryLabel(labels[cat] || 'Primera');
+                      setNewPhotoCategoryLabel(labels[cat] || 'Plantel Mayor');
                     }}
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
                   >
-                    <option value="mayor">Primera</option>
-                    <option value="reserva">Reserva</option>
-                    <option value="tercera">Tercera</option>
-                    <option value="cuarta">Cuarta</option>
-                    <option value="quinta">Quinta</option>
+                    <option value="plantel_mayor">Plantel Mayor</option>
+                    <option value="inferiores">Inferiores</option>
                     <option value="hockey">Hockey</option>
-                    <option value="hinchada">La Hinchada</option>
+                    <option value="eventos">Eventos</option>
+                    <option value="predio">Predio</option>
                   </select>
                 </div>
               </div>

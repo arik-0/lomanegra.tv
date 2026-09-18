@@ -27,9 +27,13 @@ export const metadata: Metadata = {
   authors: [{ name: 'Pasión Lomonegra' }],
   creator: 'Pasión Lomonegra',
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: [
+      { url: '/logo-pasion-lomonegra.png' },
+      { url: '/favicon.ico' },
+      { url: '/icon.png' },
+    ],
+    shortcut: '/logo-pasion-lomonegra.png',
+    apple: '/logo-pasion-lomonegra.png',
   },
   openGraph: {
     title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',

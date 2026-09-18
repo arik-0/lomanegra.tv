@@ -28,7 +28,7 @@ import {
 interface GalleryItem {
   id: string;
   title: string;
-  category: 'mayor' | 'hinchada' | 'festejos' | 'estadio' | 'cabina';
+  category: 'plantel_mayor' | 'inferiores' | 'hockey' | 'eventos' | 'predio' | string;
   categoryLabel: string;
   imageUrl: string;
   date: string;
@@ -40,8 +40,8 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   {
     id: 'photo-1',
     title: 'La Hinchada Lomonegra Copando la Tribuna',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80',
     date: 'Torneo Clausura 2026',
     description: 'El aliento incondicional de los lomonegros durante los 90 minutos del clásico.',
@@ -50,8 +50,8 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   {
     id: 'photo-2',
     title: 'Festejo Eufórico tras el Gol del Triunfo',
-    category: 'festejos',
-    categoryLabel: 'Festejos & Goles',
+    category: 'plantel_mayor',
+    categoryLabel: 'Plantel Mayor',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
     date: 'Fecha 12 • Clásico Regional',
     description: 'Abrazo de gol sobre la hora que selló la clasificación a los play-offs.',
@@ -60,8 +60,8 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   {
     id: 'photo-3',
     title: 'El 11 Titular de Primera en la Cancha',
-    category: 'mayor',
-    categoryLabel: 'Primera',
+    category: 'plantel_mayor',
+    categoryLabel: 'Plantel Mayor',
     imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80',
     date: 'Apertura 2026',
     description: 'Formación inicial lista para disputar una nueva fecha del campeonato.',
@@ -69,55 +69,56 @@ const GALLERY_PHOTOS: GalleryItem[] = [
   {
     id: 'photo-4',
     title: 'El Estadio Parque Bajo los Reflectores',
-    category: 'estadio',
-    categoryLabel: 'Estadio & Mística',
+    category: 'predio',
+    categoryLabel: 'Predio',
     imageUrl: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?auto=format&fit=crop&w=1200&q=80',
-    date: 'Noche de Liga',
+    date: 'Predio Oficial',
     description: 'Postal nocturna del campo de juego en óptimas condiciones para la transmisión HD.',
-    badge: 'ESTADIO',
+    badge: 'PREDIO',
   },
   {
     id: 'photo-5',
     title: 'Concentración y Humo Lomonegro en el Ingreso',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1200&q=80',
     date: 'Fecha 9',
     description: 'La salida del equipo a la cancha con el recibimiento más emocionante de la región.',
   },
   {
     id: 'photo-6',
-    title: 'Remate Inatajable al Ángulo Superior',
-    category: 'festejos',
-    categoryLabel: 'Festejos & Goles',
+    title: 'Cuarta División: Remate al Ángulo Superior',
+    category: 'inferiores',
+    categoryLabel: 'Inferiores',
     imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80',
-    date: 'Semifinal de Ida',
-    description: 'Momento exacto en que la pelota impacta en la red desatando el delirio de la tribuna.',
+    date: 'Inferiores',
+    description: 'Momento exacto de la definición de divisiones formativas en la fecha regional.',
     badge: 'GOLAZO',
   },
   {
     id: 'photo-7',
-    title: 'Cabina de Transmisión Oficial Pasión Lomonegra',
-    category: 'cabina',
-    categoryLabel: 'Transmisión & Cabina',
+    title: 'Jornada Oficial de Hockey Lomonegro',
+    category: 'hockey',
+    categoryLabel: 'Hockey',
     imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80',
-    date: 'Operativo en Directo',
-    description: 'El equipo periodístico y técnico llevando la transmisión en alta definición a todo el país.',
+    date: 'Liga Hockey',
+    description: 'Excelente despliegue y compromiso en la fecha oficial de hockey sobre césped.',
+    badge: 'HOCKEY',
   },
   {
     id: 'photo-8',
-    title: 'Primera: Disputa Aérea en el Área Rival',
-    category: 'mayor',
-    categoryLabel: 'Primera',
+    title: 'Divisiones Formativas: Disputa y Entrega Total',
+    category: 'inferiores',
+    categoryLabel: 'Inferiores',
     imageUrl: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=1200&q=80',
-    date: 'Torneo 2026',
-    description: 'Duelo físico en una pelota parada definitoria sobre el final del primer tiempo.',
+    date: 'Inferiores',
+    description: 'Duelo y garra de las divisiones formativas en una fecha vibrante.',
   },
   {
     id: 'photo-9',
     title: 'Banderas, Bombos y Pasión en el Alambrado',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80',
     date: 'Fecha 14',
     description: 'Los colores blanco y negro flameando alto con el orgullo lomonegro.',
@@ -259,13 +260,11 @@ function GaleriaContent() {
 
   const categories = [
     { id: 'todas', label: 'Todas' },
-    { id: 'mayor', label: 'Primera' },
-    { id: 'reserva', label: 'Reserva' },
-    { id: 'tercera', label: 'Tercera' },
-    { id: 'cuarta', label: 'Cuarta' },
-    { id: 'quinta', label: 'Quinta' },
+    { id: 'plantel_mayor', label: 'Plantel Mayor' },
+    { id: 'inferiores', label: 'Inferiores' },
     { id: 'hockey', label: 'Hockey' },
-    { id: 'hinchada', label: 'La Hinchada' },
+    { id: 'eventos', label: 'Eventos' },
+    { id: 'predio', label: 'Predio' },
   ];
 
   const filteredPhotos =
@@ -273,8 +272,32 @@ function GaleriaContent() {
       ? photos
       : photos.filter((p) => {
           if (p.category === activeCategory) return true;
-          // Compatibilidad con fotos legacy
-          if (activeCategory === 'mayor' && (p.category === 'festejos' || p.category === 'estadio' || p.category === 'cabina')) {
+          // Mapeos de compatibilidad inteligente
+          if (
+            activeCategory === 'plantel_mayor' &&
+            (p.category === 'mayor' || p.category === 'reserva' || p.category === 'festejos' || p.category === 'cabina' || p.category === 'primera')
+          ) {
+            return true;
+          }
+          if (
+            activeCategory === 'inferiores' &&
+            (p.category === 'tercera' || p.category === 'cuarta' || p.category === 'quinta' || p.category === 'juveniles' || p.category === 'sub19')
+          ) {
+            return true;
+          }
+          if (activeCategory === 'hockey' && p.category === 'hockey') {
+            return true;
+          }
+          if (
+            activeCategory === 'eventos' &&
+            (p.category === 'hinchada' || p.category === 'eventos')
+          ) {
+            return true;
+          }
+          if (
+            activeCategory === 'predio' &&
+            (p.category === 'estadio' || p.category === 'predio')
+          ) {
             return true;
           }
           return false;
@@ -325,12 +348,25 @@ function GaleriaContent() {
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 <span>COBERTURA AUDIOVISUAL // CLUB ATLÉTICO BLANCO Y NEGRO</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3 mt-1">
-                <span>Galería de Pasión Lomonegra</span>
-                <span className="text-[10px] font-mono font-bold px-2.5 py-1 bg-red-950/80 border border-red-700 text-red-400 rounded-md">
-                  HD OFICIAL
-                </span>
-              </h1>
+              <div className="flex items-center gap-3.5 mt-2">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 relative shrink-0">
+                  <Image
+                    src="/logo-pasion-lomonegra.png"
+                    alt="Pasión Lomonegra"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                    <span>Galería de Pasión Lomonegra</span>
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 bg-red-950/80 border border-red-700 text-red-400 rounded-md">
+                      HD OFICIAL
+                    </span>
+                  </h1>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

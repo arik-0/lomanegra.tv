@@ -5,7 +5,7 @@ import { supabaseAdmin } from './supabase/admin';
 export interface GalleryPhoto {
   id: string;
   title: string;
-  category: 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta' | 'hockey' | 'hinchada' | 'festejos' | 'estadio' | 'cabina' | string;
+  category: 'plantel_mayor' | 'inferiores' | 'hockey' | 'eventos' | 'predio' | string;
   categoryLabel: string;
   imageUrl: string;
   date: string;
@@ -35,8 +35,8 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: 'photo-1',
     title: 'La Hinchada Lomonegra Copando la Tribuna',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=80',
     date: 'Torneo Clausura 2026',
     description: 'El aliento incondicional de los lomonegros durante los 90 minutos del clásico.',
@@ -45,37 +45,37 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: 'photo-2',
     title: 'Festejo Eufórico tras el Gol del Triunfo en Reserva',
-    category: 'reserva',
-    categoryLabel: 'Reserva',
+    category: 'plantel_mayor',
+    categoryLabel: 'Plantel Mayor',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
-    date: 'Fecha 12 • Reserva',
-    description: 'Abrazo de gol sobre la hora que selló la clasificación a los play-offs de Reserva.',
+    date: 'Fecha 12 • Plantel Mayor',
+    description: 'Abrazo de gol sobre la hora que selló la clasificación a los play-offs.',
     badge: 'MOMENTO CLAVE',
   },
   {
     id: 'photo-3',
     title: 'El 11 Titular de Primera en la Cancha',
-    category: 'mayor',
-    categoryLabel: 'Primera',
+    category: 'plantel_mayor',
+    categoryLabel: 'Plantel Mayor',
     imageUrl: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80',
     date: 'Apertura 2026',
     description: 'Formación inicial lista para disputar una nueva fecha del campeonato.',
   },
   {
     id: 'photo-4',
-    title: 'Postales de Tercera División en Cancha Principal',
-    category: 'tercera',
-    categoryLabel: 'Tercera',
+    title: 'El Estadio Parque Bajo los Reflectores',
+    category: 'predio',
+    categoryLabel: 'Predio',
     imageUrl: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?auto=format&fit=crop&w=1200&q=80',
-    date: 'Tercera División',
-    description: 'Encuentro oficial de Tercera con una destacada labor en el campo de juego.',
-    badge: 'TERCERA',
+    date: 'Predio Oficial',
+    description: 'Postal nocturna del campo de juego y las instalaciones del club.',
+    badge: 'PREDIO',
   },
   {
     id: 'photo-5',
     title: 'Concentración y Humo Lomonegro en el Ingreso',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=1200&q=80',
     date: 'Fecha 9',
     description: 'La salida del equipo a la cancha con el recibimiento más emocionante de la región.',
@@ -83,11 +83,11 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   {
     id: 'photo-6',
     title: 'Cuarta División: Remate al Ángulo Superior',
-    category: 'cuarta',
-    categoryLabel: 'Cuarta',
+    category: 'inferiores',
+    categoryLabel: 'Inferiores',
     imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80',
-    date: 'Cuarta División',
-    description: 'Momento exacto de la definición de Cuarta División en la fecha regional.',
+    date: 'Inferiores',
+    description: 'Momento exacto de la definición de divisiones formativas en la fecha regional.',
     badge: 'GOLAZO',
   },
   {
@@ -102,18 +102,18 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: 'photo-8',
-    title: 'Quinta División: Disputa y Entrega Total',
-    category: 'quinta',
-    categoryLabel: 'Quinta',
+    title: 'Divisiones Formativas: Disputa y Entrega Total',
+    category: 'inferiores',
+    categoryLabel: 'Inferiores',
     imageUrl: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=1200&q=80',
-    date: 'Quinta División',
+    date: 'Inferiores',
     description: 'Duelo y garra de las divisiones formativas en una fecha vibrante.',
   },
   {
     id: 'photo-9',
     title: 'Banderas, Bombos y Pasión en el Alambrado',
-    category: 'hinchada',
-    categoryLabel: 'La Hinchada',
+    category: 'eventos',
+    categoryLabel: 'Eventos',
     imageUrl: 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=1200&q=80',
     date: 'Fecha 14',
     description: 'Los colores blanco y negro flameando alto con el orgullo lomonegro.',

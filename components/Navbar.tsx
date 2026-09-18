@@ -61,19 +61,19 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-[#101116]/95 backdrop-blur-md border-b border-zinc-800/80 h-14 flex items-center shadow-[0_4px_24px_rgba(0,0,0,0.45)]">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logotipo Oficial y Menú Hamburguesa en móviles */}
-        <div className="flex items-center gap-2.5 lg:hidden">
+        {/* Logotipo Oficial y Menú Hamburguesa */}
+        <div className="flex items-center gap-2.5">
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white bg-[#181920] hover:bg-[#20222a] border border-zinc-800 transition shadow-sm"
+            className="lg:hidden p-2 rounded-xl text-zinc-400 hover:text-white bg-[#181920] hover:bg-[#20222a] border border-zinc-800 transition shadow-sm"
             aria-label="Abrir menú"
             title="Abrir menú de navegación"
           >
             <Menu className="w-4 h-4 text-zinc-300" />
           </button>
 
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 relative flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Image
                 src="/logo-pasion-lomonegra.png"
                 alt="Pasión Lomonegra"

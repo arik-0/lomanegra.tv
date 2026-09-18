@@ -281,12 +281,26 @@ export default function PosicionesPage() {
                   ? 'LIGA DEPORTIVA DEL SUR // BYD'
                   : 'LIGA DE CLUBES UNIDOS POR EL HOCKEY (LCUH) // BYD'}
               </div>
-              <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                <span>Tablas & Play-Offs</span>
-                <span className="text-xs font-mono font-bold px-2.5 py-1 bg-red-950/70 border border-red-800 text-red-400 rounded-md">
-                  OFICIAL 2026
-                </span>
-              </h1>
+              <div className="flex items-center gap-3.5 mt-2">
+                <div className="w-11 h-11 sm:w-13 sm:h-13 relative shrink-0">
+                  <Image
+                    src="/logo-pasion-lomonegra.png"
+                    alt="Pasión Lomonegra"
+                    width={48}
+                    height={48}
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                    <span>Tablas & Play-Offs</span>
+                    <span className="text-xs font-mono font-bold px-2.5 py-1 bg-red-950/70 border border-red-800 text-red-400 rounded-md">
+                      OFICIAL 2026
+                    </span>
+                  </h1>
+                </div>
+              </div>
             </div>
 
             {/* Selectores Superiores: AÑO + PRIMERO / SEGUNDO (Según boceto) */}
