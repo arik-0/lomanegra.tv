@@ -7,6 +7,7 @@ import {
   CLAUSURA_TEAMS_ZONA_A,
   CLAUSURA_TEAMS_ZONA_B,
 } from './clausuraFixtures';
+import { createInferioresClausuraStandings } from './clausuraInferioresFixtures';
 
 export type DeporteType = 'futbol' | 'hockey';
 export type TorneoType = 'apertura' | 'clausura' | 'primer' | 'segundo';
@@ -95,6 +96,8 @@ export function canonicalTeamKey(name: string): string {
     norm.includes('firmat') ||
     norm.startsWith('fir')
   ) {
+    if (norm.includes('rojo')) return 'firmat_rojo';
+    if (norm.includes('blanco') && !norm.includes('negro')) return 'firmat_blanco';
     return 'firmat';
   }
 
@@ -331,6 +334,14 @@ export const TEAM_LOGOS: Record<string, string> = {
   'ca argentino': '/teams/Argentino de Firmat.png',
   'firmat fbc': '/teams/Firmat FBC.png',
   'firmat': '/teams/Firmat FBC.png',
+  'firmat fbc (rojo)': '/teams/Firmat FBC.png',
+  'firmat fbc (blanco)': '/teams/Firmat FBC.png',
+  'firmat (rojo)': '/teams/Firmat FBC.png',
+  'firmat (blanco)': '/teams/Firmat FBC.png',
+  'firmat fbc rojo': '/teams/Firmat FBC.png',
+  'firmat fbc blanco': '/teams/Firmat FBC.png',
+  'firmat rojo': '/teams/Firmat FBC.png',
+  'firmat blanco': '/teams/Firmat FBC.png',
   'atlético acebal': '/teams/Atletico Acebal.png',
   'atletico acebal': '/teams/Atletico Acebal.png',
   'atl. acebal': '/teams/Atletico Acebal.png',
@@ -1860,6 +1871,9 @@ export function createDefaultStandings(
 
   // Fútbol Formativas (Reserva, Tercera, Cuarta, Quinta)
   if (deporte === 'futbol') {
+    if (normTorneo === 'clausura' && (categoria === 'tercera' || categoria === 'cuarta' || categoria === 'quinta')) {
+      return createInferioresClausuraStandings(categoria);
+    }
     const base = JSON.parse(JSON.stringify(normTorneo === 'clausura' ? defaultClausuraStandings : defaultAperturaStandings));
     base.deporte = 'futbol';
     base.categoria = categoria;

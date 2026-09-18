@@ -416,8 +416,8 @@ export default function PosicionesPage() {
             </div>
           </div>
 
-          {/* Grid de Tablas por Zonas (Zona A, Zona B, etc.) */}
-          <div className={`grid grid-cols-1 ${(standings?.zones?.length || 0) > 1 ? 'lg:grid-cols-2' : ''} gap-6`}>
+          {/* Grid de Tablas por Zonas (Zona A, Zona B, Zona C) */}
+          <div className={`grid grid-cols-1 ${(standings?.zones?.length || 0) === 3 ? 'xl:grid-cols-3 md:grid-cols-2' : (standings?.zones?.length || 0) > 1 ? 'lg:grid-cols-2' : ''} gap-6`}>
             {(standings?.zones || []).map((zone) => (
               <div
                 key={zone.id}
