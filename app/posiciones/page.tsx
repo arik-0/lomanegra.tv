@@ -239,7 +239,7 @@ export default function PosicionesPage() {
               }`}
             >
               <Shield className="w-4 h-4" />
-              <span>Liga Deportiva del Sur (ByD)</span>
+              <span>Tablas Lomonegras</span>
             </button>
 
             <button

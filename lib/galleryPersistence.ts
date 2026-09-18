@@ -5,7 +5,7 @@ import { supabaseAdmin } from './supabase/admin';
 export interface GalleryPhoto {
   id: string;
   title: string;
-  category: 'mayor' | 'hinchada' | 'festejos' | 'estadio' | 'cabina' | string;
+  category: 'mayor' | 'reserva' | 'tercera' | 'cuarta' | 'quinta' | 'hockey' | 'hinchada' | 'festejos' | 'estadio' | 'cabina' | string;
   categoryLabel: string;
   imageUrl: string;
   date: string;
@@ -44,12 +44,12 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: 'photo-2',
-    title: 'Festejo Eufórico tras el Gol del Triunfo',
-    category: 'festejos',
-    categoryLabel: 'Festejos & Goles',
+    title: 'Festejo Eufórico tras el Gol del Triunfo en Reserva',
+    category: 'reserva',
+    categoryLabel: 'Reserva',
     imageUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
-    date: 'Fecha 12 • Clásico Regional',
-    description: 'Abrazo de gol sobre la hora que selló la clasificación a los play-offs.',
+    date: 'Fecha 12 • Reserva',
+    description: 'Abrazo de gol sobre la hora que selló la clasificación a los play-offs de Reserva.',
     badge: 'MOMENTO CLAVE',
   },
   {
@@ -63,13 +63,13 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: 'photo-4',
-    title: 'El Estadio Parque Bajo los Reflectores',
-    category: 'estadio',
-    categoryLabel: 'Estadio & Mística',
+    title: 'Postales de Tercera División en Cancha Principal',
+    category: 'tercera',
+    categoryLabel: 'Tercera',
     imageUrl: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?auto=format&fit=crop&w=1200&q=80',
-    date: 'Noche de Liga',
-    description: 'Postal nocturna del campo de juego en óptimas condiciones para la transmisión HD.',
-    badge: 'ESTADIO',
+    date: 'Tercera División',
+    description: 'Encuentro oficial de Tercera con una destacada labor en el campo de juego.',
+    badge: 'TERCERA',
   },
   {
     id: 'photo-5',
@@ -82,31 +82,32 @@ export const DEFAULT_GALLERY_PHOTOS: GalleryPhoto[] = [
   },
   {
     id: 'photo-6',
-    title: 'Remate Inatajable al Ángulo Superior',
-    category: 'festejos',
-    categoryLabel: 'Festejos & Goles',
+    title: 'Cuarta División: Remate al Ángulo Superior',
+    category: 'cuarta',
+    categoryLabel: 'Cuarta',
     imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1200&q=80',
-    date: 'Semifinal de Ida',
-    description: 'Momento exacto en que la pelota impacta en la red desatando el delirio de la tribuna.',
+    date: 'Cuarta División',
+    description: 'Momento exacto de la definición de Cuarta División en la fecha regional.',
     badge: 'GOLAZO',
   },
   {
     id: 'photo-7',
-    title: 'Cabina de Transmisión Oficial Pasión Lomonegra',
-    category: 'cabina',
-    categoryLabel: 'Transmisión & Cabina',
+    title: 'Jornada Oficial de Hockey Lomonegro',
+    category: 'hockey',
+    categoryLabel: 'Hockey',
     imageUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80',
-    date: 'Operativo en Directo',
-    description: 'El equipo periodístico y técnico llevando la transmisión en alta definición a todo el país.',
+    date: 'Liga Hockey',
+    description: 'Excelente despliegue y compromiso en la fecha oficial de hockey sobre césped.',
+    badge: 'HOCKEY',
   },
   {
     id: 'photo-8',
-    title: 'Primera: Disputa Aérea en el Área Rival',
-    category: 'mayor',
-    categoryLabel: 'Primera',
+    title: 'Quinta División: Disputa y Entrega Total',
+    category: 'quinta',
+    categoryLabel: 'Quinta',
     imageUrl: 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=1200&q=80',
-    date: 'Torneo 2026',
-    description: 'Duelo físico en una pelota parada definitoria sobre el final del primer tiempo.',
+    date: 'Quinta División',
+    description: 'Duelo y garra de las divisiones formativas en una fecha vibrante.',
   },
   {
     id: 'photo-9',

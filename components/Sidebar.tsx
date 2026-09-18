@@ -361,22 +361,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             </div>
           )}
 
-          {/* Sponsor Oficial Quilmes */}
-          <div className="pt-1">
-            <div className="group relative h-14 flex items-center gap-2.5 px-3 overflow-hidden rounded-2xl border border-zinc-800/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.03)_0%,rgba(20,21,30,1)_100%)]">
-              <div className="shrink-0 w-8 h-8 rounded-xl bg-red-950/40 border border-red-800/60 flex items-center justify-center text-red-400 font-mono text-xs font-black">
-                VIVO
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[8px] text-zinc-500 tracking-[0.2em] uppercase font-mono leading-tight">
-                  Sponsor oficial
-                </div>
-                <div className="text-xs font-black tracking-tight text-white font-mono leading-tight truncate mt-0.5 group-hover:text-red-400 transition-colors">
-                  Quilmes Oficial
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
 
         {/* 6. Footer del Sidebar con CTA Rápido y Redes */}

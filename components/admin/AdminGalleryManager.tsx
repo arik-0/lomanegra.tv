@@ -32,7 +32,7 @@ export default function AdminGalleryManager() {
 
   // Estado formulario nueva foto
   const [newPhotoTitle, setNewPhotoTitle] = useState('');
-  const [newPhotoCategory, setNewPhotoCategory] = useState<'mayor' | 'hinchada' | 'festejos' | 'estadio' | 'cabina'>('mayor');
+  const [newPhotoCategory, setNewPhotoCategory] = useState<string>('mayor');
   const [newPhotoCategoryLabel, setNewPhotoCategoryLabel] = useState('Primera');
   const [newPhotoImageUrl, setNewPhotoImageUrl] = useState('');
   const [newPhotoDate, setNewPhotoDate] = useState('Torneo Clausura 2026');
@@ -376,24 +376,28 @@ export default function AdminGalleryManager() {
                   <select
                     value={newPhotoCategory}
                     onChange={(e) => {
-                      const cat = e.target.value as any;
+                      const cat = e.target.value;
                       setNewPhotoCategory(cat);
                       const labels: Record<string, string> = {
                         mayor: 'Primera',
+                        reserva: 'Reserva',
+                        tercera: 'Tercera',
+                        cuarta: 'Cuarta',
+                        quinta: 'Quinta',
+                        hockey: 'Hockey',
                         hinchada: 'La Hinchada',
-                        festejos: 'Festejos & Goles',
-                        estadio: 'Estadio & Mística',
-                        cabina: 'Transmisión & Cabina',
                       };
-                      setNewPhotoCategoryLabel(labels[cat] || 'General');
+                      setNewPhotoCategoryLabel(labels[cat] || 'Primera');
                     }}
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
                   >
-                    <option value="mayor">Primera División</option>
+                    <option value="mayor">Primera</option>
+                    <option value="reserva">Reserva</option>
+                    <option value="tercera">Tercera</option>
+                    <option value="cuarta">Cuarta</option>
+                    <option value="quinta">Quinta</option>
+                    <option value="hockey">Hockey</option>
                     <option value="hinchada">La Hinchada</option>
-                    <option value="festejos">Festejos & Goles</option>
-                    <option value="estadio">Estadio & Mística</option>
-                    <option value="cabina">Transmisión & Cabina</option>
                   </select>
                 </div>
               </div>

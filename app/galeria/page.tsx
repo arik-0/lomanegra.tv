@@ -254,22 +254,31 @@ function GaleriaContent() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Estados sección Videos
-  const [activeVideoFilter, setActiveVideoFilter] = useState<'todas' | 'mayor' | 'juveniles' | 'programas'>('todas');
+  const [activeVideoFilter, setActiveVideoFilter] = useState<'todas' | 'mayor' | 'juveniles' | 'hockey' | 'programas'>('todas');
   const [activeModalPlaylist, setActiveModalPlaylist] = useState<PlaylistCard | null>(null);
 
   const categories = [
-    { id: 'todas', label: 'Todas las Fotos' },
+    { id: 'todas', label: 'Todas' },
     { id: 'mayor', label: 'Primera' },
+    { id: 'reserva', label: 'Reserva' },
+    { id: 'tercera', label: 'Tercera' },
+    { id: 'cuarta', label: 'Cuarta' },
+    { id: 'quinta', label: 'Quinta' },
+    { id: 'hockey', label: 'Hockey' },
     { id: 'hinchada', label: 'La Hinchada' },
-    { id: 'festejos', label: 'Festejos & Goles' },
-    { id: 'estadio', label: 'Estadio & Mística' },
-    { id: 'cabina', label: 'Cabina de Transmisión' },
   ];
 
   const filteredPhotos =
     activeCategory === 'todas'
       ? photos
-      : photos.filter((p) => p.category === activeCategory);
+      : photos.filter((p) => {
+          if (p.category === activeCategory) return true;
+          // Compatibilidad con fotos legacy
+          if (activeCategory === 'mayor' && (p.category === 'festejos' || p.category === 'estadio' || p.category === 'cabina')) {
+            return true;
+          }
+          return false;
+        });
 
   const filteredPlaylists =
     activeVideoFilter === 'todas'
@@ -352,7 +361,7 @@ function GaleriaContent() {
                 }`}
               >
                 <Camera className="w-4 h-4" />
-                <span>Fotos & Postales ({GALLERY_PHOTOS.length})</span>
+                <span>Fotos & Postales ({photos.length})</span>
               </button>
 
               <button
@@ -364,7 +373,7 @@ function GaleriaContent() {
                 }`}
               >
                 <Youtube className="w-4 h-4" />
-                <span>Transmisiones & Videos ({PLAYLISTS.length})</span>
+                <span>Transmisiones & Videos ({playlists.length})</span>
               </button>
             </div>
 
@@ -398,7 +407,7 @@ function GaleriaContent() {
                       : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
                   }`}
                 >
-                  Todas ({PLAYLISTS.length})
+                  Todas ({playlists.length})
                 </button>
                 <button
                   onClick={() => setActiveVideoFilter('mayor')}
@@ -419,6 +428,16 @@ function GaleriaContent() {
                   }`}
                 >
                   Inferiores (3°, 4°, 5°)
+                </button>
+                <button
+                  onClick={() => setActiveVideoFilter('hockey')}
+                  className={`px-3 py-1.5 rounded-xl font-bold uppercase tracking-wider transition shrink-0 ${
+                    activeVideoFilter === 'hockey'
+                      ? 'bg-zinc-800 text-white border border-zinc-600'
+                      : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
+                  }`}
+                >
+                  Hockey
                 </button>
                 <button
                   onClick={() => setActiveVideoFilter('programas')}
