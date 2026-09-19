@@ -23,6 +23,7 @@ import {
   ExternalLink,
   Tv,
   Layers,
+  Trash2,
 } from 'lucide-react';
 
 interface GalleryItem {
@@ -232,20 +233,76 @@ function GaleriaContent() {
   // Colecciones dinámicas de fotos y playlists
   const [photos, setPhotos] = useState<GalleryItem[]>(GALLERY_PHOTOS);
   const [playlists, setPlaylists] = useState<PlaylistCard[]>(PLAYLISTS);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    fetch('/api/gallery')
+    if (typeof window !== 'undefined') {
+      const auth = localStorage.getItem('admin_session_auth');
+      if (auth === 'true') {
+        setIsAdmin(true);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/gallery', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
-        if (data.photos && Array.isArray(data.photos) && data.photos.length > 0) {
+        if (data.photos && Array.isArray(data.photos)) {
           setPhotos(data.photos);
         }
-        if (data.playlists && Array.isArray(data.playlists) && data.playlists.length > 0) {
+        if (data.playlists && Array.isArray(data.playlists)) {
           setPlaylists(data.playlists);
         }
       })
       .catch((err) => console.error('Error fetching gallery:', err));
   }, []);
+
+  const handleDeletePhoto = async (photoId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm('¿Estás seguro de que deseas eliminar esta foto de la galería?')) return;
+
+    const previous = [...photos];
+    setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+    if (lightboxIndex !== null) setLightboxIndex(null);
+
+    try {
+      const res = await fetch(`/api/admin/gallery?id=${encodeURIComponent(photoId)}&type=photo`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setPhotos(previous);
+        alert(data.error || 'Error al eliminar la foto de la galería');
+      }
+    } catch {
+      setPhotos(previous);
+      alert('Error de red al eliminar la foto');
+    }
+  };
+
+  const handleDeletePlaylist = async (plId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!confirm('¿Estás seguro de que deseas eliminar esta lista de reproducción?')) return;
+
+    const previous = [...playlists];
+    setPlaylists((prev) => prev.filter((p) => p.id !== plId));
+    if (activeModalPlaylist?.id === plId) setActiveModalPlaylist(null);
+
+    try {
+      const res = await fetch(`/api/admin/gallery?id=${encodeURIComponent(plId)}&type=playlist`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setPlaylists(previous);
+        alert(data.error || 'Error al eliminar la lista de reproducción');
+      }
+    } catch {
+      setPlaylists(previous);
+      alert('Error de red al eliminar la lista de reproducción');
+    }
+  };
 
   // Sección principal: Fotos vs Playlists/Videos
   const [section, setSection] = useState<'fotos' | 'videos'>(initialSection);
@@ -382,6 +439,22 @@ function GaleriaContent() {
               </a>
             </div>
           </div>
+
+          {/* Banner de Modo Administrador si está autenticado */}
+          {isAdmin && (
+            <div className="p-3.5 bg-red-950/60 border border-red-700/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs animate-fade-in">
+              <div className="flex items-center gap-2.5 text-red-300 font-bold">
+                <Shield className="w-4 h-4 text-red-400 shrink-0" />
+                <span>Modo Administrador Activo: Puedes eliminar fotos o playlists directamente con el icono de papelera.</span>
+              </div>
+              <Link
+                href="/admin"
+                className="self-end sm:self-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[11px] font-black uppercase tracking-wider transition shadow-md shrink-0"
+              >
+                Ir a Panel Admin
+              </Link>
+            </div>
+          )}
 
           {/* ============================================================================== */}
           {/* SELECTOR UNIFICADO: FOTOS VS VIDEOS (GALERÍA ENGLOBA TODO)                    */}
@@ -522,8 +595,21 @@ function GaleriaContent() {
                     )}
                   </div>
 
-                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ZoomIn className="w-4 h-4" />
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 z-20">
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeletePhoto(photo.id, e)}
+                        className="w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center shadow-lg transition"
+                        title="Eliminar foto de la galería (Modo Admin)"
+                        aria-label="Eliminar foto"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                    <div className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ZoomIn className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
 
@@ -642,6 +728,18 @@ function GaleriaContent() {
                     >
                       <ExternalLink className="w-4 h-4" />
                     </a>
+
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeletePlaylist(item.id, e)}
+                        className="p-2.5 rounded-xl bg-red-950/80 hover:bg-red-900 border border-red-700/80 text-red-300 hover:text-white transition"
+                        title="Eliminar esta playlist de la galería (Modo Admin)"
+                        aria-label="Eliminar playlist"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -666,6 +764,17 @@ function GaleriaContent() {
               </div>
 
               <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePhoto(activePhoto.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition text-xs shadow-md"
+                    title="Eliminar esta foto permanentemente"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Eliminar Foto</span>
+                  </button>
+                )}
                 <button
                   onClick={() => setLightboxIndex(null)}
                   className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition border border-zinc-800"

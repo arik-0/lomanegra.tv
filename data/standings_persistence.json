@@ -15177,48 +15177,116 @@
     ],
     "playoffs": [
       {
-        "id": "cuartos-1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "1° Zona A",
-        "team2": "Mejor 3°",
+        "id": "8vos-5-1789767482089",
+        "round": "8vos",
+        "title": "Octavos 1",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-6-1789767482089",
+        "round": "8vos",
+        "title": "Octavos 2",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-7-1789767482089",
+        "round": "8vos",
+        "title": "Octavos 3",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-8-1789767482089",
+        "round": "8vos",
+        "title": "Octavos 4",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "cuartos-1",
+        "round": "cuartos",
+        "title": "Cuartos 1",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 1",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-2",
         "round": "cuartos",
         "title": "Cuartos 2",
-        "team1": "1° Zona B",
-        "team2": "2° Zona C",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-3",
         "round": "cuartos",
         "title": "Cuartos 3",
-        "team1": "1° Zona C",
-        "team2": "2° Zona B",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 3",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "2° Zona A",
-        "team2": "Segundo Mejor 3°",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "semi-1",
@@ -15229,7 +15297,9 @@
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "semi-2",
@@ -15240,18 +15310,22 @@
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "final-1",
         "round": "final",
         "title": "Gran Final",
-        "team1": "Ganador Semi 1",
-        "team2": "Ganador Semi 2",
+        "team1": "Ganador Semifinal 1",
+        "team2": "Ganador Semifinal 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       }
     ],
     "playoffModality": "cuartos",
@@ -16173,48 +16247,116 @@
     ],
     "playoffs": [
       {
-        "id": "cuartos-1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "1° Zona A",
-        "team2": "Mejor 3°",
+        "id": "8vos-1-1789768815838",
+        "round": "8vos",
+        "title": "Octavos 1",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-2-1789768815838",
+        "round": "8vos",
+        "title": "Octavos 2 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-3-1789768815838",
+        "round": "8vos",
+        "title": "Octavos 3 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-4-1789768815838",
+        "round": "8vos",
+        "title": "Octavos 4 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "A definir",
+        "team2": "A definir",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "cuartos-1",
+        "round": "cuartos",
+        "title": "Cuartos 1",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 1",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-2",
         "round": "cuartos",
         "title": "Cuartos 2",
-        "team1": "1° Zona B",
-        "team2": "2° Zona C",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-3",
         "round": "cuartos",
         "title": "Cuartos 3",
-        "team1": "1° Zona C",
-        "team2": "2° Zona B",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 3",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "cuartos-4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "2° Zona A",
-        "team2": "Segundo Mejor 3°",
+        "team1": "A definir",
+        "team2": "Ganador Octavos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "semi-1",
@@ -16225,7 +16367,9 @@
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "semi-2",
@@ -16236,18 +16380,22 @@
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       },
       {
         "id": "final-1",
         "round": "final",
         "title": "Gran Final",
-        "team1": "Ganador Semi 1",
-        "team2": "Ganador Semi 2",
+        "team1": "Ganador Semifinal 1",
+        "team2": "Ganador Semifinal 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar"
+        "dateInfo": "A confirmar",
+        "penalties1": null,
+        "penalties2": null
       }
     ],
     "playoffModality": "cuartos",

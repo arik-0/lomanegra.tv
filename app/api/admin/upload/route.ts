@@ -96,3 +96,50 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    let url = searchParams.get('url');
+
+    if (!url) {
+      try {
+        const body = await req.json();
+        if (body?.url) url = body.url;
+      } catch {}
+    }
+
+    if (!url) {
+      return NextResponse.json({ error: 'URL requerida para eliminar archivo' }, { status: 400 });
+    }
+
+    // Si es un archivo local /uploads/nombre.ext
+    if (url.startsWith('/uploads/')) {
+      const fileName = path.basename(url);
+      const localFilePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+      }
+      return NextResponse.json({ success: true, message: 'Archivo local eliminado correctamente' });
+    }
+
+    // Si es una URL de Supabase Storage
+    if (url.includes('supabase.co') && url.includes('/images/')) {
+      const match = url.match(/\/images\/(.+)$/);
+      if (match && match[1]) {
+        const storagePath = decodeURIComponent(match[1]);
+        await supabaseAdmin.storage.from('images').remove([storagePath]);
+      }
+      return NextResponse.json({ success: true, message: 'Archivo de Supabase Storage eliminado' });
+    }
+
+    return NextResponse.json({ success: true, message: 'Imagen descartada' });
+  } catch (error: any) {
+    console.warn('[Upload API] Error al eliminar archivo:', error);
+    return NextResponse.json(
+      { error: error.message || 'Error al eliminar archivo' },
+      { status: 500 }
+    );
+  }
+}
+

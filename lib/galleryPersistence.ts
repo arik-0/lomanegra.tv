@@ -209,9 +209,25 @@ export const DEFAULT_PLAYLISTS: PlaylistCard[] = [
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const GALLERY_PERSISTENCE_FILE = path.join(DATA_DIR, 'gallery_persistence.json');
-const SYSTEM_GALLERY_MATCH_ID = '00000000-0000-0000-0000-0000000000g1';
+// Debe ser un UUID válido (hexadecimal 0-9, a-f) para la columna UUID de PostgreSQL en Supabase
+const SYSTEM_GALLERY_MATCH_ID = '00000000-0000-0000-0000-0000000000e1';
 
 let cachedGalleryData: GalleryData | null = null;
+
+export function deleteLocalFileIfUploaded(imageUrl: string) {
+  try {
+    if (imageUrl && imageUrl.startsWith('/uploads/')) {
+      const fileName = path.basename(imageUrl);
+      const filePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log('[GalleryPersistence] Archivo local eliminado:', filePath);
+      }
+    }
+  } catch (err) {
+    console.warn('[GalleryPersistence] No se pudo eliminar archivo local:', err);
+  }
+}
 
 function loadFromFile(): GalleryData | null {
   try {
@@ -238,7 +254,7 @@ function saveToFile(data: GalleryData) {
     }
     fs.writeFileSync(GALLERY_PERSISTENCE_FILE, JSON.stringify(data, null, 2), 'utf8');
   } catch (e) {
-    console.error('[GalleryPersistence] Error writing file:', e);
+    console.warn('[GalleryPersistence] Warning writing file (read-only filesystem on serverless):', e);
   }
 }
 
@@ -258,6 +274,8 @@ async function loadFromSupabase(): Promise<GalleryData | null> {
           playlists: Array.isArray(parsed.playlists) ? parsed.playlists : DEFAULT_PLAYLISTS,
         };
       }
+    } else if (error) {
+      console.warn('[GalleryPersistence] Supabase select error:', error.message);
     }
   } catch (e) {
     console.warn('[GalleryPersistence] Supabase load warning:', e);
@@ -267,7 +285,7 @@ async function loadFromSupabase(): Promise<GalleryData | null> {
 
 async function saveToSupabase(data: GalleryData) {
   try {
-    await supabaseAdmin.from('matches').upsert(
+    const { error } = await supabaseAdmin.from('matches').upsert(
       {
         id: SYSTEM_GALLERY_MATCH_ID,
         title: '__SYSTEM_GALLERY_STORE__',
@@ -279,6 +297,9 @@ async function saveToSupabase(data: GalleryData) {
       },
       { onConflict: 'id' }
     );
+    if (error) {
+      console.error('[GalleryPersistence] Supabase upsert error:', error.message);
+    }
   } catch (e) {
     console.warn('[GalleryPersistence] Supabase save warning:', e);
   }
@@ -287,16 +308,17 @@ async function saveToSupabase(data: GalleryData) {
 export async function getGalleryData(): Promise<GalleryData> {
   if (cachedGalleryData) return cachedGalleryData;
 
-  const fromDisk = loadFromFile();
-  if (fromDisk) {
-    cachedGalleryData = fromDisk;
-    return cachedGalleryData;
-  }
-
   const fromSb = await loadFromSupabase();
   if (fromSb) {
     cachedGalleryData = fromSb;
     saveToFile(cachedGalleryData);
+    return cachedGalleryData;
+  }
+
+  const fromDisk = loadFromFile();
+  if (fromDisk) {
+    cachedGalleryData = fromDisk;
+    saveToSupabase(cachedGalleryData).catch(() => {});
     return cachedGalleryData;
   }
 
@@ -319,4 +341,24 @@ export async function saveGalleryData(data: Partial<GalleryData>): Promise<Galle
   saveToFile(updated);
   await saveToSupabase(updated);
   return updated;
+}
+
+export async function deleteGalleryPhoto(photoId: string): Promise<GalleryData> {
+  const current = await getGalleryData();
+  const target = current.photos.find((p) => p.id === photoId);
+  if (target && target.imageUrl) {
+    deleteLocalFileIfUploaded(target.imageUrl);
+  }
+  const updatedPhotos = current.photos.filter((p) => p.id !== photoId);
+  return await saveGalleryData({ photos: updatedPhotos });
+}
+
+export async function deleteGalleryPlaylist(playlistId: string): Promise<GalleryData> {
+  const current = await getGalleryData();
+  const target = current.playlists.find((p) => p.id === playlistId);
+  if (target && target.imageUrl) {
+    deleteLocalFileIfUploaded(target.imageUrl);
+  }
+  const updatedPlaylists = current.playlists.filter((p) => p.id !== playlistId);
+  return await saveGalleryData({ playlists: updatedPlaylists });
 }

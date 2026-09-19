@@ -173,25 +173,61 @@ export default function AdminGalleryManager() {
     }
   };
 
+  const handleClearPhotoFile = async () => {
+    if (newPhotoImageUrl && newPhotoImageUrl.startsWith('/uploads/')) {
+      try {
+        await fetch('/api/admin/upload', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: newPhotoImageUrl }),
+        });
+      } catch {}
+    }
+    setNewPhotoImageUrl('');
+    if (photoFileInputRef.current) photoFileInputRef.current.value = '';
+    notifySuccess('Imagen removida del formulario.');
+  };
+
   const handleDeletePhoto = async (photoId: string) => {
     if (!confirm('¿Estás seguro de eliminar esta foto de la galería?')) return;
+    const previous = [...photos];
     const updated = photos.filter((p) => p.id !== photoId);
     setPhotos(updated);
     setSaving(true);
+    setErrorMsg('');
     try {
-      const res = await fetch('/api/admin/gallery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ photos: updated }),
+      const res = await fetch(`/api/admin/gallery?id=${encodeURIComponent(photoId)}&type=photo`, {
+        method: 'DELETE',
       });
-      if (res.ok) {
-        notifySuccess('Foto eliminada correctamente.');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        notifySuccess('Foto eliminada correctamente de la galería.');
+        if (data.photos) setPhotos(data.photos);
+      } else {
+        setPhotos(previous);
+        setErrorMsg(data.error || 'Error al eliminar la foto.');
       }
     } catch {
-      setErrorMsg('Error al eliminar la foto.');
+      setPhotos(previous);
+      setErrorMsg('Error de red al eliminar la foto.');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleClearPlCover = async () => {
+    if (newPlImageUrl && newPlImageUrl.startsWith('/uploads/')) {
+      try {
+        await fetch('/api/admin/upload', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: newPlImageUrl }),
+        });
+      } catch {}
+    }
+    setNewPlImageUrl('');
+    if (plFileInputRef.current) plFileInputRef.current.value = '';
+    notifySuccess('Portada removida del formulario.');
   };
 
   const extractPlaylistId = (url: string): string => {
@@ -258,20 +294,26 @@ export default function AdminGalleryManager() {
 
   const handleDeletePlaylist = async (plId: string) => {
     if (!confirm('¿Estás seguro de eliminar esta lista de reproducción?')) return;
+    const previous = [...playlists];
     const updated = playlists.filter((p) => p.id !== plId);
     setPlaylists(updated);
     setSaving(true);
+    setErrorMsg('');
     try {
-      const res = await fetch('/api/admin/gallery', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playlists: updated }),
+      const res = await fetch(`/api/admin/gallery?id=${encodeURIComponent(plId)}&type=playlist`, {
+        method: 'DELETE',
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         notifySuccess('Playlist eliminada correctamente.');
+        if (data.playlists) setPlaylists(data.playlists);
+      } else {
+        setPlaylists(previous);
+        setErrorMsg(data.error || 'Error al eliminar playlist.');
       }
     } catch {
-      setErrorMsg('Error al eliminar playlist.');
+      setPlaylists(previous);
+      setErrorMsg('Error de red al eliminar playlist.');
     } finally {
       setSaving(false);
     }
@@ -439,24 +481,35 @@ export default function AdminGalleryManager() {
                 </div>
               </div>
 
-              {/* Vista previa miniatura si hay URL */}
+              {/* Vista previa miniatura si hay URL y botón para quitarla */}
               {newPhotoImageUrl && (
-                <div className="p-3 bg-[#181922] rounded-2xl border border-zinc-800 flex items-center gap-4">
-                  <div className="w-20 h-14 relative rounded-xl overflow-hidden bg-black shrink-0 border border-zinc-700">
-                    <Image
-                      src={newPhotoImageUrl}
-                      alt="Vista previa"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="text-xs text-zinc-300">
-                    <div className="font-bold">Vista previa de imagen seleccionada</div>
-                    <div className="text-[10px] text-zinc-500 font-mono truncate max-w-md">
-                      {newPhotoImageUrl}
+                <div className="p-3 bg-[#181922] rounded-2xl border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-20 h-14 relative rounded-xl overflow-hidden bg-black shrink-0 border border-zinc-700">
+                      <Image
+                        src={newPhotoImageUrl}
+                        alt="Vista previa"
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="text-xs text-zinc-300 min-w-0">
+                      <div className="font-bold text-white">Vista previa de imagen seleccionada</div>
+                      <div className="text-[10px] text-zinc-500 font-mono truncate max-w-xs sm:max-w-md">
+                        {newPhotoImageUrl}
+                      </div>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={handleClearPhotoFile}
+                    className="self-end sm:self-center flex items-center gap-1.5 px-3 py-1.5 bg-red-950/70 hover:bg-red-900 border border-red-700/80 text-red-300 rounded-xl text-xs font-bold transition shrink-0"
+                    title="Quitar o eliminar esta imagen seleccionada"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                    <span>Quitar Imagen</span>
+                  </button>
                 </div>
               )}
 
@@ -706,6 +759,38 @@ export default function AdminGalleryManager() {
                   />
                 </div>
               </div>
+
+              {/* Vista previa de portada si hay URL */}
+              {newPlImageUrl && (
+                <div className="p-3 bg-[#181922] rounded-2xl border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-20 h-14 relative rounded-xl overflow-hidden bg-black shrink-0 border border-zinc-700">
+                      <Image
+                        src={newPlImageUrl}
+                        alt="Vista previa portada"
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="text-xs text-zinc-300 min-w-0">
+                      <div className="font-bold text-white">Portada seleccionada para la playlist</div>
+                      <div className="text-[10px] text-zinc-500 font-mono truncate max-w-xs sm:max-w-md">
+                        {newPlImageUrl}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearPlCover}
+                    className="self-end sm:self-center flex items-center gap-1.5 px-3 py-1.5 bg-red-950/70 hover:bg-red-900 border border-red-700/80 text-red-300 rounded-xl text-xs font-bold transition shrink-0"
+                    title="Quitar portada seleccionada"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                    <span>Quitar Portada</span>
+                  </button>
+                </div>
+              )}
 
               <div>
                 <label className="block text-[11px] font-bold text-zinc-400 uppercase mb-1">
