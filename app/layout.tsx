@@ -28,12 +28,17 @@ export const metadata: Metadata = {
   creator: 'Pasión Lomonegra',
   icons: {
     icon: [
-      { url: '/logo-pasion-lomonegra.png' },
-      { url: '/favicon.ico' },
-      { url: '/icon.png' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/icon-96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/icon-144.png', sizes: '144x144', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/logo-pasion-lomonegra.png', type: 'image/png' },
     ],
-    shortcut: '/logo-pasion-lomonegra.png',
-    apple: '/logo-pasion-lomonegra.png',
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
   openGraph: {
     title: 'Pasión Lomonegra - Transmisiones Oficiales en Vivo',

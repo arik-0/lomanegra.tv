@@ -1,5 +1,4 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -14,6 +13,16 @@ import {
   Clock,
   Radio,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Términos y Condiciones del Servicio',
+  description:
+    'Condiciones generales de uso, contratación de pases por partido (Pay-Per-View) y acceso a las señales de Pasión Lomonegra.',
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 export default function TerminosPage() {
   return (

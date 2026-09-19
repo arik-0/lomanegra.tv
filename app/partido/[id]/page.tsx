@@ -77,6 +77,10 @@ export async function generateMetadata({ params }: MatchPageProps): Promise<Meta
         },
       ],
     },
+    robots: {
+      index: false,
+      follow: true,
+    },
     twitter: {
       card: 'summary_large_image',
       title: `${title} | Pasión Lomonegra`,
