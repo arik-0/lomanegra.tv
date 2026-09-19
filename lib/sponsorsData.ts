@@ -105,7 +105,7 @@ export const SPONSORS: Sponsor[] = [
   },
   {
     id: 'maria-juana',
-    name: 'María Juana (Laura Massei)',
+    name: 'María Juana',
     category: 'Indumentaria & Regalería',
     tier: 'SPONSOR OFICIAL',
     logo: '/sponsors/maria-juana.jpeg',
