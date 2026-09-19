@@ -62,10 +62,10 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-[#101116]/95 backdrop-blur-md border-b border-zinc-800/80 h-14 flex items-center shadow-[0_4px_24px_rgba(0,0,0,0.45)]">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logotipo Oficial y Menú Hamburguesa */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 lg:hidden">
           <button
             onClick={toggleSidebar}
-            className="lg:hidden p-2 rounded-xl text-zinc-400 hover:text-white bg-[#181920] hover:bg-[#20222a] border border-zinc-800 transition shadow-sm"
+            className="p-2 rounded-xl text-zinc-400 hover:text-white bg-[#181920] hover:bg-[#20222a] border border-zinc-800 transition shadow-sm"
             aria-label="Abrir menú"
             title="Abrir menú de navegación"
           >

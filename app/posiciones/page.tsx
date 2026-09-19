@@ -1076,7 +1076,6 @@ export default function PosicionesPage() {
                     <Trophy className="w-3.5 h-3.5 text-amber-500" />
                     Gran Final
                   </span>
-                  <span className="text-[9px] text-red-500 animate-pulse font-black">EN DIRECTO</span>
                 </div>
 
                 <div className="my-auto">
