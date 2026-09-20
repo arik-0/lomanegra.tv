@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { ClubItem } from '@/lib/clubsPersistence';
 import { registerCustomClubLogo } from '@/lib/standingsStore';
+import { optimizeImageBeforeUpload } from '@/lib/imageOptimizer';
 
 export default function AdminClubsManager() {
   const [clubs, setClubs] = useState<ClubItem[]>([]);
@@ -84,12 +85,13 @@ export default function AdminClubsManager() {
   };
 
   const handleClubLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !targetClubId) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile || !targetClubId) return;
 
     setUploadingForClubId(targetClubId);
     setErrorMsg('');
     try {
+      const file = await optimizeImageBeforeUpload(rawFile, 512, 0.9);
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/admin/upload', {

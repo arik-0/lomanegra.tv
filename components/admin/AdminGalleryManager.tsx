@@ -19,6 +19,7 @@ import {
   Eye,
 } from 'lucide-react';
 import type { GalleryPhoto, PlaylistCard, GalleryData } from '@/lib/galleryPersistence';
+import { optimizeImageBeforeUpload } from '@/lib/imageOptimizer';
 
 export default function AdminGalleryManager() {
   const [subTab, setSubTab] = useState<'fotos' | 'playlists'>('fotos');
@@ -77,11 +78,13 @@ export default function AdminGalleryManager() {
   };
 
   const handleUploadPhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingPhoto(true);
     setErrorMsg('');
     try {
+      // Optimizar en el navegador: comprime fotos de celular (5MB-15MB) a ~350KB HD
+      const file = await optimizeImageBeforeUpload(rawFile, 1920, 0.85);
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/admin/upload', {
@@ -91,7 +94,7 @@ export default function AdminGalleryManager() {
       const data = await res.json();
       if (res.ok && data.url) {
         setNewPhotoImageUrl(data.url);
-        notifySuccess('Foto subida exitosamente.');
+        notifySuccess('Foto optimizada y subida exitosamente a la nube.');
       } else {
         setErrorMsg(data.error || 'Error al subir la foto.');
       }
@@ -104,11 +107,12 @@ export default function AdminGalleryManager() {
   };
 
   const handleUploadPlCover = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const rawFile = e.target.files?.[0];
+    if (!rawFile) return;
     setUploadingPlCover(true);
     setErrorMsg('');
     try {
+      const file = await optimizeImageBeforeUpload(rawFile, 1280, 0.85);
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/admin/upload', {
@@ -127,6 +131,35 @@ export default function AdminGalleryManager() {
     } finally {
       setUploadingPlCover(false);
       if (plFileInputRef.current) plFileInputRef.current.value = '';
+    }
+  };
+
+  const handleRestoreDefaults = async () => {
+    if (
+      !confirm(
+        '¿Deseas restaurar las fotos oficiales de muestra (hockey, inferiores, predio)? Tus fotos ya subidas se mantendrán intactas.'
+      )
+    )
+      return;
+    setSaving(true);
+    setErrorMsg('');
+    try {
+      const res = await fetch('/api/admin/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'restore_defaults' }),
+      });
+      const data = await res.json();
+      if (res.ok && data.photos) {
+        setPhotos(data.photos);
+        notifySuccess('Fotos de muestra restauradas correctamente.');
+      } else {
+        setErrorMsg(data.error || 'Error al restaurar fotos.');
+      }
+    } catch {
+      setErrorMsg('Error de red al restaurar fotos.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -390,9 +423,20 @@ export default function AdminGalleryManager() {
         <div className="space-y-6">
           {/* Formulario para agregar / subir foto */}
           <div className="bg-[#12131a] border border-zinc-800/90 rounded-3xl p-5 shadow-xl space-y-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase text-zinc-300 border-b border-zinc-800/80 pb-3">
-              <Plus className="w-4 h-4 text-red-500" />
-              <span>Subir Nueva Foto a la Galería</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
+              <div className="flex items-center gap-2 text-xs font-black uppercase text-zinc-300">
+                <Plus className="w-4 h-4 text-red-500" />
+                <span>Subir Nueva Foto a la Galería</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRestoreDefaults}
+                className="self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/80 text-zinc-300 hover:text-white rounded-xl text-[11px] font-bold transition shadow-sm"
+                title="Restaurar fotos de muestra para hockey, inferiores y eventos (conservando tus fotos subidas)"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                <span>Restaurar fotos de muestra</span>
+              </button>
             </div>
 
             <form onSubmit={handleAddPhoto} className="space-y-4">

@@ -4,6 +4,7 @@ import {
   saveGalleryData,
   deleteGalleryPhoto,
   deleteGalleryPlaylist,
+  restoreDefaultGalleryPhotos,
 } from '@/lib/galleryPersistence';
 
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,12 @@ export async function POST(req: Request) {
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'Cuerpo de solicitud inválido' }, { status: 400 });
     }
+
+    if (body.action === 'restore_defaults') {
+      const updated = await restoreDefaultGalleryPhotos();
+      return NextResponse.json({ success: true, ...updated });
+    }
+
     const updated = await saveGalleryData(body);
     return NextResponse.json({ success: true, ...updated });
   } catch (error: any) {

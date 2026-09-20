@@ -362,3 +362,11 @@ export async function deleteGalleryPlaylist(playlistId: string): Promise<Gallery
   const updatedPlaylists = current.playlists.filter((p) => p.id !== playlistId);
   return await saveGalleryData({ playlists: updatedPlaylists });
 }
+
+export async function restoreDefaultGalleryPhotos(): Promise<GalleryData> {
+  const current = await getGalleryData();
+  const existingIds = new Set(current.photos.map((p) => p.id));
+  const missingDefaults = DEFAULT_GALLERY_PHOTOS.filter((p) => !existingIds.has(p.id));
+  const combined = [...current.photos, ...missingDefaults];
+  return await saveGalleryData({ photos: combined });
+}

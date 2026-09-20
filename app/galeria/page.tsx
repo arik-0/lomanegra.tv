@@ -581,6 +581,7 @@ function GaleriaContent() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity" />
 
@@ -805,6 +806,7 @@ function GaleriaContent() {
                   fill
                   className="object-contain"
                   priority
+                  unoptimized
                 />
               </div>
 
