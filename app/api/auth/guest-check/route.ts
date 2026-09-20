@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!isSupabaseConfigured) {
       return NextResponse.json(
         { hasAccess: false, message: 'Modo local.' },
-        { status: 404 }
+        { status: 200 }
       );
     }
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     if (error || !purchase) {
       return NextResponse.json(
         { hasAccess: false, message: 'No se encontró un pase aprobado con este correo.' },
-        { status: 404 }
+        { status: 200 }
       );
     }
 
