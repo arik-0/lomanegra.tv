@@ -20,7 +20,9 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const { sessionId, guestEmail } = body;
 
-    const sessionKey = user ? user.id : (guestEmail ? `guest_${guestEmail.toLowerCase().trim()}` : null);
+    const cleanGuest = guestEmail ? guestEmail.toLowerCase().trim().replace(/[^a-z0-9]/g, '_') : null;
+    const rawGuest = guestEmail ? guestEmail.toLowerCase().trim() : null;
+    const sessionKey = user ? user.id : (cleanGuest ? `guest_${cleanGuest}` : null);
 
     if (!sessionKey || !sessionId) {
       return NextResponse.json(
@@ -29,14 +31,26 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Consultar la sesión activa del usuario o invitado
-    const { data: activeSession, error: sessionError } = await supabaseAdmin
+    // 1. Consultar la sesión activa del usuario o invitado (soporta clave sanitizada o cruda)
+    let activeSession = null;
+    const { data: s1 } = await supabaseAdmin
       .from('active_sessions')
       .select('session_id')
       .eq('user_id', sessionKey)
-      .single();
+      .maybeSingle();
 
-    if (sessionError || !activeSession) {
+    if (s1) {
+      activeSession = s1;
+    } else if (rawGuest && `guest_${rawGuest}` !== sessionKey) {
+      const { data: s2 } = await supabaseAdmin
+        .from('active_sessions')
+        .select('session_id')
+        .eq('user_id', `guest_${rawGuest}`)
+        .maybeSingle();
+      if (s2) activeSession = s2;
+    }
+
+    if (!activeSession) {
       return NextResponse.json(
         { success: false, error: 'No existe una sesión activa registrada.' },
         { status: 200 }
@@ -56,10 +70,11 @@ export async function POST(req: Request) {
     }
 
     // 3. Actualizar la marca de tiempo de último latido
+    const matchedKey = s1 ? sessionKey : `guest_${rawGuest}`;
     await supabaseAdmin
       .from('active_sessions')
       .update({ last_heartbeat: new Date().toISOString() })
-      .eq('user_id', sessionKey);
+      .eq('user_id', matchedKey);
 
     return NextResponse.json({ status: 'alive' }, { status: 200 });
   } catch (error: any) {
