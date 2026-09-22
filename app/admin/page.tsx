@@ -17,6 +17,7 @@ import {
   Zap,
   Lock,
   ArrowRight,
+  PlayCircle,
   Shield,
   Eye,
   LogOut,
@@ -117,6 +118,7 @@ export default function AdminPage() {
   const [formStreamUid, setFormStreamUid] = useState('');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formIsLive, setFormIsLive] = useState(false);
+  const [formIsActive, setFormIsActive] = useState(true);
   const [formSaveLoading, setFormSaveLoading] = useState(false);
   const [saveMatchError, setSaveMatchError] = useState('');
 
@@ -286,6 +288,51 @@ export default function AdminPage() {
     }
   };
 
+  const handleToggleMatchActive = async (matchId: string, currentActiveStatus: boolean) => {
+    const newStatus = !currentActiveStatus;
+    const confirmText = newStatus
+      ? '¿Deseas reactivar este partido para que vuelva a mostrarse en la cartelera principal?'
+      : '¿Deseas finalizar este partido y cambiar su estado a INACTIVO? Se quitará de la cartelera principal y se apagará la transmisión.';
+
+    if (!confirm(confirmText)) return;
+
+    // Actualización optimista inmediata en la interfaz
+    setMatches((prev) =>
+      prev.map((m) =>
+        m.id === matchId
+          ? { ...m, is_active: newStatus, is_live: newStatus ? m.is_live : false }
+          : m
+      )
+    );
+
+    try {
+      const res = await fetch('/api/admin/matches', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: matchId,
+          is_active: newStatus,
+          is_live: newStatus ? undefined : false,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setAnchorMessage({
+          type: 'success',
+          text: newStatus
+            ? '¡Partido reactivado! Ya está visible en la cartelera principal.'
+            : '¡Partido finalizado e inactivado! Se ha retirado de la cartelera principal.',
+        });
+        fetchMatches();
+      } else {
+        setAnchorMessage({ type: 'error', text: data.error || 'Error cambiando estado del partido.' });
+      }
+    } catch {
+      setAnchorMessage({ type: 'error', text: 'Error de red al actualizar estado del partido.' });
+    }
+  };
+
   const copyToClipboard = (text: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(text);
@@ -355,6 +402,7 @@ export default function AdminPage() {
       setFormStreamUid(match.cloudflare_live_input_uid);
       setFormImageUrl(match.image_url || '');
       setFormIsLive(Boolean(match.is_live));
+      setFormIsActive(match.is_active !== false);
     } else {
       const selectedLeague =
         initialLeague || (matchLeagueFilter !== 'Todas' ? matchLeagueFilter : 'Liga Deportiva del Sur');
@@ -374,6 +422,7 @@ export default function AdminPage() {
       setFormStreamUid('live_input_byn');
       setFormImageUrl('');
       setFormIsLive(false);
+      setFormIsActive(true);
     }
     setIsMatchModalOpen(true);
   };
@@ -406,6 +455,7 @@ export default function AdminPage() {
         cloudflare_live_input_uid: formStreamUid.trim() || 'live_input_byn',
         image_url: formImageUrl.trim() || null,
         is_live: formIsLive,
+        is_active: formIsActive,
       };
 
       let res: Response;
@@ -1363,6 +1413,40 @@ export default function AdminPage() {
                       <span>Abrir Pantalla del Partido</span>
                       <ExternalLink className="w-3 h-3 text-zinc-500" />
                     </Link>
+
+                    {/* Botón Finalizar / Inactivar Partido */}
+                    {(() => {
+                      const currentM = matches.find((m) => m.id === selectedMatchId);
+                      const isActive = currentM ? currentM.is_active !== false : true;
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMatchActive(selectedMatchId, isActive)}
+                          className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition shadow-lg ${
+                            isActive
+                              ? 'bg-zinc-800 hover:bg-red-950 border border-zinc-700 hover:border-red-700 text-zinc-300 hover:text-red-300'
+                              : 'bg-emerald-700 hover:bg-emerald-600 text-white shadow-emerald-950'
+                          }`}
+                          title={
+                            isActive
+                              ? 'Marcar como finalizado e inactivar (se quita de la cartelera principal)'
+                              : 'Reactivar en la cartelera principal'
+                          }
+                        >
+                          {isActive ? (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                              <span>⏹️ Finalizar Partido (Inactivar)</span>
+                            </>
+                          ) : (
+                            <>
+                              <PlayCircle className="w-4 h-4 text-emerald-300" />
+                              <span>▶️ Reactivar Partido</span>
+                            </>
+                          )}
+                        </button>
+                      );
+                    })()}
                   </div>
 
                   {/* Toggle para desplegar la Guía Cloudflare & OBS */}
@@ -1576,15 +1660,26 @@ export default function AdminPage() {
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-[10px]">
-                        <span
-                          className={`px-2 py-0.5 rounded font-bold uppercase ${
-                            m.is_date_confirmed
-                              ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-400'
-                              : 'bg-amber-950/80 border border-amber-800 text-amber-400'
-                          }`}
-                        >
-                          {m.is_date_confirmed ? 'Fecha Confirmada' : 'A Confirmar / Vacante'}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`px-2 py-0.5 rounded font-bold uppercase ${
+                              m.is_active !== false
+                                ? 'bg-emerald-950/80 border border-emerald-800 text-emerald-400'
+                                : 'bg-zinc-800 border border-zinc-700 text-zinc-400'
+                            }`}
+                          >
+                            {m.is_active !== false ? 'Activo' : 'Finalizado / Inactivo'}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded font-bold uppercase ${
+                              m.is_date_confirmed
+                                ? 'bg-blue-950/80 border border-blue-800 text-blue-300'
+                                : 'bg-amber-950/80 border border-amber-800 text-amber-400'
+                            }`}
+                          >
+                            {m.is_date_confirmed ? 'Fecha Confirmada' : 'A Confirmar'}
+                          </span>
+                        </div>
                         <span className="font-bold text-white font-mono">${m.price} ARS</span>
                       </div>
 
@@ -1642,14 +1737,33 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => handleToggleDateConfirmed(m)}
-                        className="text-[10px] px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition"
-                        title="Alternar estado de fecha"
-                      >
-                        {m.is_date_confirmed ? 'Poner Vacante' : 'Confirmar'}
-                      </button>
+                    <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMatchActive(m.id, m.is_active !== false)}
+                          className={`text-[10px] font-bold px-2 py-1 rounded border transition flex items-center gap-1 cursor-pointer ${
+                            m.is_active !== false
+                              ? 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-300 hover:border-amber-800/60'
+                              : 'bg-emerald-950/60 border-emerald-800/80 text-emerald-300 hover:bg-emerald-900/80'
+                          }`}
+                          title={
+                            m.is_active !== false
+                              ? 'Marcar como finalizado e inactivar (sale de la cartelera principal)'
+                              : 'Reactivar partido en la cartelera principal'
+                          }
+                        >
+                          {m.is_active !== false ? '⏹️ Finalizar' : '▶️ Reactivar'}
+                        </button>
+
+                        <button
+                          onClick={() => handleToggleDateConfirmed(m)}
+                          className="text-[10px] px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition"
+                          title="Alternar estado de fecha"
+                        >
+                          {m.is_date_confirmed ? 'Vacante' : 'Confirmar'}
+                        </button>
+                      </div>
 
                       <div className="flex items-center gap-1.5">
                         <Link
@@ -3055,6 +3169,46 @@ export default function AdminPage() {
                     {!formIsLive
                       ? 'Los compradores verán el Placeholder oficial con radar de espera, fecha y escudo ByN.'
                       : 'La señal en directo está activa y se emitirá en el reproductor a los compradores.'}
+                  </p>
+                </div>
+
+                {/* Control de Visibilidad en Cartelera: Activo vs Inactivo / Finalizado */}
+                <div className="bg-[#181922] border border-zinc-800/90 rounded-2xl p-3.5 space-y-2">
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                    Visibilidad en Cartelera Principal
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormIsActive(true)}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
+                        formIsActive
+                          ? 'bg-emerald-950/60 border-emerald-600 text-emerald-300 shadow-sm'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>Partido Activo</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormIsActive(false);
+                        setFormIsLive(false);
+                      }}
+                      className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
+                        !formIsActive
+                          ? 'bg-zinc-800 border-zinc-600 text-zinc-300 shadow-sm'
+                          : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <span>Inactivo / Finalizado</span>
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-zinc-500">
+                    {formIsActive
+                      ? 'El partido está visible en la cartelera principal y disponible para la venta de pases.'
+                      : 'El partido queda finalizado/inactivo: se retira de la cartelera de inicio y apaga la señal.'}
                   </p>
                 </div>
 
