@@ -18,9 +18,7 @@ const mpClient = new MercadoPagoConfig({
 
 export async function POST(req: Request) {
   try {
-    const isSupabaseConfigured =
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+    const isSupabaseConfigured = true;
 
     const body = await req.json().catch(() => ({}));
     const { matchId, paymentId, guestEmail } = body;
@@ -33,14 +31,12 @@ export async function POST(req: Request) {
     }
 
     let user: any = null;
-    if (isSupabaseConfigured) {
-      try {
-        const supabase = createServerSupabaseClient();
-        const { data } = await supabase.auth.getUser();
-        user = data?.user || null;
-      } catch {
-        user = null;
-      }
+    try {
+      const supabase = createServerSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      user = data?.user || null;
+    } catch {
+      user = null;
     }
 
     const isValidUUID = (str?: string | null): boolean =>
@@ -49,29 +45,33 @@ export async function POST(req: Request) {
     const cleanEmail = (user?.email || guestEmail)?.toLowerCase()?.trim();
 
     // 1. Verificar si ya está aprobada en Supabase
-    if (isSupabaseConfigured && (user || cleanEmail)) {
+    if (user || cleanEmail) {
       try {
         let confirmedPurchase = null;
 
         if (user && isValidUUID(user.id)) {
-          const { data: userPurch } = await supabaseAdmin
+          let userQ = supabaseAdmin
             .from('purchases')
             .select('id, status, guest_email')
-            .eq('match_id', matchId)
             .eq('user_id', user.id)
-            .eq('status', 'approved')
-            .maybeSingle();
+            .eq('status', 'approved');
+          if (isValidUUID(matchId)) {
+            userQ = userQ.eq('match_id', matchId);
+          }
+          const { data: userPurch } = await userQ.maybeSingle();
           confirmedPurchase = userPurch;
         }
 
         if (!confirmedPurchase && cleanEmail) {
-          const { data: guestPurch } = await supabaseAdmin
+          let guestQ = supabaseAdmin
             .from('purchases')
             .select('id, status, guest_email')
-            .eq('match_id', matchId)
             .ilike('guest_email', cleanEmail)
-            .eq('status', 'approved')
-            .maybeSingle();
+            .eq('status', 'approved');
+          if (isValidUUID(matchId)) {
+            guestQ = guestQ.eq('match_id', matchId);
+          }
+          const { data: guestPurch } = await guestQ.maybeSingle();
           confirmedPurchase = guestPurch;
         }
 

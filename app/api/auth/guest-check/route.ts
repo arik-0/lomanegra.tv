@@ -17,34 +17,31 @@ export async function POST(req: Request) {
       );
     }
 
-    const isSupabaseConfigured =
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
-
-    if (!isSupabaseConfigured) {
-      return NextResponse.json(
-        { hasAccess: false, message: 'Modo local.' },
-        { status: 200 }
-      );
-    }
+    const isValidUUID = (str?: string | null): boolean =>
+      !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // 1. Buscar compra específica para el matchId por guest_email
-    let { data: purchase } = await supabaseAdmin
-      .from('purchases')
-      .select('id, status, created_at')
-      .eq('match_id', matchId)
-      .ilike('guest_email', cleanEmail)
-      .eq('status', 'approved')
-      .limit(1)
-      .maybeSingle();
+    let purchase = null;
+
+    // 1. Buscar compra específica para el matchId por guest_email (solo si matchId es UUID válido)
+    if (isValidUUID(matchId)) {
+      const { data: directPurchase } = await supabaseAdmin
+        .from('purchases')
+        .select('id, status, created_at, match_id')
+        .eq('match_id', matchId)
+        .ilike('guest_email', cleanEmail)
+        .eq('status', 'approved')
+        .limit(1)
+        .maybeSingle();
+      purchase = directPurchase;
+    }
 
     // 2. Fallback: buscar cualquier compra aprobada para este email
     if (!purchase) {
       const { data: anyPurchase } = await supabaseAdmin
         .from('purchases')
-        .select('id, status, created_at')
+        .select('id, status, created_at, match_id')
         .ilike('guest_email', cleanEmail)
         .eq('status', 'approved')
         .limit(1)

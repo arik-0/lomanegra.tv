@@ -27,9 +27,7 @@ import {
 export const revalidate = 0; // Datos frescos en cada petición
 
 export default async function HomePage() {
-  const isSupabaseConfigured =
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+  const isSupabaseConfigured = true;
 
   let user = null;
   let matches: any[] | null = null;

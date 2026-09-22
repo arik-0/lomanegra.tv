@@ -20,9 +20,7 @@ const mpClient = new MercadoPagoConfig({
 
 export async function POST(req: Request) {
   try {
-    const isSupabaseConfigured =
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+    const isSupabaseConfigured = true;
 
     const body = await req.json().catch(() => ({}));
     const { matchId, guestEmail, userEmail, email } = body;

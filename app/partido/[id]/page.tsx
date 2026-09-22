@@ -28,9 +28,7 @@ export async function generateMetadata({ params }: MatchPageProps): Promise<Meta
   let imageUrl = '/logo-pasion-lomonegra.png';
 
   try {
-    const isSupabaseConfigured =
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+    const isSupabaseConfigured = true;
 
     if (isSupabaseConfigured) {
       const { data } = isUUID
@@ -109,9 +107,7 @@ export default async function MatchPage({
   params,
   searchParams,
 }: MatchPageProps) {
-  const isSupabaseConfigured =
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+  const isSupabaseConfigured = true;
 
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
 
