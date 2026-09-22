@@ -58,7 +58,7 @@ export default async function HomePage() {
           .select('*')
           .eq('is_active', true)
           .order('date', { ascending: true }),
-        2500
+        5000
       );
 
       if (matchesRes && !matchesRes.error && matchesRes.data && matchesRes.data.length > 0) {
