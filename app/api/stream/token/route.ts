@@ -99,31 +99,26 @@ export async function POST(req: Request) {
 
         if (!hasAuthorization) {
           const checkEmail = cleanGuestEmail || cookieEmail || user?.email?.toLowerCase().trim();
+          let q = supabaseAdmin
+            .from('purchases')
+            .select('id, status, match_id')
+            .eq('status', 'approved');
+
+          if (isValidUUID(targetId)) {
+            q = q.eq('match_id', targetId);
+          }
+
           if (user && isValidUUID(user.id)) {
             if (checkEmail) {
-              const { data: pList } = await supabaseAdmin
-                .from('purchases')
-                .select('id, status')
-                .or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`)
-                .eq('status', 'approved')
-                .limit(1);
-              if (pList && pList.length > 0) hasAuthorization = true;
+              q = q.or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`);
             } else {
-              const { data: pList } = await supabaseAdmin
-                .from('purchases')
-                .select('id, status')
-                .eq('user_id', user.id)
-                .eq('status', 'approved')
-                .limit(1);
-              if (pList && pList.length > 0) hasAuthorization = true;
+              q = q.eq('user_id', user.id);
             }
+            const { data: pList } = await q.limit(1);
+            if (pList && pList.length > 0) hasAuthorization = true;
           } else if (checkEmail) {
-            const { data: pList } = await supabaseAdmin
-              .from('purchases')
-              .select('id, status')
-              .ilike('guest_email', checkEmail)
-              .eq('status', 'approved')
-              .limit(1);
+            q = q.ilike('guest_email', checkEmail);
+            const { data: pList } = await q.limit(1);
             if (pList && pList.length > 0) hasAuthorization = true;
           }
         }

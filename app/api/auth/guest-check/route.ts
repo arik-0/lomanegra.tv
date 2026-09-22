@@ -37,20 +37,8 @@ export async function POST(req: Request) {
       purchase = directPurchase;
     }
 
-    // 2. Fallback: buscar cualquier compra aprobada para este email
-    if (!purchase) {
-      const { data: anyPurchase } = await supabaseAdmin
-        .from('purchases')
-        .select('id, status, created_at, match_id')
-        .ilike('guest_email', cleanEmail)
-        .eq('status', 'approved')
-        .limit(1)
-        .maybeSingle();
-      purchase = anyPurchase;
-    }
-
-    // 3. Fallback: verificar si pertenece a un usuario registrado en auth.users
-    if (!purchase) {
+    // 2. Fallback: verificar si pertenece a un usuario registrado en auth.users para este matchId
+    if (!purchase && isValidUUID(matchId)) {
       try {
         const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
         const matchedUser = usersData?.users?.find(
@@ -59,8 +47,9 @@ export async function POST(req: Request) {
         if (matchedUser) {
           const { data: userPurch } = await supabaseAdmin
             .from('purchases')
-            .select('id, status, created_at')
+            .select('id, status, created_at, match_id')
             .eq('user_id', matchedUser.id)
+            .eq('match_id', matchId)
             .eq('status', 'approved')
             .limit(1)
             .maybeSingle();

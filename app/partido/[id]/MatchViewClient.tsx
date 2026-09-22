@@ -87,7 +87,6 @@ export default function MatchViewClient({
     // 0. Prefill de email guardado si existe
     try {
       const savedEmail =
-        localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
         localStorage.getItem('lomonegrotv_guest_email') ||
         localStorage.getItem('lomanegratv_guest_email');
       if (savedEmail) {
@@ -95,13 +94,6 @@ export default function MatchViewClient({
         if (!activeGuestEmail) {
           setActiveGuestEmail(savedEmail);
         }
-      }
-
-      // Si ya hay un pase guardado localmente para este partido, activar vista de inmediato
-      const matchPass = localStorage.getItem(`lomonegrotv_pass_${match.id}`);
-      if (matchPass) {
-        setHasPaid(true);
-        setActiveGuestEmail(matchPass);
       }
     } catch {}
 
@@ -114,13 +106,26 @@ export default function MatchViewClient({
       });
     } catch {}
 
+    // Si el usuario canceló o falló en Mercado Pago
+    if (paymentStatus === 'failure') {
+      setPaymentVerifiedError(
+        'El pago no fue completado o fue cancelado en Mercado Pago. Tu pase no está activo.'
+      );
+      setVerifyingPayment(false);
+      if (!serverHasPaid && !isAdmin) {
+        setHasPaid(false);
+        try {
+          localStorage.removeItem(`lomonegrotv_pass_${match.id}`);
+        } catch {}
+      }
+    }
+
     // 2. Si el usuario retornó de Mercado Pago con paymentId oficial
     if (paymentStatus === 'success') {
       if (paymentId) {
         const emailToVerify =
           queryGuestEmail ||
           currentUserEmail ||
-          localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
           localStorage.getItem('lomonegrotv_guest_email') ||
           '';
 
@@ -157,7 +162,6 @@ export default function MatchViewClient({
         queryGuestEmail ||
         currentUserEmail ||
         emailCookie ||
-        localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
         localStorage.getItem('lomonegrotv_guest_email') ||
         localStorage.getItem('lomanegratv_guest_email');
       if (emailToCheck) {
@@ -193,11 +197,23 @@ export default function MatchViewClient({
           } catch {}
         }
       } else {
+        if (!serverHasPaid && !isAdmin) {
+          setHasPaid(false);
+          try {
+            localStorage.removeItem(`lomonegrotv_pass_${match.id}`);
+          } catch {}
+        }
         setPaymentVerifiedError(
           data.message || 'No se pudo verificar la acreditación del pago en Mercado Pago.'
         );
       }
     } catch {
+      if (!serverHasPaid && !isAdmin) {
+        setHasPaid(false);
+        try {
+          localStorage.removeItem(`lomonegrotv_pass_${match.id}`);
+        } catch {}
+      }
       setPaymentVerifiedError('Error de red al comprobar el estado del pago con Mercado Pago.');
     } finally {
       setVerifyingPayment(false);
@@ -244,6 +260,12 @@ export default function MatchViewClient({
           text: `¡Pase encontrado para ${confirmedEmail}! Acceso habilitado.`,
         });
       } else {
+        if (!serverHasPaid && !isAdmin) {
+          setHasPaid(false);
+          try {
+            localStorage.removeItem(`lomonegrotv_pass_${match.id}`);
+          } catch {}
+        }
         if (showRestoreInput) {
           setRestoreMessage({
             type: 'error',
@@ -252,6 +274,12 @@ export default function MatchViewClient({
         }
       }
     } catch {
+      if (!serverHasPaid && !isAdmin) {
+        setHasPaid(false);
+        try {
+          localStorage.removeItem(`lomonegrotv_pass_${match.id}`);
+        } catch {}
+      }
       if (showRestoreInput) {
         setRestoreMessage({
           type: 'error',

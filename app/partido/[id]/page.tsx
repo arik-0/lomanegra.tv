@@ -234,7 +234,15 @@ export default async function MatchPage({
       if (match && (user || checkEmail)) {
         const fetchPurchase = async () => {
           try {
-            let q = supabaseAdmin.from('purchases').select('id, status, match_id').eq('status', 'approved');
+            let q = supabaseAdmin
+              .from('purchases')
+              .select('id, status, match_id')
+              .eq('status', 'approved');
+
+            if (isValidUUID(match.id)) {
+              q = q.eq('match_id', match.id);
+            }
+
             if (user && isValidUUID(user.id)) {
               if (checkEmail) {
                 q = q.or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`);

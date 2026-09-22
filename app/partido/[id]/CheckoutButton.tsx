@@ -69,7 +69,6 @@ export default function CheckoutButton({
         }
         const clean = guestEmail.toLowerCase().trim();
         localStorage.setItem('lomonegrotv_guest_email', clean);
-        localStorage.setItem(`lomonegrotv_pass_${matchId}`, clean);
         document.cookie = `lomonegro_user_email=${encodeURIComponent(clean)}; path=/; max-age=2592000; SameSite=Lax`;
         if (onGuestEmailConfirmed) {
           onGuestEmailConfirmed(clean);
@@ -77,7 +76,6 @@ export default function CheckoutButton({
       } else if (userEmail) {
         const clean = userEmail.toLowerCase().trim();
         localStorage.setItem('lomonegrotv_guest_email', clean);
-        localStorage.setItem(`lomonegrotv_pass_${matchId}`, clean);
         document.cookie = `lomonegro_user_email=${encodeURIComponent(clean)}; path=/; max-age=2592000; SameSite=Lax`;
       }
 

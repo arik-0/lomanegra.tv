@@ -75,18 +75,6 @@ export async function POST(req: Request) {
           confirmedPurchase = guestPurch;
         }
 
-        // Fallback: si compró para cualquier partido con este correo
-        if (!confirmedPurchase && cleanEmail) {
-          const { data: anyApproved } = await supabaseAdmin
-            .from('purchases')
-            .select('id, status, guest_email, match_id')
-            .ilike('guest_email', cleanEmail)
-            .eq('status', 'approved')
-            .limit(1)
-            .maybeSingle();
-          if (anyApproved) confirmedPurchase = anyApproved;
-        }
-
         if (confirmedPurchase) {
           const buyerEmail = cleanEmail || confirmedPurchase.guest_email;
           const cookieStore = cookies();
