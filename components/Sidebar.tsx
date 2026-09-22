@@ -34,37 +34,38 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   // Partidos oficiales de la agenda (sincronizados con los partidos reales)
   const defaultSidebarMatches = [
     {
-      id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-      team1: 'Blanco y Negro',
-      team2: 'Atlético Acebal',
-      time: 'DOMINGO 15:45 HS',
+      id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
+      team1: 'Carreras',
+      team2: 'Blanco y Negro',
+      time: 'MIÉRCOLES 21:45 HS',
       isLive: false,
       category: 'Primera • Liga Deportiva del Sur',
       price: '$12.000 ARS',
-      logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Atletico Acebal.png',
+      logo1: getTeamLogo('Carreras') || '/teams/carreras.png',
+      logo2: getTeamLogo('Blanco y Negro') || '/teams/Blanco y Negro.png',
     },
     {
-      id: 'b1a9c001-0000-4000-8000-000000000004',
+      id: '11db1ce1-b9c5-4dcb-9fa7-3b788feaeb20',
       team1: 'Blanco y Negro',
-      team2: 'Los Andes',
+      team2: 'Nuevo Alberdi',
       time: 'A CONFIRMAR',
       isLive: false,
-      category: 'Primera • Torneo Clausura',
+      category: 'Primera • Liga Deportiva del Sur',
       price: '$12.000 ARS',
-      logo1: '/teams/Blanco y Negro.png',
-      logo2: '/teams/Los Andes.png',
+      logo1: getTeamLogo('Blanco y Negro') || '/teams/Blanco y Negro.png',
+      logo2: getTeamLogo('Nuevo Alberdi') || '/teams/nuevo-alberdi.png',
     },
   ];
 
   const [matches, setMatches] = useState(defaultSidebarMatches);
 
-  useEffect(() => {
-    fetch('/api/admin/matches')
+  const fetchMatches = () => {
+    fetch('/api/admin/matches', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
         if (data?.matches && data.matches.length > 0) {
-          const mapped = data.matches.map((m: any) => {
+          const activeMatches = data.matches.filter((m: any) => m.is_active !== false);
+          const mapped = activeMatches.map((m: any) => {
             const parts = (m.title || '').split(/vs/i);
             const t1 = parts[0]?.trim() || 'Blanco y Negro';
             const t2 = parts[1]?.trim() || 'Rival';
@@ -95,11 +96,44 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               logo2: getTeamLogo(t2) || '/teams/ifc.png',
             };
           });
-          setMatches(mapped);
+          if (mapped.length > 0) {
+            setMatches(mapped);
+          }
         }
       })
       .catch(() => {});
+  };
+
+  // Carga inicial y listeners para sincronización en tiempo real
+  useEffect(() => {
+    fetchMatches();
+
+    const handleUpdated = () => fetchMatches();
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'matches_updated_at') {
+        fetchMatches();
+      }
+    };
+
+    window.addEventListener('matches_updated', handleUpdated);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('matches_updated', handleUpdated);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
+
+  // Re-sincronizar al navegar o al abrir el drawer
+  useEffect(() => {
+    fetchMatches();
+  }, [pathname]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchMatches();
+    }
+  }, [isOpen]);
 
 
 
@@ -367,7 +401,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {/* 6. Footer del Sidebar con CTA Rápido y Redes */}
         <div className="p-3 border-t border-zinc-800/80 bg-[#12131a] shrink-0 pb-20 lg:pb-3">
           <Link
-            href="/partido/0790eca3-cc28-41bb-a4b8-8e2c0c514cdf"
+            href={`/partido/${matches[0]?.id || 'b1343cdc-be37-4e30-9c29-fbb505721566'}`}
             onClick={handleLinkClick}
             className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-white text-black hover:bg-zinc-200 text-xs font-black tracking-wider uppercase rounded-xl no-underline transition-colors shadow-[0_4px_16px_rgba(255,255,255,0.1)]"
           >

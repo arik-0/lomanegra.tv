@@ -91,7 +91,37 @@ function decodeMatchFields(m: any): MatchData {
   };
 }
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+function sortMatches(matches: MatchData[]): MatchData[] {
+  return [...matches].sort((a, b) => {
+    // 1. Partidos EN VIVO van primero
+    if (a.is_live && !b.is_live) return -1;
+    if (!a.is_live && b.is_live) return 1;
+
+    // 2. Partidos con fecha confirmada van antes que los no confirmados
+    if (a.is_date_confirmed && a.date && (!b.is_date_confirmed || !b.date)) return -1;
+    if ((!a.is_date_confirmed || !a.date) && b.is_date_confirmed && b.date) return 1;
+
+    // 3. Si ambos tienen fecha confirmada, ordenar cronológicamente
+    if (a.date && b.date) {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    }
+
+    return 0;
+  });
+}
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
+
 export async function GET() {
+  const isAdmin = verifyAdminSession();
+
   try {
     const res: any = await withTimeout(
       supabaseAdmin.from('matches').select('*').order('date', { ascending: true })
@@ -106,19 +136,27 @@ export async function GET() {
     }
 
     if (res && !res.error && res.data && res.data.length > 0) {
-      // Filtrar filas del sistema (como persistencia de tablas)
+      // Filtrar filas del sistema (como persistencia de tablas o galería)
       const realMatches = res.data.filter((m: any) => !m.title?.startsWith('__SYSTEM_'));
-      const normalized = realMatches.map(decodeMatchFields);
-      return NextResponse.json({ matches: normalized, source: 'supabase', mpStatus });
+      const normalized = sortMatches(realMatches.map(decodeMatchFields));
+      return NextResponse.json(
+        { matches: normalized, source: 'supabase', mpStatus, isAdmin },
+        { headers: NO_CACHE_HEADERS }
+      );
     }
 
-    // Retornar partidos del almacén en memoria
-    const memMatches = getStoredMatches().map((m) => ({
-      ...m,
-      title: sanitizeRegionalText(m.title),
-      description: sanitizeRegionalText(m.description),
-    }));
-    return NextResponse.json({ matches: memMatches, source: 'memory', mpStatus });
+    // Retornar partidos del almacén en memoria / disco
+    const memMatches = sortMatches(
+      getStoredMatches().map((m) => ({
+        ...m,
+        title: sanitizeRegionalText(m.title),
+        description: sanitizeRegionalText(m.description),
+      }))
+    );
+    return NextResponse.json(
+      { matches: memMatches, source: 'memory', mpStatus, isAdmin },
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (error: any) {
     const mpToken = process.env.MP_ACCESS_TOKEN || '';
     let mpStatus: 'production' | 'sandbox' | 'mock' = 'mock';
@@ -128,12 +166,17 @@ export async function GET() {
       mpStatus = 'sandbox';
     }
 
-    const memMatches = getStoredMatches().map((m) => ({
-      ...m,
-      title: sanitizeRegionalText(m.title),
-      description: sanitizeRegionalText(m.description),
-    }));
-    return NextResponse.json({ matches: memMatches, source: 'fallback', mpStatus });
+    const memMatches = sortMatches(
+      getStoredMatches().map((m) => ({
+        ...m,
+        title: sanitizeRegionalText(m.title),
+        description: sanitizeRegionalText(m.description),
+      }))
+    );
+    return NextResponse.json(
+      { matches: memMatches, source: 'fallback', mpStatus, isAdmin },
+      { headers: NO_CACHE_HEADERS }
+    );
   }
 }
 
@@ -205,14 +248,14 @@ export async function POST(req: Request) {
     };
 
     try {
-      const { error: dbError } = await supabaseAdmin.from('matches').insert([dbPayload]);
+      const { error: dbError } = await supabaseAdmin.from('matches').upsert([dbPayload], { onConflict: 'id' });
       if (dbError) {
-        console.error('[Matches API] Error insertando partido en Supabase:', dbError);
+        console.error('[Matches API] Error guardando partido en Supabase:', dbError);
       } else {
-        console.log('[Matches API] Partido insertado exitosamente en Supabase:', newMatch.id);
+        console.log('[Matches API] Partido guardado exitosamente en Supabase:', newMatch.id);
       }
     } catch (dbEx) {
-      console.error('[Matches API] Excepción insertando en Supabase:', dbEx);
+      console.error('[Matches API] Excepción guardando en Supabase:', dbEx);
     }
 
     return NextResponse.json({ success: true, match: newMatch, source: 'supabase' });

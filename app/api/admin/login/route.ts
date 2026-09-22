@@ -1,6 +1,21 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { verifyPassword, getAdminPasswordHash } from '@/lib/adminAuth';
+import { verifyPassword, getAdminPasswordHash, verifyAdminSession } from '@/lib/adminAuth';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+export async function GET() {
+  const isAuthorized = verifyAdminSession();
+  return NextResponse.json(
+    { authenticated: isAuthorized },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+      },
+    }
+  );
+}
 
 export async function POST(req: Request) {
   try {

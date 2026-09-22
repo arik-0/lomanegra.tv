@@ -137,14 +137,51 @@ export default function AdminPage() {
   const [isPlayoffOpen, setIsPlayoffOpen] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Comprobar autenticación inicial y cargar datos
-  useEffect(() => {
+  const notifyMatchesUpdated = () => {
     if (typeof window !== 'undefined') {
-      const storedAuth = localStorage.getItem('admin_session_auth');
-      if (storedAuth === 'true') {
-        setIsAuthenticated(true);
-      }
+      window.dispatchEvent(new Event('matches_updated'));
+      localStorage.setItem('matches_updated_at', Date.now().toString());
     }
+  };
+
+  const handleAuthError = (msg?: string) => {
+    setIsAuthenticated(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('admin_session_auth');
+    }
+    setLoginError(
+      msg || 'Tu sesión ha expirado o no es válida. Por favor ingresa nuevamente la contraseña de operador.'
+    );
+  };
+
+  // Comprobar autenticación inicial con el backend y cargar datos
+  useEffect(() => {
+    // 1. Validar cookie real de sesión de operador en el servidor
+    fetch('/api/admin/login', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.authenticated) {
+          setIsAuthenticated(true);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('admin_session_auth', 'true');
+          }
+        } else {
+          setIsAuthenticated(false);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('admin_session_auth');
+          }
+        }
+      })
+      .catch(() => {
+        // En caso de fallo de red puntual, conservar estado local si existía
+        if (typeof window !== 'undefined') {
+          const storedAuth = localStorage.getItem('admin_session_auth');
+          if (storedAuth === 'true') {
+            setIsAuthenticated(true);
+          }
+        }
+      });
+
     fetchMatches();
     fetchStandings();
   }, []);
@@ -246,7 +283,9 @@ export default function AdminPage() {
       if (res.ok) {
         setAnchorMessage({ type: 'success', text: '¡Señal y Stream anclados con éxito!' });
         fetchMatches();
+        notifyMatchesUpdated();
       } else {
+        if (res.status === 401) handleAuthError(data.error);
         setAnchorMessage({ type: 'error', text: data.error || 'Error al anclar el stream.' });
       }
     } catch {
@@ -280,7 +319,9 @@ export default function AdminPage() {
             : 'Transmisión puesta en espera (muestra pantalla previa oficial).',
         });
         fetchMatches();
+        notifyMatchesUpdated();
       } else {
+        if (res.status === 401) handleAuthError(data.error);
         setAnchorMessage({ type: 'error', text: data.error || 'Error cambiando estado de transmisión.' });
       }
     } catch {
@@ -325,7 +366,9 @@ export default function AdminPage() {
             : '¡Partido finalizado e inactivado! Se ha retirado de la cartelera principal.',
         });
         fetchMatches();
+        notifyMatchesUpdated();
       } else {
+        if (res.status === 401) handleAuthError(data.error);
         setAnchorMessage({ type: 'error', text: data.error || 'Error cambiando estado del partido.' });
       }
     } catch {
@@ -344,7 +387,7 @@ export default function AdminPage() {
   const handleToggleDateConfirmed = async (match: Match) => {
     const newStatus = !match.is_date_confirmed;
     try {
-      await fetch('/api/admin/matches', {
+      const res = await fetch('/api/admin/matches', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -353,7 +396,12 @@ export default function AdminPage() {
           date: newStatus ? match.date || new Date().toISOString() : null,
         }),
       });
+      if (res.status === 401) {
+        handleAuthError();
+        return;
+      }
       fetchMatches();
+      notifyMatchesUpdated();
     } catch (err) {
       console.error(err);
     }
@@ -481,6 +529,9 @@ export default function AdminPage() {
 
       const result = await res.json();
       if (!res.ok) {
+        if (res.status === 401) {
+          handleAuthError(result.error);
+        }
         throw new Error(result.error || 'Error al guardar el partido');
       }
 
@@ -497,6 +548,7 @@ export default function AdminPage() {
 
       setIsMatchModalOpen(false);
       fetchMatches();
+      notifyMatchesUpdated();
     } catch (err: any) {
       console.error(err);
       setSaveMatchError(err.message || 'Error de conexión o timeout al guardar partido');
@@ -510,8 +562,14 @@ export default function AdminPage() {
     // Eliminación optimista inmediata en la interfaz
     setMatches((prev) => prev.filter((m) => m.id !== id));
     try {
-      await fetch(`/api/admin/matches?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/matches?id=${id}`, { method: 'DELETE' });
+      if (res.status === 401) {
+        const data = await res.json().catch(() => ({}));
+        handleAuthError(data.error);
+        return;
+      }
       fetchMatches();
+      notifyMatchesUpdated();
     } catch (err) {
       console.error(err);
     }
