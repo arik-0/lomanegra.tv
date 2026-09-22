@@ -86,29 +86,38 @@ export async function POST(req: Request) {
         const cookieStore = cookies();
         const adminSession = cookieStore.get('admin_session');
         const isAdmin = adminSession?.value === 'authenticated';
+        const cookieEmail = cookieStore.get('lomonegro_user_email')?.value?.toLowerCase().trim();
         const cleanGuestEmail = guestEmail?.toLowerCase().trim();
-        const isOperatorEmail = cleanGuestEmail === 'operador@pasionlomonegra.com' || cleanGuestEmail?.startsWith('operador');
+        const isOperatorEmail =
+          cleanGuestEmail === 'operador@pasionlomonegra.com' ||
+          cleanGuestEmail?.startsWith('operador') ||
+          cookieEmail === 'operador@pasionlomonegra.com';
 
         let hasAuthorization = isAdmin || isOperatorEmail;
 
+        const isValidUUID = (str?: string | null): boolean =>
+          !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
         if (!hasAuthorization) {
-          const checkEmail = cleanGuestEmail || user?.email?.toLowerCase().trim();
-          if (user && checkEmail) {
-            const { data: pList } = await supabaseAdmin
-              .from('purchases')
-              .select('id, status')
-              .or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`)
-              .eq('status', 'approved')
-              .limit(1);
-            if (pList && pList.length > 0) hasAuthorization = true;
-          } else if (user) {
-            const { data: pList } = await supabaseAdmin
-              .from('purchases')
-              .select('id, status')
-              .eq('user_id', user.id)
-              .eq('status', 'approved')
-              .limit(1);
-            if (pList && pList.length > 0) hasAuthorization = true;
+          const checkEmail = cleanGuestEmail || cookieEmail || user?.email?.toLowerCase().trim();
+          if (user && isValidUUID(user.id)) {
+            if (checkEmail) {
+              const { data: pList } = await supabaseAdmin
+                .from('purchases')
+                .select('id, status')
+                .or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`)
+                .eq('status', 'approved')
+                .limit(1);
+              if (pList && pList.length > 0) hasAuthorization = true;
+            } else {
+              const { data: pList } = await supabaseAdmin
+                .from('purchases')
+                .select('id, status')
+                .eq('user_id', user.id)
+                .eq('status', 'approved')
+                .limit(1);
+              if (pList && pList.length > 0) hasAuthorization = true;
+            }
           } else if (checkEmail) {
             const { data: pList } = await supabaseAdmin
               .from('purchases')
@@ -132,10 +141,11 @@ export async function POST(req: Request) {
 
         // Registrar sesión activa
         const newSessionId = crypto.randomUUID();
-        if (user) {
+        const effectiveEmail = cleanGuestEmail || cookieEmail || user?.email?.toLowerCase().trim();
+        if (user && isValidUUID(user.id)) {
           sessionUserKey = user.id;
-        } else if (guestEmail) {
-          sessionUserKey = `guest_${guestEmail.toLowerCase().trim()}`;
+        } else if (effectiveEmail) {
+          sessionUserKey = `guest_${effectiveEmail.replace(/[^a-z0-9]/g, '_')}`;
         }
 
         await supabaseAdmin

@@ -43,29 +43,39 @@ export async function POST(req: Request) {
       }
     }
 
+    const isValidUUID = (str?: string | null): boolean =>
+      !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
     const cleanEmail = (user?.email || guestEmail)?.toLowerCase()?.trim();
 
     // 1. Verificar si ya está aprobada en Supabase
     if (isSupabaseConfigured && (user || cleanEmail)) {
       try {
-        const query = user
-          ? supabaseAdmin
-              .from('purchases')
-              .select('id, status, guest_email')
-              .eq('match_id', matchId)
-              .eq('user_id', user.id)
-              .eq('status', 'approved')
-              .maybeSingle()
-          : supabaseAdmin
-              .from('purchases')
-              .select('id, status, guest_email')
-              .eq('match_id', matchId)
-              .eq('guest_email', cleanEmail)
-              .eq('status', 'approved')
-              .maybeSingle();
+        let confirmedPurchase = null;
 
-        const { data: existing } = await query;
-        let confirmedPurchase = existing;
+        if (user && isValidUUID(user.id)) {
+          const { data: userPurch } = await supabaseAdmin
+            .from('purchases')
+            .select('id, status, guest_email')
+            .eq('match_id', matchId)
+            .eq('user_id', user.id)
+            .eq('status', 'approved')
+            .maybeSingle();
+          confirmedPurchase = userPurch;
+        }
+
+        if (!confirmedPurchase && cleanEmail) {
+          const { data: guestPurch } = await supabaseAdmin
+            .from('purchases')
+            .select('id, status, guest_email')
+            .eq('match_id', matchId)
+            .ilike('guest_email', cleanEmail)
+            .eq('status', 'approved')
+            .maybeSingle();
+          confirmedPurchase = guestPurch;
+        }
+
+        // Fallback: si compró para cualquier partido con este correo
         if (!confirmedPurchase && cleanEmail) {
           const { data: anyApproved } = await supabaseAdmin
             .from('purchases')
@@ -82,13 +92,6 @@ export async function POST(req: Request) {
           const cookieStore = cookies();
           cookieStore.set('lomonegro_user_email', buyerEmail, {
             httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 30,
-            path: '/',
-          });
-          cookieStore.set('lomonegro_user_id', user?.id || `buyer_${buyerEmail.replace(/[^a-z0-9]/g, '_')}`, {
-            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             maxAge: 60 * 60 * 24 * 30,
@@ -127,28 +130,49 @@ export async function POST(req: Request) {
             cleanEmail
           )?.toLowerCase()?.trim() || 'hincha@pasionlomonegra.com';
 
-          // Registrar de inmediato en Supabase para habilitar el acceso
+          // Registrar de inmediato para ambos correos (formulario y cuenta MP)
+          const allEmails = new Set<string>();
+          if (payerEmail) allEmails.add(payerEmail);
+          if (paymentData.metadata?.guest_email) allEmails.add(paymentData.metadata.guest_email.toLowerCase().trim());
+          if (paymentData.payer?.email) allEmails.add(paymentData.payer.email.toLowerCase().trim());
+          if (cleanEmail) allEmails.add(cleanEmail);
+
           if (isSupabaseConfigured && mpMatchId) {
-            await supabaseAdmin.from('purchases').upsert({
-              user_id: user ? user.id : null,
-              guest_email: user ? null : payerEmail,
-              match_id: mpMatchId,
-              status: 'approved',
-              mp_payment_id: String(paymentData.id),
-              created_at: new Date().toISOString(),
-            });
+            for (const em of Array.from(allEmails)) {
+              try {
+                const { data: exists } = await supabaseAdmin
+                  .from('purchases')
+                  .select('id')
+                  .eq('match_id', mpMatchId)
+                  .ilike('guest_email', em)
+                  .maybeSingle();
+
+                if (exists) {
+                  await supabaseAdmin
+                    .from('purchases')
+                    .update({ status: 'approved', mp_payment_id: String(paymentData.id) })
+                    .eq('id', exists.id);
+                } else {
+                  await supabaseAdmin
+                    .from('purchases')
+                    .insert({
+                      user_id: user && isValidUUID(user.id) ? user.id : null,
+                      guest_email: em,
+                      match_id: mpMatchId,
+                      status: 'approved',
+                      mp_payment_id: String(paymentData.id),
+                      created_at: new Date().toISOString(),
+                    });
+                }
+              } catch (insErr) {
+                console.warn(`Error guardando compra para ${em}:`, insErr);
+              }
+            }
           }
 
           const cookieStore = cookies();
           cookieStore.set('lomonegro_user_email', payerEmail, {
             httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 30,
-            path: '/',
-          });
-          cookieStore.set('lomonegro_user_id', user?.id || `buyer_${payerEmail.replace(/[^a-z0-9]/g, '_')}`, {
-            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             maxAge: 60 * 60 * 24 * 30,

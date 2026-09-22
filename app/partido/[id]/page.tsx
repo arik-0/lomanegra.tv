@@ -221,29 +221,36 @@ export default async function MatchPage({
 
       if (!user) {
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
-        const cookieId = cookieStore.get('lomonegro_user_id')?.value;
         if (cookieEmail) {
-          user = { id: cookieId || 'user-cookie', email: cookieEmail };
+          user = { id: 'guest-buyer', email: cookieEmail.toLowerCase().trim() };
         }
       }
 
-      // Verificar compras aprobadas con timeout de 3000ms buscando por user_id o email
-      const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
+      // Helper para validar UUID antes de consultar columnas Postgres UUID
+      const isValidUUID = (str?: string | null): boolean =>
+        !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+      // Verificar compras aprobadas con timeout buscando por user_id o email
+      const cookieEmail = cookieStore.get('lomonegro_user_email')?.value?.toLowerCase().trim();
       const guestEmail = (searchParams?.guest_email || cookieEmail)?.toLowerCase().trim();
       const checkEmail = user?.email?.toLowerCase().trim() || guestEmail;
 
       if (match && (user || checkEmail)) {
         const fetchPurchase = async () => {
           try {
-            let q = supabaseAdmin.from('purchases').select('id, status').eq('status', 'approved');
-            if (user && checkEmail && user.id && user.id !== 'user-cookie') {
-              q = q.or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`);
-            } else if (user && user.id && user.id !== 'user-cookie') {
-              q = q.or(`user_id.eq.${user.id},guest_email.ilike.${user.email}`);
+            let q = supabaseAdmin.from('purchases').select('id, status, match_id').eq('status', 'approved');
+            if (user && isValidUUID(user.id)) {
+              if (checkEmail) {
+                q = q.or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`);
+              } else {
+                q = q.eq('user_id', user.id);
+              }
             } else if (checkEmail) {
               q = q.ilike('guest_email', checkEmail);
+            } else {
+              return { data: null };
             }
-            const { data: pList } = await q.limit(5);
+            const { data: pList } = await q.limit(10);
             return { data: pList && pList.length > 0 ? pList[0] : null };
           } catch {
             return { data: null };

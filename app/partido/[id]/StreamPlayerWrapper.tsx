@@ -48,10 +48,18 @@ export default function StreamPlayerWrapper({
 
       const activePreview = overridePreview !== undefined ? overridePreview : previewMode;
 
+      let emailToSend = guestEmail;
+      if (!emailToSend && typeof window !== 'undefined') {
+        emailToSend =
+          localStorage.getItem('lomonegrotv_guest_email') ||
+          localStorage.getItem('lomanegratv_guest_email') ||
+          undefined;
+      }
+
       const res = await fetch('/api/stream/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ matchId, guestEmail, previewMode: activePreview }),
+        body: JSON.stringify({ matchId, guestEmail: emailToSend, previewMode: activePreview }),
       });
 
       const data = await res.json();

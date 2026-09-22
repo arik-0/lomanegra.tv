@@ -52,7 +52,10 @@ export async function POST(req: Request) {
       );
     }
 
-    let user_id = paymentData.metadata?.user_id;
+    const isValidUUID = (str?: string | null): boolean =>
+      !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
+    let user_id = isValidUUID(paymentData.metadata?.user_id) ? paymentData.metadata.user_id : null;
     let guest_email = paymentData.metadata?.guest_email;
     let match_id = paymentData.metadata?.match_id;
 
@@ -69,6 +72,11 @@ export async function POST(req: Request) {
           }
         }
       }
+    }
+
+    const payerAccountEmail = paymentData.payer?.email?.toLowerCase()?.trim();
+    if (!guest_email && payerAccountEmail) {
+      guest_email = payerAccountEmail;
     }
 
     if (!match_id || (!user_id && !guest_email)) {
@@ -90,50 +98,78 @@ export async function POST(req: Request) {
     }
 
     // 3. Persistir o actualizar la compra usando Supabase Service Role (Bypass de RLS)
-    let existingQuery = supabaseAdmin
-      .from('purchases')
-      .select('id')
-      .eq('match_id', match_id);
+    // Recopilar todos los correos asociados a este pago (formulario y cuenta de MP)
+    const emailsToProcess = new Set<string>();
+    if (guest_email) emailsToProcess.add(guest_email.toLowerCase().trim());
+    if (payerAccountEmail) emailsToProcess.add(payerAccountEmail);
 
+    for (const em of Array.from(emailsToProcess)) {
+      try {
+        const { data: existingPurchase } = await supabaseAdmin
+          .from('purchases')
+          .select('id')
+          .eq('match_id', match_id)
+          .ilike('guest_email', em)
+          .maybeSingle();
+
+        if (existingPurchase) {
+          await supabaseAdmin
+            .from('purchases')
+            .update({
+              status: purchaseStatus,
+              mp_payment_id: String(paymentData.id),
+            })
+            .eq('id', existingPurchase.id);
+        } else {
+          await supabaseAdmin
+            .from('purchases')
+            .insert({
+              user_id: user_id || null,
+              guest_email: em,
+              match_id,
+              status: purchaseStatus,
+              mp_payment_id: String(paymentData.id),
+              created_at: new Date().toISOString(),
+            });
+        }
+      } catch (insertErr) {
+        console.warn(`Error al registrar pase para email ${em}:`, insertErr);
+      }
+    }
+
+    // Si además hay user_id UUID registrado, asegurar su registro
     if (user_id) {
-      existingQuery = existingQuery.eq('user_id', user_id);
-    } else {
-      existingQuery = existingQuery.eq('guest_email', guest_email.toLowerCase().trim());
-    }
+      try {
+        const { data: existingUserPurchase } = await supabaseAdmin
+          .from('purchases')
+          .select('id')
+          .eq('match_id', match_id)
+          .eq('user_id', user_id)
+          .maybeSingle();
 
-    const { data: existingPurchase } = await existingQuery.maybeSingle();
-
-    let saveError = null;
-
-    if (existingPurchase) {
-      const { error } = await supabaseAdmin
-        .from('purchases')
-        .update({
-          status: purchaseStatus,
-          mp_payment_id: String(paymentData.id),
-        })
-        .eq('id', existingPurchase.id);
-      saveError = error;
-    } else {
-      const { error } = await supabaseAdmin
-        .from('purchases')
-        .insert({
-          user_id: user_id || null,
-          guest_email: user_id ? null : guest_email.toLowerCase().trim(),
-          match_id,
-          status: purchaseStatus,
-          mp_payment_id: String(paymentData.id),
-          created_at: new Date().toISOString(),
-        });
-      saveError = error;
-    }
-
-    if (saveError) {
-      console.error('Error registrando compra en Supabase:', saveError);
-      return NextResponse.json(
-        { error: 'Error al persistir la compra en la base de datos' },
-        { status: 500 }
-      );
+        if (existingUserPurchase) {
+          await supabaseAdmin
+            .from('purchases')
+            .update({
+              status: purchaseStatus,
+              mp_payment_id: String(paymentData.id),
+            })
+            .eq('id', existingUserPurchase.id);
+        } else {
+          await supabaseAdmin
+            .from('purchases')
+            .insert({
+              user_id,
+              guest_email: guest_email?.toLowerCase()?.trim() || null,
+              match_id,
+              status: purchaseStatus,
+              mp_payment_id: String(paymentData.id),
+              created_at: new Date().toISOString(),
+            });
+        }
+      } catch (userErr) {
+        console.warn('Error al registrar compra por user_id:', userErr);
+      }
     }
 
     return NextResponse.json(

@@ -109,20 +109,25 @@ export default async function HomePage() {
       if (!user) {
         const cookieStore = cookies();
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
-        const cookieId = cookieStore.get('lomonegro_user_id')?.value;
         if (cookieEmail) {
-          user = { id: cookieId || 'user-cookie', email: cookieEmail };
+          user = { id: 'guest-buyer', email: cookieEmail.toLowerCase().trim() };
         }
       }
 
+      const isValidUUID = (str?: string | null): boolean =>
+        !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+
       if (user) {
         let q = supabaseAdmin.from('purchases').select('match_id').eq('status', 'approved');
-        if (user.id && user.id !== 'user-cookie' && user.email) {
-          q = q.or(`user_id.eq.${user.id},guest_email.ilike.${user.email}`);
-        } else if (user.email) {
-          q = q.ilike('guest_email', user.email);
-        } else {
-          q = q.eq('user_id', user.id);
+        const cleanUserEmail = user.email?.toLowerCase().trim();
+        if (isValidUUID(user.id)) {
+          if (cleanUserEmail) {
+            q = q.or(`user_id.eq.${user.id},guest_email.ilike.${cleanUserEmail}`);
+          } else {
+            q = q.eq('user_id', user.id);
+          }
+        } else if (cleanUserEmail) {
+          q = q.ilike('guest_email', cleanUserEmail);
         }
         const purchasesRes: any = await withTimeout(q, 3000);
 

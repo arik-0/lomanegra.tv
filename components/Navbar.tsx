@@ -35,9 +35,20 @@ export default function Navbar() {
       if (typeof document !== 'undefined') {
         const cookieMatch = document.cookie.match(/lomonegro_user_email=([^;]+)/);
         const cookieEmail = cookieMatch ? decodeURIComponent(cookieMatch[1].trim()) : null;
+        let passEmail: string | null = null;
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith('lomonegrotv_pass_')) {
+              passEmail = localStorage.getItem(k);
+              break;
+            }
+          }
+        } catch {}
         const storedGuest =
           localStorage.getItem('lomonegrotv_guest_email') ||
-          localStorage.getItem('lomanegratv_guest_email');
+          localStorage.getItem('lomanegratv_guest_email') ||
+          passEmail;
         const buyerEmail = cookieEmail || storedGuest;
         if (buyerEmail && buyerEmail.includes('@')) {
           setUser({ id: 'guest-buyer', email: buyerEmail } as User);
@@ -66,9 +77,13 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('lomonegrotv_guest_email');
-      localStorage.removeItem('lomanegratv_guest_email');
-      localStorage.removeItem('lomonegrotv_user_authenticated');
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('lomonegrotv_') || key.startsWith('lomanegratv_')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } catch {}
       document.cookie = 'lomonegro_user_email=; path=/; max-age=0';
       document.cookie = 'lomonegro_user_id=; path=/; max-age=0';
     }

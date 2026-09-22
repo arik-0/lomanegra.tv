@@ -63,7 +63,7 @@ export default function MatchViewClient({
   const [activeGuestEmail, setActiveGuestEmail] = useState<string | null>(
     queryGuestEmail || (isAdmin ? 'operador@pasionlomonegra.com' : null)
   );
-  const [showRestoreInput, setShowRestoreInput] = useState(false);
+  const [showRestoreInput, setShowRestoreInput] = useState(true);
   const [restoreEmail, setRestoreEmail] = useState('');
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [restoreMessage, setRestoreMessage] = useState<{
@@ -82,9 +82,30 @@ export default function MatchViewClient({
   const [adminError, setAdminError] = useState('');
   const [adminLoading, setAdminLoading] = useState(false);
 
-  // Al cargar, verificar autenticidad estricta y purgar residuos de pruebas
+  // Al cargar, verificar autenticidad estricta y sincronizar almacenamiento
   useEffect(() => {
-    // 1. Purgar cualquier residuo de aprobaciones locales falsas de pruebas pasadas
+    // 0. Prefill de email guardado si existe
+    try {
+      const savedEmail =
+        localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
+        localStorage.getItem('lomonegrotv_guest_email') ||
+        localStorage.getItem('lomanegratv_guest_email');
+      if (savedEmail) {
+        setRestoreEmail(savedEmail);
+        if (!activeGuestEmail) {
+          setActiveGuestEmail(savedEmail);
+        }
+      }
+
+      // Si ya hay un pase guardado localmente para este partido, activar vista de inmediato
+      const matchPass = localStorage.getItem(`lomonegrotv_pass_${match.id}`);
+      if (matchPass) {
+        setHasPaid(true);
+        setActiveGuestEmail(matchPass);
+      }
+    } catch {}
+
+    // 1. Purgar cualquier residuo de pruebas antiguas
     try {
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('lomonegrotv_approved_')) {
@@ -99,16 +120,14 @@ export default function MatchViewClient({
         const emailToVerify =
           queryGuestEmail ||
           currentUserEmail ||
+          localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
           localStorage.getItem('lomonegrotv_guest_email') ||
           '';
 
         verifyPaymentTransaction(emailToVerify, paymentId);
         return;
       } else {
-        // Si solo estaba ?payment=success sin ID de transacción, limpiar URL y apagar el spinner
-        try {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch {}
+        // Si solo estaba ?payment=success sin ID de transacción, apagar el spinner
         setVerifyingPayment(false);
       }
     }
@@ -121,12 +140,13 @@ export default function MatchViewClient({
         setActiveGuestEmail(emailToPersist);
         try {
           localStorage.setItem('lomonegrotv_guest_email', emailToPersist);
+          localStorage.setItem(`lomonegrotv_pass_${match.id}`, emailToPersist);
           document.cookie = `lomonegro_user_email=${encodeURIComponent(emailToPersist)}; path=/; max-age=2592000; SameSite=Lax`;
         } catch {}
       }
     }
 
-    // 3. Si no es admin y aún no pagó por servidor, consultar si el email guardado ya tiene pase
+    // 3. Si aún no pagó por servidor, consultar si el email guardado o cookie ya tiene pase
     if (!serverHasPaid && !isAdmin) {
       let emailCookie: string | null = null;
       if (typeof document !== 'undefined') {
@@ -137,6 +157,7 @@ export default function MatchViewClient({
         queryGuestEmail ||
         currentUserEmail ||
         emailCookie ||
+        localStorage.getItem(`lomonegrotv_pass_${match.id}`) ||
         localStorage.getItem('lomonegrotv_guest_email') ||
         localStorage.getItem('lomanegratv_guest_email');
       if (emailToCheck) {
@@ -167,6 +188,7 @@ export default function MatchViewClient({
           setActiveGuestEmail(confirmedEmail);
           try {
             localStorage.setItem('lomonegrotv_guest_email', confirmedEmail);
+            localStorage.setItem(`lomonegrotv_pass_${match.id}`, confirmedEmail);
             document.cookie = `lomonegro_user_email=${encodeURIComponent(confirmedEmail)}; path=/; max-age=2592000; SameSite=Lax`;
           } catch {}
         }
@@ -214,6 +236,7 @@ export default function MatchViewClient({
         setActiveGuestEmail(confirmedEmail);
         try {
           localStorage.setItem('lomonegrotv_guest_email', confirmedEmail);
+          localStorage.setItem(`lomonegrotv_pass_${match.id}`, confirmedEmail);
           document.cookie = `lomonegro_user_email=${encodeURIComponent(confirmedEmail)}; path=/; max-age=2592000; SameSite=Lax`;
         } catch {}
         setRestoreMessage({
@@ -587,73 +610,59 @@ export default function MatchViewClient({
                 </div>
               )}
 
-              {/* Opción de Restaurar Pase para Invitados */}
-              {!currentUserEmail && (
-                <div className="mt-5 pt-5 border-t border-white/[0.07]">
-                  {!showRestoreInput ? (
-                    <button
-                      onClick={() => setShowRestoreInput(true)}
-                      className="w-full flex items-center justify-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition py-1.5"
-                    >
-                      <KeyRound className="w-3.5 h-3.5 text-red-500" />
-                      <span>¿Ya compraste como invitado? Recuperar pase</span>
-                    </button>
-                  ) : (
-                    <form onSubmit={handleManualRestore} className="space-y-3">
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-zinc-300 font-bold flex items-center gap-1.5 text-[11px]">
-                          <Mail className="w-3.5 h-3.5 text-red-500" />
-                          <span>Ingresa el email de compra:</span>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setShowRestoreInput(false)}
-                          className="text-[10px] text-zinc-500 hover:text-white"
-                        >
-                          Cerrar
-                        </button>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <input
-                          type="email"
-                          required
-                          value={restoreEmail}
-                          onChange={(e) => setRestoreEmail(e.target.value)}
-                          placeholder="tu@email.com"
-                          className="flex-1 bg-black/60 border border-white/[0.1] focus:border-red-500 rounded-xl px-3 py-2 text-xs text-white font-mono placeholder-zinc-600 outline-none"
-                        />
-                        <button
-                          type="submit"
-                          disabled={restoreLoading}
-                          className="px-4 py-2 bg-white text-black hover:bg-zinc-200 active:scale-95 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1"
-                        >
-                          {restoreLoading ? (
-                            'Buscando...'
-                          ) : (
-                            <>
-                              <span>Ver</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      {restoreMessage && (
-                        <p
-                          className={`text-[11px] font-mono ${
-                            restoreMessage.type === 'error'
-                              ? 'text-red-400'
-                              : 'text-emerald-400'
-                          }`}
-                        >
-                          {restoreMessage.text}
-                        </p>
-                      )}
-                    </form>
-                  )}
+              {/* Opción de Restaurar Pase Directo */}
+              <div className="mt-5 pt-5 border-t border-white/[0.08] bg-[#121218]/80 p-4 rounded-2xl border border-white/[0.06]">
+                <div className="flex items-center justify-between text-xs font-mono mb-2">
+                  <span className="text-zinc-200 font-bold flex items-center gap-1.5 text-xs">
+                    <KeyRound className="w-4 h-4 text-emerald-400" />
+                    <span>¿Ya compraste tu entrada? Desbloquear pase</span>
+                  </span>
                 </div>
-              )}
+                <p className="text-[11px] text-zinc-400 font-mono mb-3 leading-relaxed">
+                  Ingresa el correo con el que pagaste en Mercado Pago para activar la transmisión en este navegador:
+                </p>
+                <form onSubmit={handleManualRestore} className="space-y-2.5">
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      required
+                      value={restoreEmail}
+                      onChange={(e) => setRestoreEmail(e.target.value)}
+                      placeholder="tu-correo@ejemplo.com"
+                      className="flex-1 bg-black/70 border border-white/[0.12] focus:border-emerald-500 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono placeholder-zinc-500 outline-none transition"
+                    />
+                    <button
+                      type="submit"
+                      disabled={restoreLoading}
+                      className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black active:scale-95 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 shrink-0 shadow-md shadow-emerald-950/50"
+                    >
+                      {restoreLoading ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Buscando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Desbloquear</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {restoreMessage && (
+                    <div
+                      className={`p-2.5 rounded-xl border text-[11px] font-mono leading-relaxed ${
+                        restoreMessage.type === 'error'
+                          ? 'bg-red-950/60 border-red-700/60 text-red-300'
+                          : 'bg-emerald-950/60 border-emerald-600/60 text-emerald-300'
+                      }`}
+                    >
+                      {restoreMessage.text}
+                    </div>
+                  )}
+                </form>
+              </div>
 
               {/* Acceso de Operador / Admin (Backdoor de transmisión) */}
               <div className="mt-4 pt-4 border-t border-white/[0.06] text-center">
