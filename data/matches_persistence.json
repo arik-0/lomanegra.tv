@@ -8,7 +8,7 @@
     "price": 1,
     "cloudflare_live_input_uid": "dac066a4fb5c97117189392adae3f453",
     "image_url": "/matches/blanco-y-negro-vs-ifc.png",
-    "is_active": false,
+    "is_active": true,
     "is_live": false,
     "league": "Liga Deportiva del Sur",
     "category": "Primera"

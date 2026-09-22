@@ -140,13 +140,13 @@ export default async function HomePage() {
 
   // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
   const defaultFeaturedMatch = {
-    id: '11db1ce1-b9c5-4dcb-9fa7-3b788feaeb20',
-    title: 'Blanco y Negro vs Nuevo Alberdi',
+    id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
+    title: 'Carreras vs Blanco y Negro',
     description: 'Primera • Liga Deportiva del Sur',
-    date: null,
-    is_date_confirmed: false,
+    date: '2026-09-24T00:45:00.000Z',
+    is_date_confirmed: true,
     price: 12000,
-    cloudflare_live_input_uid: 'live_input_byn',
+    cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
     image_url: '/matches/blanco-y-negro-vs-ifc.png',
     is_active: true,
     is_live: false,
@@ -155,6 +155,19 @@ export default async function HomePage() {
   };
 
   const defaultOtherMatches = [
+    {
+      id: '11db1ce1-b9c5-4dcb-9fa7-3b788feaeb20',
+      title: 'Blanco y Negro vs Nuevo Alberdi',
+      description: 'Primera • Liga Deportiva del Sur',
+      date: null,
+      is_date_confirmed: false,
+      price: 12000,
+      cloudflare_live_input_uid: 'live_input_byn',
+      image_url: '/matches/blanco-y-negro-vs-ifc.png',
+      is_active: true,
+      category: 'Primera',
+      league: 'Liga Deportiva del Sur',
+    },
     {
       id: '480f1946-bd9b-4503-b1ae-9da69c733301',
       title: 'Bombal Juniors vs Blanco y Negro',
@@ -165,20 +178,6 @@ export default async function HomePage() {
       cloudflare_live_input_uid: 'live_input_byn_vs_bombal',
       image_url: null,
       is_active: true,
-      category: 'Primera',
-      league: 'Liga Deportiva del Sur',
-    },
-    {
-      id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
-      title: 'Carreras vs Blanco y Negro',
-      description: 'Primera • Liga Deportiva del Sur',
-      date: '2026-09-24T00:45:00.000Z',
-      is_date_confirmed: true,
-      price: 12000,
-      cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
-      image_url: '/matches/blanco-y-negro-vs-ifc.png',
-      is_active: false,
-      is_live: false,
       category: 'Primera',
       league: 'Liga Deportiva del Sur',
     },
