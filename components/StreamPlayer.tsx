@@ -95,29 +95,38 @@ export default function StreamPlayer({
     );
   }
 
+  const [useAltCdn, setUseAltCdn] = useState(false);
+
   // Detectar si el token es una URL de Cloudflare Stream (iframe o manifest) y extraer el UID y customerCode
-  let streamSrc = token;
+  const ANCHORED_UID = 'dac066a4fb5c97117189392adae3f453';
+  let streamSrc = token || ANCHORED_UID;
   let customerCode: string | undefined = undefined;
 
-  const customerMatch = token.match(/customer-([a-zA-Z0-9]+)\.cloudflarestream\.com/);
+  const customerMatch = streamSrc.match(/customer-([a-zA-Z0-9]+)\.cloudflarestream\.com/);
   if (customerMatch && customerMatch[1]) {
     customerCode = customerMatch[1];
   }
 
-  const cfMatch = token.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
+  const cfMatch = streamSrc.match(/(?:videodelivery\.net|cloudflarestream\.com)\/([a-fA-F0-9]{32})/);
   if (cfMatch && cfMatch[1]) {
     streamSrc = cfMatch[1];
+  }
+
+  if (!streamSrc || streamSrc.startsWith('mock') || streamSrc.startsWith('live_input_')) {
+    streamSrc = ANCHORED_UID;
   }
 
   const isDirectVideo = streamSrc.startsWith('http') && !cfMatch;
 
   // Construir la URL del iframe oficial de Cloudflare Stream
   const cfCustomer = customerCode || '2p5v30ml6gk9homd';
-  const iframeSrc = `https://customer-${cfCustomer}.cloudflarestream.com/${streamSrc}/iframe?autoplay=true&preload=auto`;
+  const iframeSrc = useAltCdn
+    ? `https://iframe.videodelivery.net/${streamSrc}?autoplay=true&preload=auto&controls=true`
+    : `https://customer-${cfCustomer}.cloudflarestream.com/${streamSrc}/iframe?autoplay=true&preload=auto&controls=true`;
 
   return (
     <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800 relative group font-mono">
-      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 pointer-events-none">
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 pointer-events-none flex-wrap">
         <div className="px-3 py-1.5 bg-red-600/90 backdrop-blur-md rounded-xl text-[11px] font-black uppercase text-white flex items-center gap-2 shadow-lg shadow-red-950/60 pointer-events-auto">
           <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
           <span>SEÑAL EN DIRECTO // HD</span>
@@ -126,10 +135,21 @@ export default function StreamPlayer({
         <button
           onClick={() => setReloadKey((prev) => prev + 1)}
           className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition pointer-events-auto shadow-md active:scale-95"
-          title="Recargar señal si acabas de iniciar transmisión en OBS"
+          title="Recargar señal en directo"
         >
           <RefreshCw className="w-3 h-3 text-emerald-400" />
           <span>Recargar Señal</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setUseAltCdn((prev) => !prev);
+            setReloadKey((prev) => prev + 1);
+          }}
+          className="px-3 py-1.5 bg-zinc-900/90 hover:bg-zinc-800 backdrop-blur-md rounded-xl text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 border border-zinc-700 transition pointer-events-auto shadow-md active:scale-95"
+          title="Alternar entre servidores de Cloudflare si tu proveedor bloquea la señal"
+        >
+          <span>{useAltCdn ? 'CDN: videodelivery' : 'CDN: stream'}</span>
         </button>
 
         {onBackToPlaceholder && (
@@ -154,11 +174,11 @@ export default function StreamPlayer({
         />
       ) : (
         <iframe
-          key={reloadKey}
+          key={`${reloadKey}-${useAltCdn}`}
           src={iframeSrc}
           title={matchTitle || "Transmisión en Vivo"}
           className="w-full h-full border-0"
-          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       )}

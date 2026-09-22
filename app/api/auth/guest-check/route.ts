@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(req: Request) {
@@ -25,32 +26,50 @@ export async function POST(req: Request) {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Resolver ID real si vino como slug
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(matchId);
-    let resolvedMatchId = matchId;
-    if (!isUUID) {
-      const { data: m } = await supabaseAdmin
-        .from('matches')
-        .select('id')
-        .ilike('title', '%blanco y negro%')
-        .maybeSingle();
-      if (m?.id) resolvedMatchId = m.id;
-    }
-
-    const { data: purchase, error } = await supabaseAdmin
+    // 1. Buscar compra específica para el matchId
+    let { data: purchase } = await supabaseAdmin
       .from('purchases')
       .select('id, status, created_at')
-      .eq('match_id', resolvedMatchId)
-      .eq('guest_email', cleanEmail)
+      .eq('match_id', matchId)
+      .ilike('guest_email', cleanEmail)
       .eq('status', 'approved')
+      .limit(1)
       .maybeSingle();
 
-    if (error || !purchase) {
+    // 2. Fallback: buscar cualquier compra aprobada para este email
+    if (!purchase) {
+      const { data: anyPurchase } = await supabaseAdmin
+        .from('purchases')
+        .select('id, status, created_at')
+        .ilike('guest_email', cleanEmail)
+        .eq('status', 'approved')
+        .limit(1)
+        .maybeSingle();
+      purchase = anyPurchase;
+    }
+
+    if (!purchase) {
       return NextResponse.json(
         { hasAccess: false, message: 'No se encontró un pase aprobado con este correo.' },
         { status: 200 }
       );
     }
+
+    const cookieStore = cookies();
+    cookieStore.set('lomonegro_user_email', cleanEmail, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+    });
+    cookieStore.set('lomonegro_user_id', `guest_${cleanEmail.replace(/[^a-z0-9]/g, '_')}`, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+    });
 
     return NextResponse.json({
       hasAccess: true,

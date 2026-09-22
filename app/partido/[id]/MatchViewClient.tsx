@@ -113,10 +113,30 @@ export default function MatchViewClient({
       }
     }
 
-    // 3. Si no es admin y no pagó por servidor, consultar si el email invitado ya tiene pase
-    if (!serverHasPaid && !currentUserEmail && !isAdmin) {
+    // Si el servidor ya confirmó el pago, asegurar persistencia de sesión
+    if (serverHasPaid) {
+      setHasPaid(true);
+      const emailToPersist = currentUserEmail || queryGuestEmail;
+      if (emailToPersist) {
+        setActiveGuestEmail(emailToPersist);
+        try {
+          localStorage.setItem('lomonegrotv_guest_email', emailToPersist);
+          document.cookie = `lomonegro_user_email=${encodeURIComponent(emailToPersist)}; path=/; max-age=2592000; SameSite=Lax`;
+        } catch {}
+      }
+    }
+
+    // 3. Si no es admin y aún no pagó por servidor, consultar si el email guardado ya tiene pase
+    if (!serverHasPaid && !isAdmin) {
+      let emailCookie: string | null = null;
+      if (typeof document !== 'undefined') {
+        const m = document.cookie.match(/lomonegro_user_email=([^;]+)/);
+        if (m) emailCookie = decodeURIComponent(m[1].trim());
+      }
       const emailToCheck =
         queryGuestEmail ||
+        currentUserEmail ||
+        emailCookie ||
         localStorage.getItem('lomonegrotv_guest_email') ||
         localStorage.getItem('lomanegratv_guest_email');
       if (emailToCheck) {
@@ -142,9 +162,13 @@ export default function MatchViewClient({
       const data = await res.json();
       if (res.ok && data.approved) {
         setHasPaid(true);
-        if (data.email) {
-          setActiveGuestEmail(data.email);
-          localStorage.setItem('lomonegrotv_guest_email', data.email);
+        const confirmedEmail = data.email || email;
+        if (confirmedEmail) {
+          setActiveGuestEmail(confirmedEmail);
+          try {
+            localStorage.setItem('lomonegrotv_guest_email', confirmedEmail);
+            document.cookie = `lomonegro_user_email=${encodeURIComponent(confirmedEmail)}; path=/; max-age=2592000; SameSite=Lax`;
+          } catch {}
         }
       } else {
         setPaymentVerifiedError(
@@ -186,11 +210,15 @@ export default function MatchViewClient({
       const data = await res.json();
       if (res.ok && data.hasAccess) {
         setHasPaid(true);
-        setActiveGuestEmail(email);
-        localStorage.setItem('lomonegrotv_guest_email', email);
+        const confirmedEmail = data.email || email;
+        setActiveGuestEmail(confirmedEmail);
+        try {
+          localStorage.setItem('lomonegrotv_guest_email', confirmedEmail);
+          document.cookie = `lomonegro_user_email=${encodeURIComponent(confirmedEmail)}; path=/; max-age=2592000; SameSite=Lax`;
+        } catch {}
         setRestoreMessage({
           type: 'success',
-          text: `¡Pase encontrado para ${email}! Acceso habilitado.`,
+          text: `¡Pase encontrado para ${confirmedEmail}! Acceso habilitado.`,
         });
       } else {
         if (showRestoreInput) {

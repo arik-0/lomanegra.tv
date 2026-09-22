@@ -30,6 +30,22 @@ export default function Navbar() {
       } catch (err) {
         console.error('Error fetching user:', err);
       }
+
+      // Si no hay usuario con sesión Supabase directa, verificar si pagó como invitado o hincha
+      if (typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/lomonegro_user_email=([^;]+)/);
+        const cookieEmail = cookieMatch ? decodeURIComponent(cookieMatch[1].trim()) : null;
+        const storedGuest =
+          localStorage.getItem('lomonegrotv_guest_email') ||
+          localStorage.getItem('lomanegratv_guest_email');
+        const buyerEmail = cookieEmail || storedGuest;
+        if (buyerEmail && buyerEmail.includes('@')) {
+          setUser({ id: 'guest-buyer', email: buyerEmail } as User);
+          setLoading(false);
+          return;
+        }
+      }
+
       setUser(null);
       setLoading(false);
     }
@@ -38,7 +54,9 @@ export default function Navbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        setUser(session.user);
+      }
     });
 
     return () => {
@@ -49,7 +67,10 @@ export default function Navbar() {
   const handleSignOut = async () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('lomonegrotv_guest_email');
+      localStorage.removeItem('lomanegratv_guest_email');
       localStorage.removeItem('lomonegrotv_user_authenticated');
+      document.cookie = 'lomonegro_user_email=; path=/; max-age=0';
+      document.cookie = 'lomonegro_user_id=; path=/; max-age=0';
     }
     try {
       await fetch('/api/auth/authenticate', { method: 'DELETE' });

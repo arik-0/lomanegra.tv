@@ -116,14 +116,15 @@ export default async function HomePage() {
       }
 
       if (user) {
-        const purchasesRes: any = await withTimeout(
-          supabaseAdmin
-            .from('purchases')
-            .select('match_id')
-            .eq('user_id', user.id)
-            .eq('status', 'approved'),
-          2000
-        );
+        let q = supabaseAdmin.from('purchases').select('match_id').eq('status', 'approved');
+        if (user.id && user.id !== 'user-cookie' && user.email) {
+          q = q.or(`user_id.eq.${user.id},guest_email.ilike.${user.email}`);
+        } else if (user.email) {
+          q = q.ilike('guest_email', user.email);
+        } else {
+          q = q.eq('user_id', user.id);
+        }
+        const purchasesRes: any = await withTimeout(q, 3000);
 
         if (purchasesRes?.data) {
           approvedMatchIds = new Set(purchasesRes.data.map((p: any) => p.match_id));
@@ -136,15 +137,16 @@ export default async function HomePage() {
 
   // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
   const defaultFeaturedMatch = {
-    id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-    title: 'Blanco y Negro vs Atlético Acebal',
+    id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
+    title: 'Carreras vs Blanco y Negro',
     description: 'Primera • Liga Deportiva del Sur',
-    date: '2026-09-13T18:45:00.000Z',
+    date: '2026-09-21T23:40:00.000Z',
     is_date_confirmed: true,
-    price: 12000,
-    cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
-    image_url: null,
+    price: 1,
+    cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
+    image_url: '/matches/blanco-y-negro-vs-ifc.png',
     is_active: true,
+    is_live: true,
     category: 'Primera',
     league: 'Liga Deportiva del Sur',
   };

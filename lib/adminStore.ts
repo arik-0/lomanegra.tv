@@ -18,6 +18,20 @@ export interface MatchData {
 // Partidos base con estado inicial
 export const initialAdminMatches: MatchData[] = [
   {
+    id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
+    title: 'Carreras vs Blanco y Negro',
+    description: 'Primera • Liga Deportiva del Sur',
+    date: '2026-09-21T23:40:00.000Z',
+    is_date_confirmed: true,
+    price: 1,
+    cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
+    image_url: '/matches/blanco-y-negro-vs-ifc.png',
+    is_active: true,
+    is_live: true,
+    league: 'Liga Deportiva del Sur',
+    category: 'Primera',
+  },
+  {
     id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
     title: 'Blanco y Negro vs Atlético Acebal',
     description: 'Primera • Liga Deportiva del Sur',
@@ -27,6 +41,7 @@ export const initialAdminMatches: MatchData[] = [
     cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
     image_url: null,
     is_active: true,
+    is_live: true,
     league: 'Liga Deportiva del Sur',
     category: 'Primera',
   },
@@ -104,7 +119,25 @@ export function getStoredMatches(): MatchData[] {
 export function updateStoredMatch(id: string, updates: Partial<MatchData>): MatchData | null {
   if (!globalThis.globalMatchesStore) getStoredMatches();
   const idx = globalThis.globalMatchesStore!.findIndex((m) => m.id === id);
-  if (idx === -1) return null;
+  if (idx === -1) {
+    const newEntry: MatchData = {
+      id,
+      title: updates.title || 'Carreras vs Blanco y Negro',
+      description: updates.description || 'Primera • Liga Deportiva del Sur',
+      date: updates.date !== undefined ? updates.date : new Date().toISOString(),
+      is_date_confirmed: updates.is_date_confirmed !== undefined ? updates.is_date_confirmed : true,
+      price: updates.price !== undefined ? updates.price : 1,
+      cloudflare_live_input_uid: updates.cloudflare_live_input_uid || 'dac066a4fb5c97117189392adae3f453',
+      image_url: updates.image_url || null,
+      is_active: updates.is_active !== undefined ? updates.is_active : true,
+      is_live: updates.is_live !== undefined ? updates.is_live : true,
+      league: updates.league || 'Liga Deportiva del Sur',
+      category: updates.category || 'Primera',
+    };
+    globalThis.globalMatchesStore!.unshift(newEntry);
+    saveMatchesToDisk(globalThis.globalMatchesStore!);
+    return newEntry;
+  }
   globalThis.globalMatchesStore![idx] = {
     ...globalThis.globalMatchesStore![idx],
     ...updates,

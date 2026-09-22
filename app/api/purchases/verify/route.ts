@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
@@ -64,10 +65,39 @@ export async function POST(req: Request) {
               .maybeSingle();
 
         const { data: existing } = await query;
-        if (existing) {
+        let confirmedPurchase = existing;
+        if (!confirmedPurchase && cleanEmail) {
+          const { data: anyApproved } = await supabaseAdmin
+            .from('purchases')
+            .select('id, status, guest_email, match_id')
+            .ilike('guest_email', cleanEmail)
+            .eq('status', 'approved')
+            .limit(1)
+            .maybeSingle();
+          if (anyApproved) confirmedPurchase = anyApproved;
+        }
+
+        if (confirmedPurchase) {
+          const buyerEmail = cleanEmail || confirmedPurchase.guest_email;
+          const cookieStore = cookies();
+          cookieStore.set('lomonegro_user_email', buyerEmail, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+          });
+          cookieStore.set('lomonegro_user_id', user?.id || `buyer_${buyerEmail.replace(/[^a-z0-9]/g, '_')}`, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+          });
+
           return NextResponse.json({
             approved: true,
-            email: cleanEmail || existing.guest_email,
+            email: buyerEmail,
             source: 'database',
           });
         }
@@ -88,24 +118,42 @@ export async function POST(req: Request) {
             paymentData.metadata?.match_id ||
             (paymentData.external_reference?.startsWith('match_')
               ? paymentData.external_reference.split('_')[1]
-              : null);
+              : null) ||
+            matchId;
 
-          const payerEmail =
+          const payerEmail = (
             paymentData.metadata?.guest_email ||
             paymentData.payer?.email ||
-            cleanEmail;
+            cleanEmail
+          )?.toLowerCase()?.trim() || 'hincha@pasionlomonegra.com';
 
           // Registrar de inmediato en Supabase para habilitar el acceso
           if (isSupabaseConfigured && mpMatchId) {
             await supabaseAdmin.from('purchases').upsert({
               user_id: user ? user.id : null,
-              guest_email: user ? null : (payerEmail?.toLowerCase()?.trim() || 'invitado@pasionlomonegra.com'),
+              guest_email: user ? null : payerEmail,
               match_id: mpMatchId,
               status: 'approved',
               mp_payment_id: String(paymentData.id),
               created_at: new Date().toISOString(),
             });
           }
+
+          const cookieStore = cookies();
+          cookieStore.set('lomonegro_user_email', payerEmail, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+          });
+          cookieStore.set('lomonegro_user_id', user?.id || `buyer_${payerEmail.replace(/[^a-z0-9]/g, '_')}`, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+          });
 
           return NextResponse.json({
             approved: true,

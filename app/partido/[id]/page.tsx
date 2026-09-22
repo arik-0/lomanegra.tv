@@ -140,65 +140,84 @@ export default async function MatchPage({
 
       const fetchMatch = async () => {
         try {
-          const { data } = isUUID
-            ? await supabaseAdmin.from('matches').select('*').eq('id', params.id).maybeSingle()
-            : await supabaseAdmin.from('matches').select('*').ilike('title', '%blanco y negro%').maybeSingle();
-
-          if (!data || data.title?.startsWith('__SYSTEM_')) {
-            return { data: null };
+          if (isUUID) {
+            const { data } = await supabaseAdmin
+              .from('matches')
+              .select('*')
+              .eq('id', params.id)
+              .maybeSingle();
+            if (data && !data.title?.startsWith('__SYSTEM_')) {
+              return { data };
+            }
           }
 
-          const rawDesc = data.description || '';
-          const isTbd =
-            rawDesc.includes('[A CONFIRMAR]') ||
-            (data.date && new Date(data.date).getFullYear() >= 2099);
+          // Si no es UUID o no se encontró por ID, buscar partidos activos en Supabase
+          const { data: activeList } = await supabaseAdmin
+            .from('matches')
+            .select('*')
+            .eq('is_active', true)
+            .not('title', 'like', '__SYSTEM_%')
+            .order('date', { ascending: true });
 
-          let league = data.league || 'Liga Deportiva del Sur';
-          let category = data.category || 'Primera';
-          if (category === 'Fútbol Mayor') category = 'Primera';
-          let is_live = data.is_live !== undefined ? Boolean(data.is_live) : false;
-
-          const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
-          if (metaMatch) {
-            try {
-              const parsed = JSON.parse(metaMatch[1]);
-              if (parsed.league) league = parsed.league;
-              if (parsed.category) category = parsed.category;
-              if (category === 'Fútbol Mayor') category = 'Primera';
-              if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
-            } catch {}
+          if (activeList && activeList.length > 0) {
+            const liveMatch =
+              activeList.find((m: any) => m.description?.includes('"is_live":true')) ||
+              activeList[0];
+            return { data: liveMatch };
           }
-
-          const cleanDesc = rawDesc
-            .replace(/\[META:\{.*?\}\]/g, '')
-            .replace('[A CONFIRMAR]', '')
-            .trim();
-
-          return {
-            data: {
-              ...data,
-              title: sanitizeRegionalText(data.title),
-              is_date_confirmed: !isTbd,
-              date: isTbd ? null : data.date,
-              description: sanitizeRegionalText(cleanDesc),
-              league: sanitizeRegionalText(league),
-              category: sanitizeRegionalText(category),
-              is_live,
-            },
-          };
+          return { data: null };
         } catch {
           return { data: null };
         }
       };
 
-      // Ejecutar autenticación y consulta de partido en paralelo con timeout de 1200ms
+      // Ejecutar autenticación y consulta de partido en paralelo con timeout resiliente de 4000ms
       const [authRes, matchRes] = await Promise.all([
-        withTimeout(fetchUser(), 1200, { data: { user: null } }),
-        withTimeout(fetchMatch(), 1200, { data: null }),
+        withTimeout(fetchUser(), 3000, { data: { user: null } }),
+        withTimeout(fetchMatch(), 4000, { data: null }),
       ]);
 
       user = authRes?.data?.user || null;
-      match = matchRes?.data || null;
+      let rawMatch = matchRes?.data || null;
+
+      if (rawMatch) {
+        const rawDesc = rawMatch.description || '';
+        const isTbd =
+          rawDesc.includes('[A CONFIRMAR]') ||
+          (rawMatch.date && new Date(rawMatch.date).getFullYear() >= 2099);
+
+        let league = rawMatch.league || 'Liga Deportiva del Sur';
+        let category = rawMatch.category || 'Primera';
+        if (category === 'Fútbol Mayor') category = 'Primera';
+        let is_live = rawMatch.is_live !== undefined ? Boolean(rawMatch.is_live) : false;
+
+        const metaMatch = rawDesc.match(/\[META:(\{.*?\})\]/);
+        if (metaMatch) {
+          try {
+            const parsed = JSON.parse(metaMatch[1]);
+            if (parsed.league) league = parsed.league;
+            if (parsed.category) category = parsed.category;
+            if (category === 'Fútbol Mayor') category = 'Primera';
+            if (parsed.is_live !== undefined) is_live = Boolean(parsed.is_live);
+          } catch {}
+        }
+
+        const cleanDesc = rawDesc
+          .replace(/\[META:\{.*?\}\]/g, '')
+          .replace('[A CONFIRMAR]', '')
+          .trim();
+
+        match = {
+          ...rawMatch,
+          title: sanitizeRegionalText(rawMatch.title),
+          is_date_confirmed: !isTbd,
+          date: isTbd ? null : rawMatch.date,
+          description: sanitizeRegionalText(cleanDesc),
+          league: sanitizeRegionalText(league),
+          category: sanitizeRegionalText(category),
+          is_live,
+        };
+      }
 
       if (!user) {
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
@@ -208,27 +227,24 @@ export default async function MatchPage({
         }
       }
 
-      // Verificar compras aprobadas con timeout de 800ms
-      const guestEmail = searchParams?.guest_email?.toLowerCase().trim();
-      if (match && (user || guestEmail)) {
+      // Verificar compras aprobadas con timeout de 3000ms buscando por user_id o email
+      const cookieEmail = cookieStore.get('lomonegro_user_email')?.value;
+      const guestEmail = (searchParams?.guest_email || cookieEmail)?.toLowerCase().trim();
+      const checkEmail = user?.email?.toLowerCase().trim() || guestEmail;
+
+      if (match && (user || checkEmail)) {
         const fetchPurchase = async () => {
           try {
-            const { data } = user
-              ? await supabaseAdmin
-                  .from('purchases')
-                  .select('status')
-                  .eq('user_id', user.id)
-                  .eq('match_id', match.id)
-                  .eq('status', 'approved')
-                  .maybeSingle()
-              : await supabaseAdmin
-                  .from('purchases')
-                  .select('status')
-                  .eq('guest_email', guestEmail!)
-                  .eq('match_id', match.id)
-                  .eq('status', 'approved')
-                  .maybeSingle();
-            return { data };
+            let q = supabaseAdmin.from('purchases').select('id, status').eq('status', 'approved');
+            if (user && checkEmail && user.id && user.id !== 'user-cookie') {
+              q = q.or(`user_id.eq.${user.id},guest_email.ilike.${checkEmail}`);
+            } else if (user && user.id && user.id !== 'user-cookie') {
+              q = q.or(`user_id.eq.${user.id},guest_email.ilike.${user.email}`);
+            } else if (checkEmail) {
+              q = q.ilike('guest_email', checkEmail);
+            }
+            const { data: pList } = await q.limit(5);
+            return { data: pList && pList.length > 0 ? pList[0] : null };
           } catch {
             return { data: null };
           }
@@ -236,7 +252,7 @@ export default async function MatchPage({
 
         const purchaseRes = await withTimeout(
           fetchPurchase(),
-          800,
+          3000,
           { data: null }
         );
 
@@ -254,32 +270,35 @@ export default async function MatchPage({
     const fromStore = getStoredMatches().find((m) => m.id === params.id);
     if (fromStore) {
       match = fromStore;
-    } else if (params.id === 'b1a9c001-0000-4000-8000-000000000004') {
-      match = {
-        id: 'b1a9c001-0000-4000-8000-000000000004',
-        title: 'Blanco y Negro vs Los Andes',
-        description: 'Torneo Clausura • Fecha 4 • Transmisión oficial en vivo',
-        date: null,
-        is_date_confirmed: false,
-        price: 12000,
-        cloudflare_live_input_uid: 'live_input_byn_vs_los_andes',
-        image_url: null,
-        is_active: true,
-      };
     } else {
       match = {
-        id: '0790eca3-cc28-41bb-a4b8-8e2c0c514cdf',
-        title: 'Blanco y Negro vs Atlético Acebal',
+        id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
+        title: 'Carreras vs Blanco y Negro',
         description: 'Primera • Liga Deportiva del Sur',
-        date: '2026-09-13T18:45:00.000Z',
+        date: '2026-09-21T23:40:00.000Z',
         is_date_confirmed: true,
-        price: 12000,
-        cloudflare_live_input_uid: 'live_input_byn_vs_acebal',
-        image_url: null,
+        price: 1,
+        cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
+        image_url: '/matches/blanco-y-negro-vs-ifc.png',
         is_active: true,
+        is_live: true,
       };
     }
   }
+
+  // Asegurar que el UID no sea un mock/placeholder en producción
+  if (
+    !match.cloudflare_live_input_uid ||
+    match.cloudflare_live_input_uid.startsWith('live_input_')
+  ) {
+    match.cloudflare_live_input_uid = 'dac066a4fb5c97117189392adae3f453';
+  }
+
+  const persistentEmail =
+    user?.email ||
+    cookieStore.get('lomonegro_user_email')?.value ||
+    searchParams?.guest_email ||
+    null;
 
   return (
     <main className="min-h-screen bg-[#08080a] text-white px-4 py-6 sm:px-6 lg:px-8">
@@ -304,9 +323,9 @@ export default async function MatchPage({
             description: sanitizeRegionalText(match.description),
           }}
           serverHasPaid={serverHasPaid}
-          currentUserEmail={user?.email || null}
+          currentUserEmail={persistentEmail}
           paymentStatus={searchParams?.payment}
-          queryGuestEmail={searchParams?.guest_email}
+          queryGuestEmail={persistentEmail || undefined}
           paymentId={searchParams?.payment_id || searchParams?.collection_id}
           isAdmin={isAdmin}
         />
