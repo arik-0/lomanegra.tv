@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     let liveInputUid = ANCHORED_LIVE_UID;
     let user = null;
     let sessionUserKey = `guest_${guestEmail || 'invitado'}`;
+    const currentSessionId = crypto.randomUUID();
 
     // 1. Buscar el partido en el almacén local primero para alta velocidad
     const localMatch = getStoredMatches().find((m) => m.id === matchId);
@@ -138,7 +139,6 @@ export async function POST(req: Request) {
         }
 
         // Registrar sesión activa
-        const newSessionId = crypto.randomUUID();
         const effectiveEmail = cleanGuestEmail || cookieEmail || user?.email?.toLowerCase().trim();
         if (user && isValidUUID(user.id)) {
           sessionUserKey = user.id;
@@ -150,7 +150,7 @@ export async function POST(req: Request) {
           .from('active_sessions')
           .upsert({
             user_id: sessionUserKey,
-            session_id: newSessionId,
+            session_id: currentSessionId,
             last_heartbeat: new Date().toISOString(),
           });
       } catch (err: any) {
@@ -165,7 +165,6 @@ export async function POST(req: Request) {
     const adminSession = cookieStore.get('admin_session');
     const isAdmin = adminSession?.value === 'authenticated';
 
-    const newSessionId = crypto.randomUUID();
     const matchTitle = resolvedMatch?.title || 'Carreras vs Blanco y Negro';
     const matchDate = resolvedMatch?.date || null;
 
@@ -189,7 +188,7 @@ export async function POST(req: Request) {
         matchTitle,
         matchDate,
         token: null,
-        sessionId: newSessionId,
+        sessionId: currentSessionId,
         liveInputUid,
         message: 'La transmisión está programada y a la espera del inicio oficial.',
       });
@@ -209,7 +208,7 @@ export async function POST(req: Request) {
       matchTitle,
       matchDate,
       token: streamToken || liveInputUid,
-      sessionId: newSessionId,
+      sessionId: currentSessionId,
       liveInputUid,
     });
   } catch (error: any) {
