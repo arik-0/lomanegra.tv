@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getClubsData, saveClubsData } from '@/lib/clubsPersistence';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +15,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     if (!body || !Array.isArray(body.clubs)) {
       return NextResponse.json({ error: 'Formato de clubes inválido' }, { status: 400 });

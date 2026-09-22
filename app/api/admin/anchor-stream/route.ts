@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { updateStoredMatch } from '@/lib/adminStore';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const { matchId, streamUid, isLive } = await req.json();
 
     if (!matchId) {

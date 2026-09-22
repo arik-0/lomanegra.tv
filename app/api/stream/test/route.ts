@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { generateStreamToken } from '@/lib/cloudflare';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getStoredMatches } from '@/lib/adminStore';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,13 @@ export async function POST(req: Request) {
 }
 
 async function handleTest(req: Request) {
+  if (!verifyAdminSession()) {
+    return NextResponse.json(
+      { error: 'Acceso no autorizado. El diagnóstico de transmisión requiere privilegios de administrador.' },
+      { status: 401 }
+    );
+  }
+
   const startTime = Date.now();
   const { searchParams } = new URL(req.url);
   let body: any = {};

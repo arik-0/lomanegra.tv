@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,13 @@ if (typeof process !== 'undefined') {
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador para subir archivos.' },
+        { status: 401 }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 

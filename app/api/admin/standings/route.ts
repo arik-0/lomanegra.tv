@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getStandings, updateStandings, resetStandings } from '@/lib/standingsPersistence';
 import { TorneoType } from '@/lib/standingsStore';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +27,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const deporteParam = searchParams.get('deporte') || undefined;
     const categoriaParam = searchParams.get('categoria') || undefined;
@@ -48,6 +56,13 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const deporte = searchParams.get('deporte') || undefined;
     const categoria = searchParams.get('categoria') || undefined;

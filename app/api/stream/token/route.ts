@@ -87,12 +87,8 @@ export async function POST(req: Request) {
         const isAdmin = adminSession?.value === 'authenticated';
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value?.toLowerCase().trim();
         const cleanGuestEmail = guestEmail?.toLowerCase().trim();
-        const isOperatorEmail =
-          cleanGuestEmail === 'operador@pasionlomonegra.com' ||
-          cleanGuestEmail?.startsWith('operador') ||
-          cookieEmail === 'operador@pasionlomonegra.com';
 
-        let hasAuthorization = isAdmin || isOperatorEmail;
+        let hasAuthorization = isAdmin;
 
         const isValidUUID = (str?: string | null): boolean =>
           !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
@@ -207,16 +203,13 @@ export async function POST(req: Request) {
       liveInputUid,
     });
   } catch (error: any) {
-    console.warn('Fallback en POST /api/stream/token:', error);
-    const mockSessionId = crypto.randomUUID();
-    return NextResponse.json({
-      isLive: true,
-      status: 'live',
-      matchTitle: 'Carreras vs Blanco y Negro',
-      matchDate: null,
-      token: 'dac066a4fb5c97117189392adae3f453',
-      sessionId: mockSessionId,
-      liveInputUid: 'dac066a4fb5c97117189392adae3f453',
-    });
+    console.error('Error en POST /api/stream/token:', error);
+    return NextResponse.json(
+      {
+        error: error?.message || 'Error interno al autorizar la transmisión.',
+        code: error?.code || 'STREAM_ERROR',
+      },
+      { status: error?.status || 500 }
+    );
   }
 }

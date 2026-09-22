@@ -6,6 +6,7 @@ import {
   deleteGalleryPlaylist,
   restoreDefaultGalleryPhotos,
 } from '@/lib/galleryPersistence';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ error: 'Cuerpo de solicitud inválido' }, { status: 400 });
@@ -48,6 +56,13 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     let id = searchParams.get('id');
     let type = searchParams.get('type') || 'photo';

@@ -97,16 +97,6 @@ export async function POST(req: Request) {
       purchaseStatus = 'rejected';
     }
 
-    const isVipTestEmail =
-      guest_email === 'arikayelin@gmail.com' ||
-      payerAccountEmail === 'arikayelin@gmail.com' ||
-      guest_email === 'reydecopas2877@gmail.com' ||
-      payerAccountEmail === 'lucasmacel28@gmail.com';
-
-    if (isVipTestEmail) {
-      purchaseStatus = 'approved';
-    }
-
     // 3. Persistir o actualizar la compra usando Supabase Service Role (Bypass de RLS)
     // Recopilar todos los correos asociados a este pago (formulario y cuenta de MP)
     const emailsToProcess = new Set<string>();

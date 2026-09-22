@@ -42,3 +42,17 @@ export const DEFAULT_ADMIN_HASH =
 export function getAdminPasswordHash(): string {
   return process.env.ADMIN_PASSWORD_HASH || DEFAULT_ADMIN_HASH;
 }
+
+/**
+ * Verifica si la petición actual proviene de un administrador autenticado con cookie de sesión segura.
+ */
+export function verifyAdminSession(): boolean {
+  try {
+    const { cookies } = require('next/headers');
+    const cookieStore = cookies();
+    const session = cookieStore.get('admin_session');
+    return session?.value === 'authenticated';
+  } catch {
+    return false;
+  }
+}

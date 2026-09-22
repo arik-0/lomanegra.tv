@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getStoredMatches, addStoredMatch, updateStoredMatch, deleteStoredMatch, MatchData } from '@/lib/adminStore';
-import crypto from 'crypto';
 import { sanitizeRegionalText } from '@/lib/sanitize';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 // Utilidad para evitar cuelgues si la red está caída
 async function withTimeout<T>(promise: PromiseLike<T>, ms = 3000): Promise<T | null> {
@@ -139,6 +139,13 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const matchId = body.id || crypto.randomUUID();
     const isDateConfirmed = Boolean(body.is_date_confirmed);
@@ -216,6 +223,13 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const { id, ...updates } = body;
 
@@ -281,6 +295,13 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
