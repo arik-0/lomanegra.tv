@@ -4,6 +4,13 @@ import { TorneoType } from '@/lib/standingsStore';
 import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
 
 export async function GET(req: Request) {
   try {
@@ -12,14 +19,17 @@ export async function GET(req: Request) {
     const categoria = searchParams.get('categoria') || undefined;
     const torneo = searchParams.get('torneo') || undefined;
     const data = await getStandings({ deporte, categoria, torneo });
-    return NextResponse.json({
-      success: true,
-      standings: data,
-      deporte: data.deporte,
-      categoria: data.categoria,
-      torneo: data.torneo,
-      source: 'supabase',
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        standings: data,
+        deporte: data.deporte,
+        categoria: data.categoria,
+        torneo: data.torneo,
+        source: 'supabase',
+      },
+      { headers: NO_CACHE }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Error obteniendo tablas' }, { status: 500 });
   }

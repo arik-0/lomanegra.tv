@@ -244,22 +244,37 @@ export async function ensureGlobalStore(): Promise<Record<string, TournamentStan
 
   if (!initPromise) {
     initPromise = (async () => {
-      // 1. Cargar desde Supabase como fuente primaria
-      const fromSupabase = await loadFromSupabase();
-      const fromDisk = loadFromPersistenceFile();
+      try {
+        // 1. Cargar desde Supabase como fuente primaria
+        const fromSupabase = await loadFromSupabase();
+        const fromDisk = loadFromPersistenceFile();
 
-      const mergedStore: Record<string, TournamentStandings> = {
-        ...(fromDisk || {}),
-        ...(fromSupabase || {}),
-      };
+        const mergedStore: Record<string, TournamentStandings> = {
+          ...(fromDisk || {}),
+          ...(fromSupabase || {}),
+        };
 
-      if (Object.keys(mergedStore).length > 0) {
-        globalThis.globalTournamentsStore = mergedStore;
-        saveToPersistenceFile(mergedStore);
+        if (Object.keys(mergedStore).length > 0) {
+          globalThis.globalTournamentsStore = mergedStore;
+          saveToPersistenceFile(mergedStore);
+          return;
+        }
+      } catch (err) {
+        console.error('[StandingsPersistence] Error en carga inicial:', err);
+      } finally {
+        // CRÍTICO: siempre resetear initPromise para poder reintentar si el store quedó vacío
+        initPromise = null;
+      }
+
+      // Si llegamos aquí, ni Supabase ni disco devolvieron datos.
+      // Intentar disco nuevamente antes de usar defaults (puede ser timing en serverless)
+      const diskRetry = loadFromPersistenceFile();
+      if (diskRetry && Object.keys(diskRetry).length > 0) {
+        globalThis.globalTournamentsStore = diskRetry;
         return;
       }
 
-      // 2. Fallback con estructuras iniciales
+      // 2. Fallback con estructuras iniciales (solo si no hay NADA guardado)
       const initialStore: Record<string, TournamentStandings> = {
         apertura: JSON.parse(JSON.stringify(defaultAperturaStandings)),
         clausura: JSON.parse(JSON.stringify(defaultClausuraStandings)),
@@ -313,6 +328,25 @@ export async function getStandings(
   }
   if ((key === 'futbol_mayor_clausura' || !deporte) && store['clausura']) {
     return store['clausura'];
+  }
+
+  // El store en memoria no tiene esta key → puede ser un cold-start serverless.
+  // Intentar recargar desde Supabase antes de generar un default vacío.
+  try {
+    const freshFromSupabase = await loadFromSupabase();
+    if (freshFromSupabase && Object.keys(freshFromSupabase).length > 0) {
+      // Merge y actualizar el store global con los datos frescos
+      Object.assign(store, freshFromSupabase);
+      if (globalThis.globalTournamentsStore) {
+        Object.assign(globalThis.globalTournamentsStore, freshFromSupabase);
+      }
+      saveToPersistenceFile(store);
+      if (store[key]) {
+        return store[key];
+      }
+    }
+  } catch (retryErr) {
+    console.error('[StandingsPersistence] Reintento de carga desde Supabase falló:', retryErr);
   }
 
   // Si no existe para este deporte y categoría, generar plantilla limpia y guardarla
