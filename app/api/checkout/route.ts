@@ -171,15 +171,32 @@ export async function POST(req: Request) {
     // 3. Crear preferencia en Mercado Pago Checkout Pro oficial
     const isHttps = appUrl.startsWith('https://');
 
+    const matchTitle = (match.title || 'Partido en Vivo').trim();
+
+    // Afiche autogenerado oficial con los escudos auténticos de ambos clubes
+    const generatedPosterUrl = `${appUrl}/api/match-poster?id=${match.id}&title=${encodeURIComponent(matchTitle)}`;
+
+    // Si posee una foto personalizada real subida por el usuario a /uploads/, preservarla;
+    // de lo contrario, usar siempre el afiche autogenerado del partido para evitar fotos desfasadas de otros rivales.
+    const isIfcMatch = /independiente|ifc|bigand/i.test(matchTitle);
+    const isMismatchedIfc = match.image_url?.includes('blanco-y-negro-vs-ifc') && !isIfcMatch;
+    const hasCustomUpload =
+      match.image_url &&
+      !isMismatchedIfc &&
+      !match.image_url.endsWith('.svg') &&
+      (match.image_url.startsWith('/uploads/') || (match.image_url.startsWith('http') && !match.image_url.includes('/matches/')));
+
+    const finalPictureUrl = hasCustomUpload
+      ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
+      : generatedPosterUrl;
+
     const preferenceBody: any = {
       items: [
         {
           id: match.id,
-          title: `Pasión Lomonegra: ${match.title}`,
+          title: matchTitle.slice(0, 250),
           description: `Pase oficial de transmisión en vivo HD • ${match.category === 'Fútbol Mayor' ? 'Primera' : (match.category || 'Primera')}`,
-          picture_url: match.image_url
-            ? (match.image_url.startsWith('http') ? match.image_url : `${appUrl}${match.image_url}`)
-            : `${appUrl}/logo-pasion-lomonegra.png`,
+          picture_url: finalPictureUrl,
           category_id: 'sports',
           quantity: 1,
           unit_price: Number(match.price) || 12000,
