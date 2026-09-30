@@ -203,7 +203,40 @@ export default function AdminClubsManager() {
     notifySuccess(`Club "${newClub.name}" agregado. Haz clic en "Guardar Todos los Clubes".`);
   };
 
+  const [selectedLeagueFilter, setSelectedLeagueFilter] = useState<'todos' | 'ldds' | 'senior' | 'reserva_30' | 'hockey'>('todos');
+
+  const handleResetDefaults = async () => {
+    if (!confirm('¿Deseas sincronizar todos los clubes con el catálogo oficial del sistema? Esto incorporará automáticamente los clubes de Senior, Reserva +30 y Hockey manteniendo los escudos existentes.')) return;
+    setSaving(true);
+    setErrorMsg('');
+    try {
+      const res = await fetch('/api/admin/clubs', { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.clubs) {
+        setClubs(data.clubs);
+        data.clubs.forEach((c: ClubItem) => {
+          registerCustomClubLogo(c.name, c.logoUrl);
+          registerCustomClubLogo(c.id, c.logoUrl);
+        });
+        notifySuccess('¡Catálogo de clubes sincronizado y actualizado!');
+      } else {
+        setErrorMsg(data.error || 'Error al sincronizar catálogo.');
+      }
+    } catch {
+      setErrorMsg('Error de red al sincronizar catálogo.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const filteredClubs = clubs.filter((c) => {
+    if (selectedLeagueFilter !== 'todos') {
+      const l = (c.league || '').toLowerCase();
+      if (selectedLeagueFilter === 'ldds' && !l.includes('deportiva del sur')) return false;
+      if (selectedLeagueFilter === 'senior' && !l.includes('senior')) return false;
+      if (selectedLeagueFilter === 'reserva_30' && !l.includes('reserva') && !l.includes('30')) return false;
+      if (selectedLeagueFilter === 'hockey' && !l.includes('hockey')) return false;
+    }
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -236,7 +269,7 @@ export default function AdminClubsManager() {
               <h2 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
                 <span>Gestión de Clubes, Nombres & Escudos</span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-red-950 text-red-400 border border-red-800 rounded">
-                  LDDS // HOCKEY
+                  LDDS // SENIOR // RESERVA +30 // HOCKEY
                 </span>
               </h2>
               <div className="text-[10px] text-zinc-400">
@@ -245,11 +278,22 @@ export default function AdminClubsManager() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleResetDefaults}
+              disabled={saving}
+              title="Sincronizar y actualizar con todos los clubes oficiales de LDDS, Senior, Reserva +30 y Hockey"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#181922] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
+              <span className="hidden sm:inline">Sincronizar Catálogo</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#181922] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#181922] hover:bg-[#20222a] border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition"
             >
               <Plus className="w-4 h-4 text-red-400" />
               <span>Nuevo Club</span>
@@ -259,12 +303,36 @@ export default function AdminClubsManager() {
               type="button"
               onClick={handleSaveAllClubs}
               disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-lg shadow-emerald-950"
+              className="flex items-center gap-2 px-4 sm:px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-lg shadow-emerald-950"
             >
               {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span>Guardar Cambios</span>
             </button>
           </div>
+        </div>
+
+        {/* Pestañas de Filtro por Disciplina / Liga */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+          {[
+            { id: 'todos', label: 'Todos los Clubes' },
+            { id: 'ldds', label: 'Liga Deportiva del Sur' },
+            { id: 'senior', label: 'Fútbol Senior (+35)' },
+            { id: 'reserva_30', label: 'Reserva +30 (Especial)' },
+            { id: 'hockey', label: 'Liga de Hockey (LCUH)' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSelectedLeagueFilter(tab.id as any)}
+              className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap ${
+                selectedLeagueFilter === tab.id
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950'
+                  : 'bg-[#181922] text-zinc-400 hover:text-white border border-zinc-800'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Buscador de clubes */}
@@ -457,15 +525,19 @@ export default function AdminClubsManager() {
 
                 <div>
                   <label className="block text-[11px] font-bold text-zinc-400 uppercase mb-1">
-                    Liga o Torneo
+                    Liga o Categoría
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={newClubLeague}
                     onChange={(e) => setNewClubLeague(e.target.value)}
-                    placeholder="Liga Deportiva del Sur"
                     className="w-full bg-[#181922] border border-zinc-800 focus:border-red-500 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
-                  />
+                  >
+                    <option value="Liga Deportiva del Sur">Liga Deportiva del Sur</option>
+                    <option value="Fútbol Senior (+35)">Fútbol Senior (+35)</option>
+                    <option value="Reserva +30 (Especial)">Reserva +30 (Especial)</option>
+                    <option value="Liga de Hockey (LCUH)">Liga de Hockey (LCUH)</option>
+                    <option value="Torneo Regional / Otro">Torneo Regional / Otro</option>
+                  </select>
                 </div>
               </div>
 

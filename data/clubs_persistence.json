@@ -1,0 +1,275 @@
+[
+  {
+    "id": "blanco_y_negro",
+    "name": "Blanco y Negro",
+    "shortName": "ByN",
+    "logoUrl": "/teams/Blanco y Negro.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "los_andes",
+    "name": "Los Andes",
+    "shortName": "CLA",
+    "logoUrl": "/teams/Los Andes.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "san_martin",
+    "name": "San Martín",
+    "shortName": "CASM",
+    "logoUrl": "/teams/San Martin.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "eduardo_hertz",
+    "name": "Eduardo Hertz",
+    "shortName": "CAEH",
+    "logoUrl": "/teams/Eduardo Hertz.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "atletico_acebal",
+    "name": "Atlético Acebal",
+    "shortName": "CAA",
+    "logoUrl": "/teams/Atletico Acebal.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "atletico_paz",
+    "name": "Atlético Paz",
+    "shortName": "CAP",
+    "logoUrl": "/teams/Atletico Paz.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "argentino_firmat",
+    "name": "Argentino de Firmat",
+    "shortName": "CAF",
+    "logoUrl": "/teams/Argentino de Firmat.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "firmat_fbc",
+    "name": "Firmat FBC",
+    "shortName": "FFBC",
+    "logoUrl": "/teams/Firmat FBC.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "sp_bombal",
+    "name": "Sportivo Bombal",
+    "shortName": "CSB",
+    "logoUrl": "/teams/Sportivo Bombal.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "bombal_jrs",
+    "name": "Bombal Juniors",
+    "shortName": "BJC",
+    "logoUrl": "/teams/Bombal Juniors.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "sporting_bigand",
+    "name": "Sporting de Bigand",
+    "shortName": "SAMCS",
+    "logoUrl": "/teams/Sporting de Bigan.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "independiente_bigand",
+    "name": "Independiente de Bigand",
+    "shortName": "IFC",
+    "logoUrl": "/teams/ifc.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "italo_argentino",
+    "name": "Ítalo Argentino",
+    "shortName": "CIA",
+    "logoUrl": "/teams/Italo Argentino.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "carreras",
+    "name": "Carreras",
+    "shortName": "CAC",
+    "logoUrl": "/teams/Carreras.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "hughes",
+    "name": "Hughes",
+    "shortName": "Hughes",
+    "logoUrl": "/teams/Hughes.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "nuevo_alberdi",
+    "name": "Nuevo Alberdi",
+    "shortName": "NA",
+    "logoUrl": "/teams/Nuevo Alberdi.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "olimpia",
+    "name": "Olimpia de Santa Teresa",
+    "shortName": "Olimpia",
+    "logoUrl": "/teams/Olimpia de Santa Teresa.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "fredriksson",
+    "name": "Fredriksson",
+    "shortName": "FFBC",
+    "logoUrl": "/teams/Fredriksson.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "rivadavia",
+    "name": "Bernardino Rivadavia",
+    "shortName": "CABR",
+    "logoUrl": "/teams/Bernardino Rivadavia.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "miguel_torres",
+    "name": "Deportivo Miguel Torres",
+    "shortName": "DMT",
+    "logoUrl": "/teams/Miguel Torres.png",
+    "league": "Liga Deportiva del Sur"
+  },
+  {
+    "id": "atletico_empalme",
+    "name": "Atlético Empalme",
+    "shortName": "CAE",
+    "logoUrl": "",
+    "league": "Liga de Hockey (LCUH)"
+  },
+  {
+    "id": "alianza_fuentes",
+    "name": "Alianza Dep. Fuentes",
+    "shortName": "ADF",
+    "logoUrl": "",
+    "league": "Liga de Hockey (LCUH)"
+  },
+  {
+    "id": "atletico_soldini",
+    "name": "Atlético Soldini",
+    "shortName": "CAS",
+    "logoUrl": "",
+    "league": "Liga de Hockey (LCUH)"
+  },
+  {
+    "id": "independiente_ricardone",
+    "name": "Independiente (Ricardone)",
+    "shortName": "CAI",
+    "logoUrl": "",
+    "league": "Liga de Hockey (LCUH)"
+  },
+  {
+    "id": "sportivo_fc",
+    "name": "Sportivo FC",
+    "shortName": "SFC",
+    "logoUrl": "/teams/Blanco y Negro.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "mundo_balon",
+    "name": "Mundo Balón",
+    "shortName": "MB",
+    "logoUrl": "/teams/ifc.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "uranga_fbc",
+    "name": "Uranga FBC",
+    "shortName": "UFBC",
+    "logoUrl": "/teams/San Martin.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "estrella_del_sur",
+    "name": "Estrella del Sur",
+    "shortName": "EDS",
+    "logoUrl": "/teams/Los Andes.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "atletico_union",
+    "name": "Atlético Unión",
+    "shortName": "CAU",
+    "logoUrl": "/teams/Atletico Acebal.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "independiente_st",
+    "name": "Independiente ST",
+    "shortName": "IST",
+    "logoUrl": "/teams/ifc.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "atletico_pinero",
+    "name": "Atlético Piñero",
+    "shortName": "CAP",
+    "logoUrl": "/teams/Carreras.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "atletico_chabas",
+    "name": "Atlético Chabás",
+    "shortName": "ACH",
+    "logoUrl": "/teams/Eduardo Hertz.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "velez_sarsfield",
+    "name": "Vélez Sarsfield",
+    "shortName": "CVS",
+    "logoUrl": "/teams/Bombal Juniors.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "nautico_melincue",
+    "name": "Náutico Melincué",
+    "shortName": "CNM",
+    "logoUrl": "/teams/Miguel Torres.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "los_leones_norte",
+    "name": "Los Leones Norte",
+    "shortName": "CLN",
+    "logoUrl": "/teams/Hughes.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "atl_estudiantes",
+    "name": "Atl. Estudiantes",
+    "shortName": "CAE",
+    "logoUrl": "/teams/Nuevo Alberdi.png",
+    "league": "Fútbol Senior (+35)"
+  },
+  {
+    "id": "santa_teresita",
+    "name": "Atl. Santa Teresita",
+    "shortName": "AST",
+    "logoUrl": "/teams/San Martin.png",
+    "league": "Reserva +30 (Especial)"
+  },
+  {
+    "id": "unidos_zavalla",
+    "name": "Unidos (Zavalla)",
+    "shortName": "UAC",
+    "logoUrl": "/teams/Sporting de Bigan.png",
+    "league": "Liga de Hockey (LCUH)"
+  },
+  {
+    "id": "union_alvear",
+    "name": "Atlético Unión (Alvear)",
+    "shortName": "CAUA",
+    "logoUrl": "/teams/Atletico Acebal.png",
+    "league": "Liga de Hockey (LCUH)"
+  }
+]

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getClubsData, saveClubsData } from '@/lib/clubsPersistence';
+import { getClubsData, saveClubsData, resetClubsToDefault } from '@/lib/clubsPersistence';
 import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
@@ -32,3 +32,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message || 'Error al guardar clubes' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador.' },
+        { status: 401 }
+      );
+    }
+
+    const reset = await resetClubsToDefault();
+    return NextResponse.json({ success: true, clubs: reset });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Error al restablecer catálogo de clubes' }, { status: 500 });
+  }
+}
+

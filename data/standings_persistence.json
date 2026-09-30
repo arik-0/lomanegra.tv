@@ -1091,9 +1091,9 @@
             "pts": 10,
             "form": [
               "W",
+              "W",
+              "W",
               "D",
-              "W",
-              "W",
               "L"
             ],
             "qualified": true
@@ -1112,10 +1112,10 @@
             "dif": 5,
             "pts": 10,
             "form": [
-              "W",
               "L",
-              "D",
               "W",
+              "W",
+              "D",
               "W"
             ],
             "qualified": true
@@ -1129,14 +1129,14 @@
             "pg": 3,
             "pe": 1,
             "pp": 1,
-            "gf": 7,
+            "gf": 6,
             "gc": 5,
-            "dif": 2,
+            "dif": 1,
             "pts": 10,
             "form": [
               "W",
-              "W",
               "L",
+              "W",
               "W",
               "D"
             ],
@@ -1156,10 +1156,10 @@
             "dif": 5,
             "pts": 9,
             "form": [
+              "L",
               "W",
               "W",
-              "W",
-              "L"
+              "W"
             ],
             "qualified": true
           },
@@ -1173,17 +1173,17 @@
             "pe": 2,
             "pp": 1,
             "gf": 6,
-            "gc": 6,
-            "dif": 0,
+            "gc": 5,
+            "dif": 1,
             "pts": 8,
             "form": [
-              "D",
+              "W",
               "D",
               "L",
-              "W",
+              "D",
               "W"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "los-andes",
@@ -1199,12 +1199,12 @@
             "dif": 2,
             "pts": 5,
             "form": [
-              "D",
+              "W",
               "D",
               "L",
               "D"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "italo-argentino",
@@ -1220,9 +1220,9 @@
             "dif": -4,
             "pts": 4,
             "form": [
-              "L",
-              "L",
               "W",
+              "L",
+              "L",
               "D",
               "L"
             ],
@@ -1255,18 +1255,17 @@
             "pos": 9,
             "name": "San Martín",
             "logoUrl": "/teams/San Martin.png",
-            "pj": 4,
+            "pj": 3,
             "pg": 0,
             "pe": 2,
-            "pp": 2,
+            "pp": 1,
             "gf": 4,
-            "gc": 6,
-            "dif": -2,
+            "gc": 5,
+            "dif": -1,
             "pts": 2,
             "form": [
+              "L",
               "D",
-              "L",
-              "L",
               "D"
             ],
             "qualified": false
@@ -1276,18 +1275,17 @@
             "pos": 10,
             "name": "Sporting CS",
             "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 4,
+            "pj": 3,
             "pg": 0,
-            "pe": 1,
+            "pe": 0,
             "pp": 3,
-            "gf": 3,
-            "gc": 10,
+            "gf": 2,
+            "gc": 9,
             "dif": -7,
-            "pts": 1,
+            "pts": 0,
             "form": [
               "L",
               "L",
-              "D",
               "L"
             ],
             "qualified": false
@@ -1500,8 +1498,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-5",
@@ -2031,8 +2029,8 @@
             "form": [
               "W",
               "W",
-              "D",
               "W",
+              "D",
               "W"
             ],
             "qualified": true
@@ -2043,70 +2041,25 @@
             "name": "Blanco y Negro",
             "logoUrl": "/teams/Blanco y Negro.png",
             "isBlancoYNegro": true,
-            "pj": 5,
+            "pj": 4,
             "pg": 2,
-            "pe": 3,
+            "pe": 2,
             "pp": 0,
-            "gf": 9,
-            "gc": 4,
+            "gf": 8,
+            "gc": 3,
             "dif": 5,
-            "pts": 9,
+            "pts": 8,
             "form": [
               "D",
+              "D",
               "W",
-              "D",
-              "D",
               "W"
             ],
             "qualified": true
           },
           {
-            "id": "carreras-ac",
-            "pos": 3,
-            "name": "Carreras AC",
-            "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 7,
-            "gc": 3,
-            "dif": 4,
-            "pts": 8,
-            "form": [
-              "D",
-              "W",
-              "W",
-              "D",
-              "L"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "atl-acebal",
-            "pos": 4,
-            "name": "Atl. Acebal",
-            "logoUrl": "/teams/Atletico Acebal.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 4,
-            "gc": 2,
-            "dif": 2,
-            "pts": 8,
-            "form": [
-              "W",
-              "D",
-              "W",
-              "L",
-              "D"
-            ],
-            "qualified": true
-          },
-          {
             "id": "bombal-jrs",
-            "pos": 5,
+            "pos": 3,
             "name": "Bombal Jrs",
             "logoUrl": "/teams/Bombal Juniors.png",
             "pj": 5,
@@ -2118,17 +2071,38 @@
             "dif": 1,
             "pts": 8,
             "form": [
-              "D",
-              "D",
               "W",
               "W",
+              "D",
+              "D",
               "L"
             ],
-            "qualified": false
+            "qualified": true
+          },
+          {
+            "id": "carreras-ac",
+            "pos": 4,
+            "name": "Carreras AC",
+            "logoUrl": "/teams/Carreras.png",
+            "pj": 4,
+            "pg": 2,
+            "pe": 1,
+            "pp": 1,
+            "gf": 6,
+            "gc": 2,
+            "dif": 4,
+            "pts": 7,
+            "form": [
+              "W",
+              "W",
+              "D",
+              "L"
+            ],
+            "qualified": true
           },
           {
             "id": "firmat-fbc",
-            "pos": 6,
+            "pos": 5,
             "name": "Firmat FBC",
             "logoUrl": "/teams/Firmat FBC.png",
             "pj": 5,
@@ -2140,39 +2114,38 @@
             "dif": 1,
             "pts": 7,
             "form": [
-              "W",
               "L",
+              "W",
               "L",
               "D",
               "W"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
-            "id": "independiente-fc",
-            "pos": 7,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 5,
+            "id": "atl-acebal",
+            "pos": 6,
+            "name": "Atl. Acebal",
+            "logoUrl": "/teams/Atletico Acebal.png",
+            "pj": 4,
             "pg": 1,
             "pe": 2,
-            "pp": 2,
-            "gf": 5,
-            "gc": 5,
-            "dif": 0,
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
             "pts": 5,
             "form": [
-              "D",
-              "L",
               "W",
+              "L",
               "D",
-              "L"
+              "D"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "hughes-fbc",
-            "pos": 8,
+            "pos": 7,
             "name": "Hughes FBC",
             "logoUrl": "/teams/Hughes.png",
             "pj": 5,
@@ -2184,11 +2157,32 @@
             "dif": -4,
             "pts": 5,
             "form": [
-              "L",
               "D",
+              "L",
               "L",
               "D",
               "W"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "independiente-fc",
+            "pos": 8,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 4,
+            "pg": 1,
+            "pe": 1,
+            "pp": 2,
+            "gf": 4,
+            "gc": 4,
+            "dif": 0,
+            "pts": 4,
+            "form": [
+              "L",
+              "D",
+              "W",
+              "L"
             ],
             "qualified": false
           },
@@ -2206,8 +2200,8 @@
             "dif": -10,
             "pts": 2,
             "form": [
-              "L",
               "D",
+              "L",
               "L",
               "L",
               "D"
@@ -2230,8 +2224,8 @@
             "form": [
               "L",
               "L",
-              "L",
               "D",
+              "L",
               "L"
             ],
             "qualified": false
@@ -2444,8 +2438,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-5",
@@ -3173,9 +3167,9 @@
             "pts": 10,
             "form": [
               "W",
+              "W",
+              "W",
               "D",
-              "W",
-              "W",
               "L"
             ],
             "qualified": true
@@ -3194,10 +3188,10 @@
             "dif": 5,
             "pts": 10,
             "form": [
-              "W",
               "L",
-              "D",
               "W",
+              "W",
+              "D",
               "W"
             ],
             "qualified": true
@@ -3211,14 +3205,14 @@
             "pg": 3,
             "pe": 1,
             "pp": 1,
-            "gf": 7,
+            "gf": 6,
             "gc": 5,
-            "dif": 2,
+            "dif": 1,
             "pts": 10,
             "form": [
               "W",
-              "W",
               "L",
+              "W",
               "W",
               "D"
             ],
@@ -3238,10 +3232,10 @@
             "dif": 5,
             "pts": 9,
             "form": [
+              "L",
               "W",
               "W",
-              "W",
-              "L"
+              "W"
             ],
             "qualified": true
           },
@@ -3255,17 +3249,17 @@
             "pe": 2,
             "pp": 1,
             "gf": 6,
-            "gc": 6,
-            "dif": 0,
+            "gc": 5,
+            "dif": 1,
             "pts": 8,
             "form": [
-              "D",
+              "W",
               "D",
               "L",
-              "W",
+              "D",
               "W"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "los-andes",
@@ -3281,12 +3275,12 @@
             "dif": 2,
             "pts": 5,
             "form": [
-              "D",
+              "W",
               "D",
               "L",
               "D"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "italo-argentino",
@@ -3302,9 +3296,9 @@
             "dif": -4,
             "pts": 4,
             "form": [
-              "L",
-              "L",
               "W",
+              "L",
+              "L",
               "D",
               "L"
             ],
@@ -3337,18 +3331,17 @@
             "pos": 9,
             "name": "San Martín",
             "logoUrl": "/teams/San Martin.png",
-            "pj": 4,
+            "pj": 3,
             "pg": 0,
             "pe": 2,
-            "pp": 2,
+            "pp": 1,
             "gf": 4,
-            "gc": 6,
-            "dif": -2,
+            "gc": 5,
+            "dif": -1,
             "pts": 2,
             "form": [
+              "L",
               "D",
-              "L",
-              "L",
               "D"
             ],
             "qualified": false
@@ -3358,18 +3351,17 @@
             "pos": 10,
             "name": "Sporting CS",
             "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 4,
+            "pj": 3,
             "pg": 0,
-            "pe": 1,
+            "pe": 0,
             "pp": 3,
-            "gf": 3,
-            "gc": 10,
+            "gf": 2,
+            "gc": 9,
             "dif": -7,
-            "pts": 1,
+            "pts": 0,
             "form": [
               "L",
               "L",
-              "D",
               "L"
             ],
             "qualified": false
@@ -3582,8 +3574,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-5",
@@ -4113,8 +4105,8 @@
             "form": [
               "W",
               "W",
-              "D",
               "W",
+              "D",
               "W"
             ],
             "qualified": true
@@ -4125,70 +4117,25 @@
             "name": "Blanco y Negro",
             "logoUrl": "/teams/Blanco y Negro.png",
             "isBlancoYNegro": true,
-            "pj": 5,
+            "pj": 4,
             "pg": 2,
-            "pe": 3,
+            "pe": 2,
             "pp": 0,
-            "gf": 9,
-            "gc": 4,
+            "gf": 8,
+            "gc": 3,
             "dif": 5,
-            "pts": 9,
+            "pts": 8,
             "form": [
               "D",
+              "D",
               "W",
-              "D",
-              "D",
               "W"
             ],
             "qualified": true
           },
           {
-            "id": "carreras-ac",
-            "pos": 3,
-            "name": "Carreras AC",
-            "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 7,
-            "gc": 3,
-            "dif": 4,
-            "pts": 8,
-            "form": [
-              "D",
-              "W",
-              "W",
-              "D",
-              "L"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "atl-acebal",
-            "pos": 4,
-            "name": "Atl. Acebal",
-            "logoUrl": "/teams/Atletico Acebal.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 4,
-            "gc": 2,
-            "dif": 2,
-            "pts": 8,
-            "form": [
-              "W",
-              "D",
-              "W",
-              "L",
-              "D"
-            ],
-            "qualified": true
-          },
-          {
             "id": "bombal-jrs",
-            "pos": 5,
+            "pos": 3,
             "name": "Bombal Jrs",
             "logoUrl": "/teams/Bombal Juniors.png",
             "pj": 5,
@@ -4200,17 +4147,38 @@
             "dif": 1,
             "pts": 8,
             "form": [
-              "D",
-              "D",
               "W",
               "W",
+              "D",
+              "D",
               "L"
             ],
-            "qualified": false
+            "qualified": true
+          },
+          {
+            "id": "carreras-ac",
+            "pos": 4,
+            "name": "Carreras AC",
+            "logoUrl": "/teams/Carreras.png",
+            "pj": 4,
+            "pg": 2,
+            "pe": 1,
+            "pp": 1,
+            "gf": 6,
+            "gc": 2,
+            "dif": 4,
+            "pts": 7,
+            "form": [
+              "W",
+              "W",
+              "D",
+              "L"
+            ],
+            "qualified": true
           },
           {
             "id": "firmat-fbc",
-            "pos": 6,
+            "pos": 5,
             "name": "Firmat FBC",
             "logoUrl": "/teams/Firmat FBC.png",
             "pj": 5,
@@ -4222,39 +4190,38 @@
             "dif": 1,
             "pts": 7,
             "form": [
-              "W",
               "L",
+              "W",
               "L",
               "D",
               "W"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
-            "id": "independiente-fc",
-            "pos": 7,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 5,
+            "id": "atl-acebal",
+            "pos": 6,
+            "name": "Atl. Acebal",
+            "logoUrl": "/teams/Atletico Acebal.png",
+            "pj": 4,
             "pg": 1,
             "pe": 2,
-            "pp": 2,
-            "gf": 5,
-            "gc": 5,
-            "dif": 0,
+            "pp": 1,
+            "gf": 3,
+            "gc": 2,
+            "dif": 1,
             "pts": 5,
             "form": [
-              "D",
-              "L",
               "W",
+              "L",
               "D",
-              "L"
+              "D"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "hughes-fbc",
-            "pos": 8,
+            "pos": 7,
             "name": "Hughes FBC",
             "logoUrl": "/teams/Hughes.png",
             "pj": 5,
@@ -4266,11 +4233,32 @@
             "dif": -4,
             "pts": 5,
             "form": [
-              "L",
               "D",
+              "L",
               "L",
               "D",
               "W"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "independiente-fc",
+            "pos": 8,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 4,
+            "pg": 1,
+            "pe": 1,
+            "pp": 2,
+            "gf": 4,
+            "gc": 4,
+            "dif": 0,
+            "pts": 4,
+            "form": [
+              "L",
+              "D",
+              "W",
+              "L"
             ],
             "qualified": false
           },
@@ -4288,8 +4276,8 @@
             "dif": -10,
             "pts": 2,
             "form": [
-              "L",
               "D",
+              "L",
               "L",
               "L",
               "D"
@@ -4312,8 +4300,8 @@
             "form": [
               "L",
               "L",
-              "L",
               "D",
+              "L",
               "L"
             ],
             "qualified": false
@@ -4526,8 +4514,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-5",
