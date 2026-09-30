@@ -94,15 +94,22 @@ export async function POST(req: Request) {
           !!str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
         if (!hasAuthorization) {
+          if (!isValidUUID(targetId)) {
+            return NextResponse.json(
+              {
+                error: 'Identificador de partido no válido para autorizar transmisión.',
+                code: 'INVALID_MATCH',
+              },
+              { status: 400 }
+            );
+          }
+
           const checkEmail = cleanGuestEmail || cookieEmail || user?.email?.toLowerCase().trim();
           let q = supabaseAdmin
             .from('purchases')
             .select('id, status, match_id')
-            .eq('status', 'approved');
-
-          if (isValidUUID(targetId)) {
-            q = q.eq('match_id', targetId);
-          }
+            .eq('status', 'approved')
+            .eq('match_id', targetId);
 
           if (user && isValidUUID(user.id)) {
             if (checkEmail) {

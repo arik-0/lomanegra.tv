@@ -44,33 +44,29 @@ export async function POST(req: Request) {
 
     const cleanEmail = (user?.email || guestEmail)?.toLowerCase()?.trim();
 
-    // 1. Verificar si ya está aprobada en Supabase
-    if (user || cleanEmail) {
+    // 1. Verificar si ya está aprobada en Supabase estrictamente para el matchId solicitado
+    if ((user || cleanEmail) && isValidUUID(matchId)) {
       try {
         let confirmedPurchase = null;
 
         if (user && isValidUUID(user.id)) {
-          let userQ = supabaseAdmin
+          const userQ = supabaseAdmin
             .from('purchases')
             .select('id, status, guest_email')
             .eq('user_id', user.id)
+            .eq('match_id', matchId)
             .eq('status', 'approved');
-          if (isValidUUID(matchId)) {
-            userQ = userQ.eq('match_id', matchId);
-          }
           const { data: userPurch } = await userQ.maybeSingle();
           confirmedPurchase = userPurch;
         }
 
         if (!confirmedPurchase && cleanEmail) {
-          let guestQ = supabaseAdmin
+          const guestQ = supabaseAdmin
             .from('purchases')
             .select('id, status, guest_email')
             .ilike('guest_email', cleanEmail)
+            .eq('match_id', matchId)
             .eq('status', 'approved');
-          if (isValidUUID(matchId)) {
-            guestQ = guestQ.eq('match_id', matchId);
-          }
           const { data: guestPurch } = await guestQ.maybeSingle();
           confirmedPurchase = guestPurch;
         }
@@ -109,8 +105,17 @@ export async function POST(req: Request) {
             paymentData.metadata?.match_id ||
             (paymentData.external_reference?.startsWith('match_')
               ? paymentData.external_reference.split('_')[1]
-              : null) ||
-            matchId;
+              : null);
+
+          // Blindaje estricto: Si el pago de Mercado Pago pertenece a otro partido, rechazar
+          if (mpMatchId && isValidUUID(matchId) && mpMatchId !== matchId) {
+            return NextResponse.json(
+              { approved: false, message: 'El comprobante de pago no corresponde a este partido.' },
+              { status: 403 }
+            );
+          }
+
+          const targetMatchId = mpMatchId || matchId;
 
           const payerEmail = (
             paymentData.metadata?.guest_email ||
@@ -125,13 +130,13 @@ export async function POST(req: Request) {
           if (paymentData.payer?.email) allEmails.add(paymentData.payer.email.toLowerCase().trim());
           if (cleanEmail) allEmails.add(cleanEmail);
 
-          if (isSupabaseConfigured && mpMatchId) {
+          if (isSupabaseConfigured && targetMatchId && isValidUUID(targetMatchId)) {
             for (const em of Array.from(allEmails)) {
               try {
                 const { data: exists } = await supabaseAdmin
                   .from('purchases')
                   .select('id')
-                  .eq('match_id', mpMatchId)
+                  .eq('match_id', targetMatchId)
                   .ilike('guest_email', em)
                   .maybeSingle();
 
@@ -146,7 +151,7 @@ export async function POST(req: Request) {
                     .insert({
                       user_id: user && isValidUUID(user.id) ? user.id : null,
                       guest_email: em,
-                      match_id: mpMatchId,
+                      match_id: targetMatchId,
                       status: 'approved',
                       mp_payment_id: String(paymentData.id),
                       created_at: new Date().toISOString(),

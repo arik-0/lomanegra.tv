@@ -111,6 +111,8 @@ export default function PosicionesPage() {
   const categoryLabels: Record<string, string> = {
     mayor: 'Primera División',
     reserva: 'Reserva',
+    senior: 'Fútbol Senior',
+    reserva_30: 'Reserva +30',
     tercera: 'Tercera División',
     cuarta: 'Cuarta División',
     quinta: 'Quinta División',

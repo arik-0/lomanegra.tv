@@ -32,29 +32,29 @@ export interface TeamRowItem {
 }
 
 export const CLAUSURA_TEAMS_ZONA_A: TeamRowItem[] = [
-  { id: 'san-martin', pos: 1, name: 'San Martín', logoUrl: '/teams/San Martin.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'eduardo-hertz', pos: 2, name: 'Eduardo Hertz', logoUrl: '/teams/Eduardo Hertz.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'ca-argentino', pos: 3, name: 'C.A. Argentino', logoUrl: '/teams/Argentino de Firmat.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'los-andes', pos: 4, name: 'Los Andes', logoUrl: '/teams/Los Andes.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'sp-bombal', pos: 5, name: 'Sp. Bombal', logoUrl: '/teams/Sportivo Bombal.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'italo-argentino', pos: 6, name: 'Ítalo Argentino', logoUrl: '/teams/Italo Argentino.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'sporting-cs', pos: 7, name: 'Sporting CS', logoUrl: '/teams/Sporting de Bigan.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'dep-miguel-torres', pos: 8, name: 'Dep. Miguel Torres', logoUrl: '/teams/Miguel Torres.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'olimpia', pos: 9, name: 'Olimpia', logoUrl: '/teams/Olimpia de Santa Teresa.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'fredriksson-fbc', pos: 10, name: 'Fredriksson FBC', logoUrl: '/teams/Fredriksson.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
+  { id: 'eduardo-hertz', pos: 1, name: 'Eduardo Hertz', logoUrl: '/teams/Eduardo Hertz.png', pj: 5, pg: 3, pe: 1, pp: 1, gf: 10, gc: 4, dif: 6, pts: 10, form: ['W', 'D', 'W', 'W', 'L'], qualified: true },
+  { id: 'ca-argentino', pos: 2, name: 'C.A. Argentino', logoUrl: '/teams/Argentino de Firmat.png', pj: 5, pg: 3, pe: 1, pp: 1, gf: 12, gc: 7, dif: 5, pts: 10, form: ['W', 'L', 'D', 'W', 'W'], qualified: true },
+  { id: 'fredriksson-fbc', pos: 3, name: 'Fredriksson FBC', logoUrl: '/teams/Fredriksson.png', pj: 5, pg: 3, pe: 1, pp: 1, gf: 7, gc: 5, dif: 2, pts: 10, form: ['W', 'W', 'L', 'W', 'D'], qualified: true },
+  { id: 'olimpia', pos: 4, name: 'Olimpia', logoUrl: '/teams/Olimpia de Santa Teresa.png', pj: 4, pg: 3, pe: 0, pp: 1, gf: 9, gc: 4, dif: 5, pts: 9, form: ['W', 'W', 'W', 'L'], qualified: true },
+  { id: 'sp-bombal', pos: 5, name: 'Sp. Bombal', logoUrl: '/teams/Sportivo Bombal.png', pj: 5, pg: 2, pe: 2, pp: 1, gf: 6, gc: 6, dif: 0, pts: 8, form: ['D', 'D', 'L', 'W', 'W'], qualified: false },
+  { id: 'los-andes', pos: 6, name: 'Los Andes', logoUrl: '/teams/Los Andes.png', pj: 4, pg: 1, pe: 2, pp: 1, gf: 7, gc: 5, dif: 2, pts: 5, form: ['D', 'D', 'L', 'D'], qualified: false },
+  { id: 'italo-argentino', pos: 7, name: 'Ítalo Argentino', logoUrl: '/teams/Italo Argentino.png', pj: 5, pg: 1, pe: 1, pp: 3, gf: 5, gc: 9, dif: -4, pts: 4, form: ['L', 'L', 'W', 'D', 'L'], qualified: false },
+  { id: 'dep-miguel-torres', pos: 8, name: 'Dep. Miguel Torres', logoUrl: '/teams/Miguel Torres.png', pj: 5, pg: 1, pe: 1, pp: 3, gf: 2, gc: 6, dif: -4, pts: 4, form: ['L', 'L', 'L', 'D', 'W'], qualified: false },
+  { id: 'san-martin', pos: 9, name: 'San Martín', logoUrl: '/teams/San Martin.png', pj: 4, pg: 0, pe: 2, pp: 2, gf: 4, gc: 6, dif: -2, pts: 2, form: ['D', 'L', 'L', 'D'], qualified: false },
+  { id: 'sporting-cs', pos: 10, name: 'Sporting CS', logoUrl: '/teams/Sporting de Bigan.png', pj: 4, pg: 0, pe: 1, pp: 3, gf: 3, gc: 10, dif: -7, pts: 1, form: ['L', 'L', 'D', 'L'], qualified: false },
 ];
 
 export const CLAUSURA_TEAMS_ZONA_B: TeamRowItem[] = [
-  { id: 'hughes-fbc', pos: 1, name: 'Hughes FBC', logoUrl: '/teams/Hughes.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'nuevo-alberdi', pos: 2, name: 'Nuevo Alberdi', logoUrl: '/teams/Nuevo Alberdi.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'independiente-fc', pos: 3, name: 'Independiente FC', logoUrl: '/teams/ifc.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'blanco-y-negro', pos: 4, name: 'Blanco y Negro', logoUrl: '/teams/Blanco y Negro.png', isBlancoYNegro: true, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: true },
-  { id: 'carreras-ac', pos: 5, name: 'Carreras AC', logoUrl: '/teams/Carreras.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'firmat-fbc', pos: 6, name: 'Firmat FBC', logoUrl: '/teams/Firmat FBC.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'atl-acebal', pos: 7, name: 'Atl. Acebal', logoUrl: '/teams/Atletico Acebal.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'atletico-paz', pos: 8, name: 'Atlético Paz', logoUrl: '/teams/Atletico Paz.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'bombal-jrs', pos: 9, name: 'Bombal Jrs', logoUrl: '/teams/Bombal Juniors.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
-  { id: 'b-rivadavia', pos: 10, name: 'B. Rivadavia', logoUrl: '/teams/Bernardino Rivadavia.png', pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dif: 0, pts: 0, form: [], qualified: false },
+  { id: 'atletico-paz', pos: 1, name: 'Atlético Paz', logoUrl: '/teams/Atletico Paz.png', pj: 5, pg: 4, pe: 1, pp: 0, gf: 7, gc: 1, dif: 6, pts: 13, form: ['W', 'W', 'D', 'W', 'W'], qualified: true },
+  { id: 'blanco-y-negro', pos: 2, name: 'Blanco y Negro', logoUrl: '/teams/Blanco y Negro.png', isBlancoYNegro: true, pj: 5, pg: 2, pe: 3, pp: 0, gf: 9, gc: 4, dif: 5, pts: 9, form: ['D', 'W', 'D', 'D', 'W'], qualified: true },
+  { id: 'carreras-ac', pos: 3, name: 'Carreras AC', logoUrl: '/teams/Carreras.png', pj: 5, pg: 2, pe: 2, pp: 1, gf: 7, gc: 3, dif: 4, pts: 8, form: ['D', 'W', 'W', 'D', 'L'], qualified: true },
+  { id: 'atl-acebal', pos: 4, name: 'Atl. Acebal', logoUrl: '/teams/Atletico Acebal.png', pj: 5, pg: 2, pe: 2, pp: 1, gf: 4, gc: 2, dif: 2, pts: 8, form: ['W', 'D', 'W', 'L', 'D'], qualified: true },
+  { id: 'bombal-jrs', pos: 5, name: 'Bombal Jrs', logoUrl: '/teams/Bombal Juniors.png', pj: 5, pg: 2, pe: 2, pp: 1, gf: 5, gc: 4, dif: 1, pts: 8, form: ['D', 'D', 'W', 'W', 'L'], qualified: false },
+  { id: 'firmat-fbc', pos: 6, name: 'Firmat FBC', logoUrl: '/teams/Firmat FBC.png', pj: 5, pg: 2, pe: 1, pp: 2, gf: 8, gc: 7, dif: 1, pts: 7, form: ['W', 'L', 'L', 'D', 'W'], qualified: false },
+  { id: 'independiente-fc', pos: 7, name: 'Independiente FC', logoUrl: '/teams/ifc.png', pj: 5, pg: 1, pe: 2, pp: 2, gf: 5, gc: 5, dif: 0, pts: 5, form: ['D', 'L', 'W', 'D', 'L'], qualified: false },
+  { id: 'hughes-fbc', pos: 8, name: 'Hughes FBC', logoUrl: '/teams/Hughes.png', pj: 5, pg: 1, pe: 2, pp: 2, gf: 4, gc: 8, dif: -4, pts: 5, form: ['L', 'D', 'L', 'D', 'W'], qualified: false },
+  { id: 'b-rivadavia', pos: 9, name: 'B. Rivadavia', logoUrl: '/teams/Bernardino Rivadavia.png', pj: 5, pg: 0, pe: 2, pp: 3, gf: 1, gc: 11, dif: -10, pts: 2, form: ['L', 'D', 'L', 'L', 'D'], qualified: false },
+  { id: 'nuevo-alberdi', pos: 10, name: 'Nuevo Alberdi', logoUrl: '/teams/Nuevo Alberdi.png', pj: 5, pg: 0, pe: 1, pp: 4, gf: 3, gc: 11, dif: -8, pts: 1, form: ['L', 'L', 'L', 'D', 'L'], qualified: false },
 ];
 
 export const officialClausuraFixturesZonaA: FixtureItem[] = [

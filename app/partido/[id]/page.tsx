@@ -239,9 +239,12 @@ export default async function MatchPage({
               .select('id, status, match_id')
               .eq('status', 'approved');
 
-            if (isValidUUID(match.id)) {
-              q = q.eq('match_id', match.id);
+            // Blindaje estricto: SIEMPRE exigir coincidencia exacta con el partido abonado (match_id).
+            // Si el partido no posee UUID válido en base de datos, jamás puede haber compras asociadas.
+            if (!isValidUUID(match.id)) {
+              return { data: null };
             }
+            q = q.eq('match_id', match.id);
 
             if (user && isValidUUID(user.id)) {
               if (checkEmail) {
