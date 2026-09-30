@@ -1068,7 +1068,9 @@
   "futbol_mayor_clausura": {
     "year": "2026",
     "torneo": "clausura",
+    "deporte": "futbol",
     "categoria": "mayor",
+    "playoffModality": "cuartos",
     "zones": [
       {
         "id": "zona-a",
@@ -1300,8 +1302,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f1-2",
@@ -1311,8 +1313,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-3",
@@ -1322,8 +1324,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-4",
@@ -1333,8 +1335,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-5",
@@ -1344,8 +1346,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-6",
@@ -1355,8 +1357,8 @@
             "homeTeamName": "San Martín",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-7",
@@ -1377,8 +1379,8 @@
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-9",
@@ -1388,8 +1390,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f2-10",
@@ -1399,8 +1401,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-11",
@@ -1410,8 +1412,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-12",
@@ -1421,8 +1423,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-13",
@@ -1432,8 +1434,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-14",
@@ -1443,8 +1445,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-15",
@@ -1454,8 +1456,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 5,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-1",
@@ -1465,8 +1467,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-2",
@@ -1476,8 +1478,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-3",
@@ -1487,8 +1489,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-4",
@@ -1509,8 +1511,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-6",
@@ -1531,8 +1533,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-8",
@@ -1553,8 +1555,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -1564,19 +1566,19 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f5-26",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "fredriksson",
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f5-27",
@@ -1592,35 +1594,35 @@
           {
             "id": "clausura-za-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sporting",
             "homeTeamName": "Sporting CS",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-za-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "miguel-torres",
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sp-bombal",
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f6-31",
@@ -2244,8 +2246,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-2",
@@ -2266,8 +2268,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-4",
@@ -2277,8 +2279,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-5",
@@ -2288,8 +2290,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f2-6",
@@ -2299,8 +2301,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-7",
@@ -2310,8 +2312,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-8",
@@ -2321,8 +2323,8 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-zb-f2-9",
@@ -2332,8 +2334,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-10",
@@ -2343,8 +2345,8 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-11",
@@ -2354,8 +2356,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-12",
@@ -2365,8 +2367,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-13",
@@ -2376,8 +2378,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "blanco-y-negro",
             "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-14",
@@ -2387,8 +2389,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-15",
@@ -2398,8 +2400,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-1",
@@ -2409,8 +2411,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-2",
@@ -2420,8 +2422,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-3",
@@ -2431,8 +2433,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-4",
@@ -2453,8 +2455,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-6",
@@ -2475,8 +2477,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-8",
@@ -2497,8 +2499,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -2508,63 +2510,63 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-26",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "blanco-y-negro",
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 5,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-27",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "rivadavia",
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "firmat",
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "hughes",
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "paz",
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f6-31",
@@ -2956,67 +2958,137 @@
     ],
     "playoffs": [
       {
-        "id": "c1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "Blanco y Negro",
-        "team2": "Independiente de Bigand",
+        "id": "8vos-5-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 1",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona B",
+        "team2": "5to Zona A",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Ida: 2-0 | Vuelta: 1-1",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
+      },
+      {
+        "id": "8vos-6-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 2",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona B",
+        "team2": "6to Zona A",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-7-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 3",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona A",
+        "team2": "6to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-8-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 4",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona A",
+        "team2": "5to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "c1",
+        "round": "cuartos",
+        "title": "Cuartos 1 ",
+        "seed1": "1ero A",
+        "seed2": "",
+        "team1": "1ero Zona A",
+        "team2": "Ganador Octavos 1",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c2",
         "round": "cuartos",
-        "title": "Cuartos 2",
-        "team1": "San Martín",
-        "team2": "Ítalo Argentino",
+        "title": "Cuartos 2 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "2do Zona B",
+        "team2": "Ganador Octavos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c3",
         "round": "cuartos",
-        "title": "Cuartos 3",
-        "team1": "Hughes",
-        "team2": "Firmat FBC",
+        "title": "Cuartos 3  ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "2do Zona A",
+        "team2": "Ganador Octavos 3",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Definido por penales (4-5)",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c4",
         "round": "cuartos",
-        "title": "Cuartos 4",
-        "team1": "Los Andes",
-        "team2": "Argentino de Firmat",
+        "title": "Cuartos 4  ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "1ero Zona B",
+        "team2": "Ganador Octavos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "s1",
         "round": "semifinal",
-        "title": "Semifinal 1",
-        "team1": "Blanco y Negro",
-        "team2": "Firmat FBC",
+        "title": "Semifinal 1  ",
+        "seed1": "Ganador C1",
+        "seed2": "Ganador C2",
+        "team1": "Ganador C1",
+        "team2": "Ganador C2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-1",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       },
@@ -3024,120 +3096,63 @@
         "id": "s2",
         "round": "semifinal",
         "title": "Semifinal 2",
-        "team1": "San Martín",
-        "team2": "Hughes",
+        "seed1": "Ganador C3",
+        "seed2": "Ganador C4",
+        "team1": "Ganador C3",
+        "team2": "Ganador C4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-2",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       },
       {
         "id": "f1",
         "round": "final",
-        "title": "Gran Final del Torneo",
-        "team1": "Blanco y Negro",
-        "team2": "San Martín",
+        "title": "Gran Final ",
+        "seed1": "Ganador Semi 1",
+        "seed2": "Ganador Semi 2",
+        "team1": "Ganador Semi 1",
+        "team2": "Ganador Semi 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       }
     ],
     "goleadores": [
       {
-        "id": "g1",
+        "id": "g-1789090452575",
         "pos": 1,
-        "name": "Gonzalo Cendra",
+        "name": "Sebastiani Franco",
         "category": "Fútbol Mayor",
-        "goals": 9
+        "goals": 1
       },
       {
-        "id": "g2",
+        "id": "g-1789352582859",
         "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
+        "name": "Villan Lucas",
+        "category": "Primera",
+        "goals": 1
       },
       {
-        "id": "g3",
+        "id": "g-1789923956360",
         "pos": 3,
-        "name": "Joaquín Kraft",
-        "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
+        "name": "Román Mario",
+        "category": "Primera",
+        "goals": 1
       }
     ]
   },
   "clausura": {
     "year": "2026",
     "torneo": "clausura",
+    "deporte": "futbol",
     "categoria": "mayor",
+    "playoffModality": "cuartos",
     "zones": [
       {
         "id": "zona-a",
@@ -3369,8 +3384,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f1-2",
@@ -3380,8 +3395,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-3",
@@ -3391,8 +3406,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-4",
@@ -3402,8 +3417,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-5",
@@ -3413,8 +3428,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-6",
@@ -3424,8 +3439,8 @@
             "homeTeamName": "San Martín",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-7",
@@ -3446,8 +3461,8 @@
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f2-9",
@@ -3457,8 +3472,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f2-10",
@@ -3468,8 +3483,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-11",
@@ -3479,8 +3494,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-12",
@@ -3490,8 +3505,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-13",
@@ -3501,8 +3516,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f3-14",
@@ -3512,8 +3527,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-15",
@@ -3523,8 +3538,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 5,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-1",
@@ -3534,8 +3549,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-2",
@@ -3545,8 +3560,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-3",
@@ -3556,8 +3571,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-4",
@@ -3578,8 +3593,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-6",
@@ -3600,8 +3615,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-8",
@@ -3622,8 +3637,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -3633,19 +3648,19 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f5-26",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "fredriksson",
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f5-27",
@@ -3661,35 +3676,35 @@
           {
             "id": "clausura-za-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sporting",
             "homeTeamName": "Sporting CS",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-za-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "miguel-torres",
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sp-bombal",
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f6-31",
@@ -4313,8 +4328,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-2",
@@ -4335,8 +4350,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-4",
@@ -4346,8 +4361,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-5",
@@ -4357,8 +4372,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f2-6",
@@ -4368,8 +4383,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-7",
@@ -4379,8 +4394,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-8",
@@ -4390,8 +4405,8 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "clausura-zb-f2-9",
@@ -4401,8 +4416,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-10",
@@ -4412,8 +4427,8 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-11",
@@ -4423,8 +4438,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-12",
@@ -4434,8 +4449,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-13",
@@ -4445,8 +4460,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "blanco-y-negro",
             "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-14",
@@ -4456,8 +4471,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-15",
@@ -4467,8 +4482,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-1",
@@ -4478,8 +4493,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-2",
@@ -4489,8 +4504,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-3",
@@ -4500,8 +4515,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-4",
@@ -4522,8 +4537,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-6",
@@ -4544,8 +4559,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-8",
@@ -4566,8 +4581,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -4577,63 +4592,63 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-26",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "blanco-y-negro",
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 5,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-27",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "rivadavia",
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "firmat",
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "hughes",
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "paz",
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f6-31",
@@ -5025,67 +5040,137 @@
     ],
     "playoffs": [
       {
-        "id": "c1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "Blanco y Negro",
-        "team2": "Independiente de Bigand",
+        "id": "8vos-5-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 1",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona B",
+        "team2": "5to Zona A",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Ida: 2-0 | Vuelta: 1-1",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
+      },
+      {
+        "id": "8vos-6-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 2",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona B",
+        "team2": "6to Zona A",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-7-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 3",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona A",
+        "team2": "6to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-8-1789140928359",
+        "round": "8vos",
+        "title": "Octavos 4",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona A",
+        "team2": "5to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A Definir",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "c1",
+        "round": "cuartos",
+        "title": "Cuartos 1 ",
+        "seed1": "1ero A",
+        "seed2": "",
+        "team1": "1ero Zona A",
+        "team2": "Ganador Octavos 1",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "penalties1": null,
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c2",
         "round": "cuartos",
-        "title": "Cuartos 2",
-        "team1": "San Martín",
-        "team2": "Ítalo Argentino",
+        "title": "Cuartos 2 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "2do Zona B",
+        "team2": "Ganador Octavos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c3",
         "round": "cuartos",
-        "title": "Cuartos 3",
-        "team1": "Hughes",
-        "team2": "Firmat FBC",
+        "title": "Cuartos 3  ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "2do Zona A",
+        "team2": "Ganador Octavos 3",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Definido por penales (4-5)",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "c4",
         "round": "cuartos",
-        "title": "Cuartos 4",
-        "team1": "Los Andes",
-        "team2": "Argentino de Firmat",
+        "title": "Cuartos 4  ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "1ero Zona B",
+        "team2": "Ganador Octavos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "dateInfo": "A Definir"
       },
       {
         "id": "s1",
         "round": "semifinal",
-        "title": "Semifinal 1",
-        "team1": "Blanco y Negro",
-        "team2": "Firmat FBC",
+        "title": "Semifinal 1  ",
+        "seed1": "Ganador C1",
+        "seed2": "Ganador C2",
+        "team1": "Ganador C1",
+        "team2": "Ganador C2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-1",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       },
@@ -5093,113 +5178,54 @@
         "id": "s2",
         "round": "semifinal",
         "title": "Semifinal 2",
-        "team1": "San Martín",
-        "team2": "Hughes",
+        "seed1": "Ganador C3",
+        "seed2": "Ganador C4",
+        "team1": "Ganador C3",
+        "team2": "Ganador C4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-2",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       },
       {
         "id": "f1",
         "round": "final",
-        "title": "Gran Final del Torneo",
-        "team1": "Blanco y Negro",
-        "team2": "San Martín",
+        "title": "Gran Final ",
+        "seed1": "Ganador Semi 1",
+        "seed2": "Ganador Semi 2",
+        "team1": "Ganador Semi 1",
+        "team2": "Ganador Semi 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra",
+        "dateInfo": "A Definir",
         "penalties1": null,
         "penalties2": null
       }
     ],
     "goleadores": [
       {
-        "id": "g1",
+        "id": "g-1789090452575",
         "pos": 1,
-        "name": "Gonzalo Cendra",
+        "name": "Sebastiani Franco",
         "category": "Fútbol Mayor",
-        "goals": 9
+        "goals": 1
       },
       {
-        "id": "g2",
+        "id": "g-1789352582859",
         "pos": 2,
-        "name": "Facundo Sánchez",
-        "category": "Fútbol Mayor",
-        "goals": 7
+        "name": "Villan Lucas",
+        "category": "Primera",
+        "goals": 1
       },
       {
-        "id": "g3",
+        "id": "g-1789923956360",
         "pos": 3,
-        "name": "Joaquín Kraft",
-        "category": "Fútbol Mayor",
-        "goals": 5
-      },
-      {
-        "id": "g4",
-        "pos": 1,
-        "name": "Lucas Balvidares",
-        "category": "Reserva",
-        "goals": 6
-      },
-      {
-        "id": "g5",
-        "pos": 2,
-        "name": "Benjamín Schtreimbuger",
-        "category": "Reserva",
-        "goals": 4
-      },
-      {
-        "id": "g6",
-        "pos": 3,
-        "name": "Santiago Echeverría",
-        "category": "Reserva",
-        "goals": 3
-      },
-      {
-        "id": "g7",
-        "pos": 1,
-        "name": "Tomás Graff",
-        "category": "Tercera División",
-        "goals": 5
-      },
-      {
-        "id": "g8",
-        "pos": 2,
-        "name": "Mateo Rohwein",
-        "category": "Tercera División",
-        "goals": 3
-      },
-      {
-        "id": "g9",
-        "pos": 1,
-        "name": "Ignacio Weimann",
-        "category": "Cuarta División",
-        "goals": 4
-      },
-      {
-        "id": "g10",
-        "pos": 2,
-        "name": "Bautista Graff",
-        "category": "Cuarta División",
-        "goals": 3
-      },
-      {
-        "id": "g11",
-        "pos": 1,
-        "name": "Thiago Meier",
-        "category": "Quinta División",
-        "goals": 5
-      },
-      {
-        "id": "g12",
-        "pos": 2,
-        "name": "Valentín Schmidt",
-        "category": "Quinta División",
-        "goals": 4
+        "name": "Román Mario",
+        "category": "Primera",
+        "goals": 1
       }
     ]
   },
@@ -12466,197 +12492,197 @@
         "name": "Zona A",
         "teams": [
           {
-            "id": "eduardo-hertz",
+            "id": "los-andes",
             "pos": 1,
-            "name": "Eduardo Hertz",
-            "logoUrl": "/teams/Eduardo Hertz.png",
-            "pj": 5,
+            "name": "Los Andes",
+            "logoUrl": "/teams/Los Andes.png",
+            "pj": 4,
             "pg": 3,
-            "pe": 1,
+            "pe": 0,
             "pp": 1,
-            "gf": 10,
-            "gc": 4,
+            "gf": 8,
+            "gc": 2,
             "dif": 6,
-            "pts": 10,
+            "pts": 9,
             "form": [
               "W",
-              "D",
-              "W",
-              "W",
-              "L"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "ca-argentino",
-            "pos": 2,
-            "name": "C.A. Argentino",
-            "logoUrl": "/teams/Argentino de Firmat.png",
-            "pj": 5,
-            "pg": 3,
-            "pe": 1,
-            "pp": 1,
-            "gf": 12,
-            "gc": 7,
-            "dif": 5,
-            "pts": 10,
-            "form": [
               "W",
               "L",
-              "D",
-              "W",
               "W"
             ],
             "qualified": true
           },
           {
-            "id": "fredriksson-fbc",
-            "pos": 3,
-            "name": "Fredriksson FBC",
-            "logoUrl": "/teams/Fredriksson.png",
+            "id": "sp-bombal",
+            "pos": 2,
+            "name": "Sportivo Bombal",
+            "logoUrl": "/teams/Sportivo Bombal.png",
             "pj": 5,
-            "pg": 3,
-            "pe": 1,
+            "pg": 2,
+            "pe": 2,
             "pp": 1,
             "gf": 7,
-            "gc": 5,
-            "dif": 2,
-            "pts": 10,
+            "gc": 4,
+            "dif": 3,
+            "pts": 8,
             "form": [
               "W",
-              "W",
               "L",
+              "D",
               "W",
               "D"
             ],
             "qualified": true
           },
           {
-            "id": "olimpia",
-            "pos": 4,
-            "name": "Olimpia",
-            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
-            "pj": 4,
-            "pg": 3,
-            "pe": 0,
-            "pp": 1,
-            "gf": 9,
-            "gc": 4,
-            "dif": 5,
-            "pts": 9,
+            "id": "eduardo-hertz",
+            "pos": 3,
+            "name": "Eduardo Hertz",
+            "logoUrl": "/teams/Eduardo Hertz.png",
+            "pj": 5,
+            "pg": 2,
+            "pe": 1,
+            "pp": 2,
+            "gf": 3,
+            "gc": 6,
+            "dif": -3,
+            "pts": 7,
             "form": [
               "W",
               "W",
-              "W",
-              "L"
+              "L",
+              "L",
+              "D"
             ],
             "qualified": true
           },
           {
-            "id": "sp-bombal",
-            "pos": 5,
-            "name": "Sp. Bombal",
-            "logoUrl": "/teams/Sportivo Bombal.png",
+            "id": "ca-argentino",
+            "pos": 4,
+            "name": "C.A. Argentino",
+            "logoUrl": "/teams/Argentino de Firmat.png",
             "pj": 5,
-            "pg": 2,
-            "pe": 2,
+            "pg": 1,
+            "pe": 3,
             "pp": 1,
-            "gf": 6,
-            "gc": 6,
+            "gf": 4,
+            "gc": 4,
             "dif": 0,
-            "pts": 8,
+            "pts": 6,
             "form": [
-              "D",
-              "D",
               "L",
+              "D",
               "W",
-              "W"
+              "D",
+              "D"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
-            "id": "los-andes",
-            "pos": 6,
-            "name": "Los Andes",
-            "logoUrl": "/teams/Los Andes.png",
-            "pj": 4,
+            "id": "fredriksson-fbc",
+            "pos": 5,
+            "name": "Fredriksson FBC",
+            "logoUrl": "/teams/Fredriksson.png",
+            "pj": 5,
             "pg": 1,
             "pe": 2,
-            "pp": 1,
-            "gf": 7,
-            "gc": 5,
+            "pp": 2,
+            "gf": 9,
+            "gc": 7,
             "dif": 2,
             "pts": 5,
             "form": [
               "D",
-              "D",
               "L",
+              "D",
+              "W",
+              "L"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "san-martin",
+            "pos": 6,
+            "name": "San Martín",
+            "logoUrl": "/teams/San Martin.png",
+            "pj": 4,
+            "pg": 1,
+            "pe": 2,
+            "pp": 1,
+            "gf": 3,
+            "gc": 4,
+            "dif": -1,
+            "pts": 5,
+            "form": [
+              "D",
+              "W",
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "dep-miguel-torres",
+            "pos": 7,
+            "name": "Dep. Miguel Torres",
+            "logoUrl": "/teams/Miguel Torres.png",
+            "pj": 5,
+            "pg": 1,
+            "pe": 2,
+            "pp": 2,
+            "gf": 5,
+            "gc": 7,
+            "dif": -2,
+            "pts": 5,
+            "form": [
+              "L",
+              "W",
+              "L",
+              "D",
               "D"
             ],
             "qualified": false
           },
           {
             "id": "italo-argentino",
-            "pos": 7,
+            "pos": 8,
             "name": "Ítalo Argentino",
             "logoUrl": "/teams/Italo Argentino.png",
             "pj": 5,
             "pg": 1,
-            "pe": 1,
-            "pp": 3,
-            "gf": 5,
-            "gc": 9,
-            "dif": -4,
-            "pts": 4,
-            "form": [
-              "L",
-              "L",
-              "W",
-              "D",
-              "L"
-            ],
-            "qualified": false
-          },
-          {
-            "id": "dep-miguel-torres",
-            "pos": 8,
-            "name": "Dep. Miguel Torres",
-            "logoUrl": "/teams/Miguel Torres.png",
-            "pj": 5,
-            "pg": 1,
-            "pe": 1,
-            "pp": 3,
-            "gf": 2,
-            "gc": 6,
-            "dif": -4,
-            "pts": 4,
-            "form": [
-              "L",
-              "L",
-              "L",
-              "D",
-              "W"
-            ],
-            "qualified": false
-          },
-          {
-            "id": "san-martin",
-            "pos": 9,
-            "name": "San Martín",
-            "logoUrl": "/teams/San Martin.png",
-            "pj": 4,
-            "pg": 0,
             "pe": 2,
             "pp": 2,
-            "gf": 4,
-            "gc": 6,
+            "gf": 3,
+            "gc": 5,
             "dif": -2,
-            "pts": 2,
+            "pts": 5,
             "form": [
-              "D",
               "L",
+              "D",
+              "W",
               "L",
               "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "olimpia",
+            "pos": 9,
+            "name": "Olimpia",
+            "logoUrl": "/teams/Olimpia de Santa Teresa.png",
+            "pj": 4,
+            "pg": 1,
+            "pe": 1,
+            "pp": 2,
+            "gf": 8,
+            "gc": 9,
+            "dif": -1,
+            "pts": 4,
+            "form": [
+              "W",
+              "L",
+              "D",
+              "L"
             ],
             "qualified": false
           },
@@ -12667,17 +12693,17 @@
             "logoUrl": "/teams/Sporting de Bigan.png",
             "pj": 4,
             "pg": 0,
-            "pe": 1,
-            "pp": 3,
-            "gf": 3,
-            "gc": 10,
-            "dif": -7,
-            "pts": 1,
+            "pe": 2,
+            "pp": 2,
+            "gf": 4,
+            "gc": 7,
+            "dif": -3,
+            "pts": 2,
             "form": [
               "L",
               "L",
               "D",
-              "L"
+              "D"
             ],
             "qualified": false
           }
@@ -12691,8 +12717,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-2",
@@ -12702,8 +12728,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-3",
@@ -12713,8 +12739,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f1-4",
@@ -12724,8 +12750,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f1-5",
@@ -12735,8 +12761,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f2-6",
@@ -12746,8 +12772,8 @@
             "homeTeamName": "San Martín",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f2-7",
@@ -12768,8 +12794,8 @@
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f2-9",
@@ -12779,8 +12805,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f2-10",
@@ -12790,8 +12816,8 @@
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-11",
@@ -12801,8 +12827,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f3-12",
@@ -12812,8 +12838,8 @@
             "homeTeamName": "Olimpia",
             "awayTeamId": "sporting",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-13",
@@ -12823,8 +12849,8 @@
             "homeTeamName": "Los Andes",
             "awayTeamId": "san-martin",
             "awayTeamName": "San Martín",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f3-14",
@@ -12834,8 +12860,8 @@
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f3-15",
@@ -12845,8 +12871,8 @@
             "homeTeamName": "Eduardo Hertz",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-1",
@@ -12856,8 +12882,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-2",
@@ -12867,8 +12893,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-3",
@@ -12889,8 +12915,8 @@
             "homeTeamName": "Blanco y Negro",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-inter-f4-5",
@@ -12900,8 +12926,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-6",
@@ -12922,8 +12948,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 6
           },
           {
             "id": "clausura-inter-f4-8",
@@ -12944,8 +12970,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -12955,19 +12981,19 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-za-f5-26",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "fredriksson",
             "homeTeamName": "Fredriksson FBC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 3
           },
           {
             "id": "clausura-za-f5-27",
@@ -12983,35 +13009,35 @@
           {
             "id": "clausura-za-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sporting",
             "homeTeamName": "Sporting CS",
             "awayTeamId": "argentino",
             "awayTeamName": "C.A. Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-za-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "miguel-torres",
             "homeTeamName": "Dep. Miguel Torres",
             "awayTeamId": "italo",
             "awayTeamName": "Ítalo Argentino",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "sp-bombal",
             "homeTeamName": "Sp. Bombal",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-za-f6-31",
@@ -13405,201 +13431,201 @@
         "name": "Zona B",
         "teams": [
           {
-            "id": "atletico-paz",
+            "id": "blanco-y-negro",
             "pos": 1,
-            "name": "Atlético Paz",
-            "logoUrl": "/teams/Atletico Paz.png",
+            "name": "Blanco y Negro",
+            "logoUrl": "/teams/Blanco y Negro.png",
+            "isBlancoYNegro": true,
             "pj": 5,
-            "pg": 4,
-            "pe": 1,
+            "pg": 5,
+            "pe": 0,
             "pp": 0,
-            "gf": 7,
-            "gc": 1,
-            "dif": 6,
-            "pts": 13,
+            "gf": 11,
+            "gc": 2,
+            "dif": 9,
+            "pts": 15,
             "form": [
               "W",
               "W",
-              "D",
+              "W",
               "W",
               "W"
             ],
             "qualified": true
           },
           {
-            "id": "blanco-y-negro",
+            "id": "independiente-fc",
             "pos": 2,
-            "name": "Blanco y Negro",
-            "logoUrl": "/teams/Blanco y Negro.png",
-            "isBlancoYNegro": true,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 5,
+            "pg": 4,
+            "pe": 0,
+            "pp": 1,
+            "gf": 13,
+            "gc": 4,
+            "dif": 9,
+            "pts": 12,
+            "form": [
+              "W",
+              "L",
+              "W",
+              "W",
+              "W"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "b-rivadavia",
+            "pos": 3,
+            "name": "B. Rivadavia",
+            "logoUrl": "/teams/Bernardino Rivadavia.png",
+            "pj": 5,
+            "pg": 3,
+            "pe": 1,
+            "pp": 1,
+            "gf": 11,
+            "gc": 7,
+            "dif": 4,
+            "pts": 10,
+            "form": [
+              "D",
+              "W",
+              "L",
+              "W",
+              "W"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "atletico-paz",
+            "pos": 4,
+            "name": "Atlético Paz",
+            "logoUrl": "/teams/Atletico Paz.png",
             "pj": 5,
             "pg": 2,
             "pe": 3,
             "pp": 0,
             "gf": 9,
-            "gc": 4,
-            "dif": 5,
+            "gc": 3,
+            "dif": 6,
             "pts": 9,
             "form": [
               "D",
               "W",
               "D",
-              "D",
-              "W"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "carreras-ac",
-            "pos": 3,
-            "name": "Carreras AC",
-            "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 7,
-            "gc": 3,
-            "dif": 4,
-            "pts": 8,
-            "form": [
-              "D",
               "W",
-              "W",
-              "D",
-              "L"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "atl-acebal",
-            "pos": 4,
-            "name": "Atl. Acebal",
-            "logoUrl": "/teams/Atletico Acebal.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 2,
-            "pp": 1,
-            "gf": 4,
-            "gc": 2,
-            "dif": 2,
-            "pts": 8,
-            "form": [
-              "W",
-              "D",
-              "W",
-              "L",
               "D"
             ],
             "qualified": true
           },
           {
-            "id": "bombal-jrs",
+            "id": "hughes-fbc",
             "pos": 5,
-            "name": "Bombal Jrs",
-            "logoUrl": "/teams/Bombal Juniors.png",
+            "name": "Hughes FBC",
+            "logoUrl": "/teams/Hughes.png",
             "pj": 5,
             "pg": 2,
-            "pe": 2,
-            "pp": 1,
+            "pe": 3,
+            "pp": 0,
             "gf": 5,
-            "gc": 4,
-            "dif": 1,
-            "pts": 8,
+            "gc": 3,
+            "dif": 2,
+            "pts": 9,
             "form": [
               "D",
               "D",
+              "D",
               "W",
+              "W"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "bombal-jrs",
+            "pos": 6,
+            "name": "Bombal Juniors",
+            "logoUrl": "/teams/Bombal Juniors.png",
+            "pj": 5,
+            "pg": 1,
+            "pe": 2,
+            "pp": 2,
+            "gf": 4,
+            "gc": 9,
+            "dif": -5,
+            "pts": 5,
+            "form": [
+              "L",
               "W",
+              "D",
+              "L",
+              "D"
+            ],
+            "qualified": false
+          },
+          {
+            "id": "atl-acebal",
+            "pos": 7,
+            "name": "Atlético Acebal",
+            "logoUrl": "/teams/Atletico Acebal.png",
+            "pj": 5,
+            "pg": 1,
+            "pe": 1,
+            "pp": 3,
+            "gf": 9,
+            "gc": 9,
+            "dif": 0,
+            "pts": 4,
+            "form": [
+              "W",
+              "L",
+              "L",
+              "L",
               "L"
             ],
             "qualified": false
           },
           {
             "id": "firmat-fbc",
-            "pos": 6,
+            "pos": 8,
             "name": "Firmat FBC",
             "logoUrl": "/teams/Firmat FBC.png",
             "pj": 5,
-            "pg": 2,
-            "pe": 1,
-            "pp": 2,
-            "gf": 8,
+            "pg": 0,
+            "pe": 4,
+            "pp": 1,
+            "gf": 4,
             "gc": 7,
-            "dif": 1,
-            "pts": 7,
-            "form": [
-              "W",
-              "L",
-              "L",
-              "D",
-              "W"
-            ],
-            "qualified": false
-          },
-          {
-            "id": "independiente-fc",
-            "pos": 7,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 5,
-            "pg": 1,
-            "pe": 2,
-            "pp": 2,
-            "gf": 5,
-            "gc": 5,
-            "dif": 0,
-            "pts": 5,
+            "dif": -3,
+            "pts": 4,
             "form": [
               "D",
-              "L",
-              "W",
+              "D",
+              "D",
               "D",
               "L"
             ],
             "qualified": false
           },
           {
-            "id": "hughes-fbc",
-            "pos": 8,
-            "name": "Hughes FBC",
-            "logoUrl": "/teams/Hughes.png",
-            "pj": 5,
-            "pg": 1,
-            "pe": 2,
-            "pp": 2,
-            "gf": 4,
-            "gc": 8,
-            "dif": -4,
-            "pts": 5,
-            "form": [
-              "L",
-              "D",
-              "L",
-              "D",
-              "W"
-            ],
-            "qualified": false
-          },
-          {
-            "id": "b-rivadavia",
+            "id": "carreras-ac",
             "pos": 9,
-            "name": "B. Rivadavia",
-            "logoUrl": "/teams/Bernardino Rivadavia.png",
+            "name": "Carreras AC",
+            "logoUrl": "/teams/Carreras.png",
             "pj": 5,
             "pg": 0,
             "pe": 2,
             "pp": 3,
-            "gf": 1,
-            "gc": 11,
-            "dif": -10,
+            "gf": 2,
+            "gc": 7,
+            "dif": -5,
             "pts": 2,
             "form": [
+              "D",
               "L",
               "D",
               "L",
-              "L",
-              "D"
+              "L"
             ],
             "qualified": false
           },
@@ -13613,14 +13639,14 @@
             "pe": 1,
             "pp": 4,
             "gf": 3,
-            "gc": 11,
-            "dif": -8,
+            "gc": 19,
+            "dif": -16,
             "pts": 1,
             "form": [
               "L",
               "L",
-              "L",
               "D",
+              "L",
               "L"
             ],
             "qualified": false
@@ -13635,19 +13661,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f1-2",
-            "roundName": "Fecha 1",
-            "date": "6/9/2026",
-            "homeTeamId": "carreras",
-            "homeTeamName": "Carreras AC",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-3",
@@ -13657,8 +13672,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f1-4",
@@ -13668,8 +13683,8 @@
             "homeTeamName": "Atl. Acebal",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 6,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f1-5",
@@ -13679,8 +13694,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-6",
@@ -13690,19 +13705,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f2-7",
-            "roundName": "Fecha 2",
-            "date": "9/9/2026",
-            "homeTeamId": "blanco-y-negro",
-            "homeTeamName": "Blanco y Negro",
-            "awayTeamId": "independiente",
-            "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-8",
@@ -13712,8 +13716,8 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f2-9",
@@ -13723,8 +13727,8 @@
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f2-10",
@@ -13734,8 +13738,8 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "alberdi",
             "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-11",
@@ -13745,8 +13749,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-zb-f3-12",
@@ -13756,19 +13760,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f3-13",
-            "roundName": "Fecha 3",
-            "date": "13/9/2026",
-            "homeTeamId": "acebal",
-            "homeTeamName": "Atl. Acebal",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f3-14",
@@ -13778,8 +13771,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f3-15",
@@ -13789,8 +13782,8 @@
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "paz",
             "awayTeamName": "Atlético Paz",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 2
           },
           {
             "id": "clausura-inter-f4-1",
@@ -13800,8 +13793,8 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "sp-bombal",
             "awayTeamName": "Sp. Bombal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 3
           },
           {
             "id": "clausura-inter-f4-2",
@@ -13811,8 +13804,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "miguel-torres",
             "awayTeamName": "Dep. Miguel Torres",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-3",
@@ -13826,17 +13819,6 @@
             "awayGoals": null
           },
           {
-            "id": "clausura-inter-f4-4",
-            "roundName": "Fecha 4",
-            "date": "20/9/2026",
-            "homeTeamId": "blanco-y-negro",
-            "homeTeamName": "Blanco y Negro",
-            "awayTeamId": "los-andes",
-            "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
             "id": "clausura-inter-f4-5",
             "roundName": "Fecha 4",
             "date": "20/9/2026",
@@ -13844,8 +13826,8 @@
             "homeTeamName": "C.A. Argentino",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-6",
@@ -13866,8 +13848,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "fredriksson",
             "awayTeamName": "Fredriksson FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 6
           },
           {
             "id": "clausura-inter-f4-8",
@@ -13888,8 +13870,8 @@
             "homeTeamName": "Ítalo Argentino",
             "awayTeamId": "hughes",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "clausura-inter-f4-10",
@@ -13899,63 +13881,52 @@
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "hertz",
             "awayTeamName": "Eduardo Hertz",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f5-26",
-            "roundName": "Fecha 5",
-            "date": "27/9/2026",
-            "homeTeamId": "blanco-y-negro",
-            "homeTeamName": "Blanco y Negro",
-            "awayTeamId": "alberdi",
-            "awayTeamName": "Nuevo Alberdi",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-27",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "rivadavia",
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "acebal",
             "awayTeamName": "Atl. Acebal",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 4,
+            "awayGoals": 2
           },
           {
             "id": "clausura-zb-f5-28",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "firmat",
             "homeTeamName": "Firmat FBC",
             "awayTeamId": "independiente",
             "awayTeamName": "Independiente FC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 3
           },
           {
             "id": "clausura-zb-f5-29",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "hughes",
             "homeTeamName": "Hughes FBC",
             "awayTeamId": "carreras",
             "awayTeamName": "Carreras AC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f5-30",
             "roundName": "Fecha 5",
-            "date": "27/9/2026",
+            "date": "27/09/2026",
             "homeTeamId": "paz",
             "homeTeamName": "Atlético Paz",
             "awayTeamId": "bombal-jrs",
             "awayTeamName": "Bombal Jrs",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "clausura-zb-f6-31",
@@ -13987,17 +13958,6 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "rivadavia",
             "awayTeamName": "B. Rivadavia",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f6-34",
-            "roundName": "Fecha 6",
-            "date": "30/9/2026",
-            "homeTeamId": "bombal-jrs",
-            "homeTeamName": "Bombal Jrs",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
             "homeGoals": null,
             "awayGoals": null
           },
@@ -14057,17 +14017,6 @@
             "awayGoals": null
           },
           {
-            "id": "clausura-zb-f7-40",
-            "roundName": "Fecha 7",
-            "date": "4/10/2026",
-            "homeTeamId": "paz",
-            "homeTeamName": "Atlético Paz",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
             "id": "clausura-zb-f8-41",
             "roundName": "Fecha 8",
             "date": "11/10/2026",
@@ -14097,17 +14046,6 @@
             "homeTeamName": "Bombal Jrs",
             "awayTeamId": "firmat",
             "awayTeamName": "Firmat FBC",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-zb-f8-44",
-            "roundName": "Fecha 8",
-            "date": "11/10/2026",
-            "homeTeamId": "blanco-y-negro",
-            "homeTeamName": "Blanco y Negro",
-            "awayTeamId": "rivadavia",
-            "awayTeamName": "B. Rivadavia",
             "homeGoals": null,
             "awayGoals": null
           },
@@ -14152,17 +14090,6 @@
             "homeTeamName": "B. Rivadavia",
             "awayTeamId": "olimpia",
             "awayTeamName": "Olimpia",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
-            "id": "clausura-inter-f9-4",
-            "roundName": "Fecha 9",
-            "date": "18/10/2026",
-            "homeTeamId": "los-andes",
-            "homeTeamName": "Los Andes",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
             "homeGoals": null,
             "awayGoals": null
           },
@@ -14233,17 +14160,6 @@
             "awayGoals": null
           },
           {
-            "id": "clausura-zb-f10-56",
-            "roundName": "Fecha 10",
-            "date": "25/10/2026",
-            "homeTeamId": "firmat",
-            "homeTeamName": "Firmat FBC",
-            "awayTeamId": "blanco-y-negro",
-            "awayTeamName": "Blanco y Negro",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
             "id": "clausura-zb-f10-57",
             "roundName": "Fecha 10",
             "date": "25/10/2026",
@@ -14310,17 +14226,6 @@
             "awayGoals": null
           },
           {
-            "id": "clausura-zb-f11-63",
-            "roundName": "Fecha 11",
-            "date": "1/11/2026",
-            "homeTeamId": "blanco-y-negro",
-            "homeTeamName": "Blanco y Negro",
-            "awayTeamId": "hughes",
-            "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
-          },
-          {
             "id": "clausura-zb-f11-64",
             "roundName": "Fecha 11",
             "date": "1/11/2026",
@@ -14341,73 +14246,181 @@
             "awayTeamName": "Atlético Paz",
             "homeGoals": null,
             "awayGoals": null
+          },
+          {
+            "id": "fix-1789344061742",
+            "roundName": "Fecha 3",
+            "homeTeamId": "nuevo-alberdi",
+            "homeTeamName": "Atlético Acebal",
+            "awayTeamId": "bombal-jrs",
+            "awayTeamName": "Blanco y Negro",
+            "homeGoals": 1,
+            "awayGoals": 4
+          },
+          {
+            "id": "fix-1789344098846",
+            "roundName": "Fecha 2",
+            "homeTeamId": "team-1789343710830",
+            "homeTeamName": "Blanco y Negro",
+            "awayTeamId": "nuevo-alberdi",
+            "awayTeamName": "Independiente de Bigand",
+            "homeGoals": 2,
+            "awayGoals": 1
+          },
+          {
+            "id": "fix-1789344197294",
+            "roundName": "Fecha 1",
+            "homeTeamId": "team-1789343710830",
+            "homeTeamName": "Carreras",
+            "awayTeamId": "atletico-paz",
+            "awayTeamName": "Blanco y Negro",
+            "homeGoals": null,
+            "awayGoals": null
+          },
+          {
+            "id": "fix-1789921842503",
+            "roundName": "Fecha 4",
+            "homeTeamId": "team-1789343710830",
+            "homeTeamName": "Blanco y Negro",
+            "awayTeamId": "atletico-paz",
+            "awayTeamName": "Los Andes",
+            "homeGoals": 1,
+            "awayGoals": 0
           }
         ]
       }
     ],
     "playoffs": [
       {
-        "id": "c1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "Blanco y Negro",
-        "team2": "Independiente de Bigand",
+        "id": "8vos-5-1789343009136",
+        "round": "8vos",
+        "title": "Octavos 1",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona B",
+        "team2": "5to Zona A",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Ida: 2-0 | Vuelta: 1-1",
+        "dateInfo": "A disputarse",
         "penalties1": null,
         "penalties2": null
+      },
+      {
+        "id": "8vos-6-1789343009136",
+        "round": "8vos",
+        "title": "Octavos 2",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona B",
+        "team2": "6to Zona A",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-7-1789343009136",
+        "round": "8vos",
+        "title": "Octavos 3 ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "3ero Zona A",
+        "team2": "6to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "8vos-8-1789343009136",
+        "round": "8vos",
+        "title": "Octavos 4  ",
+        "seed1": "",
+        "seed2": "",
+        "team1": "4to Zona A",
+        "team2": "5to Zona B",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "A disputarse",
+        "penalties1": null,
+        "penalties2": null
+      },
+      {
+        "id": "c1",
+        "round": "cuartos",
+        "title": "Cuartos A ",
+        "team1": "1ero Zona A",
+        "team2": "Ganador Octavos 1",
+        "score1": null,
+        "score2": null,
+        "status": "programado",
+        "dateInfo": "",
+        "penalties1": null,
+        "penalties2": null,
+        "seed1": "",
+        "seed2": ""
       },
       {
         "id": "c2",
         "round": "cuartos",
-        "title": "Cuartos 2",
-        "team1": "San Martín",
-        "team2": "Ítalo Argentino",
+        "title": "Cuartos 2 ",
+        "team1": "2do Zona B",
+        "team2": "Ganador Octavos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
+        "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": ""
       },
       {
         "id": "c3",
         "round": "cuartos",
-        "title": "Cuartos 3",
-        "team1": "Hughes",
-        "team2": "Firmat FBC",
+        "title": "Cuartos 3  ",
+        "team1": "2do Zona A",
+        "team2": "Ganador Octavos 3",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Definido por penales (4-5)",
+        "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": ""
       },
       {
         "id": "c4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "Los Andes",
-        "team2": "Argentino de Firmat",
+        "team1": "1ero Zona B",
+        "team2": "Ganador Octavos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Finalizado",
+        "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": ""
       },
       {
         "id": "s1",
         "round": "semifinal",
         "title": "Semifinal 1",
-        "team1": "Blanco y Negro",
-        "team2": "Firmat FBC",
+        "team1": "A definir",
+        "team2": "A definir",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-1",
+        "dateInfo": "",
         "penalties1": null,
         "penalties2": null
       },
@@ -14415,12 +14428,12 @@
         "id": "s2",
         "round": "semifinal",
         "title": "Semifinal 2",
-        "team1": "San Martín",
-        "team2": "Hughes",
+        "team1": "A definir",
+        "team2": "A definir",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Global 3-2",
+        "dateInfo": "",
         "penalties1": null,
         "penalties2": null
       },
@@ -14428,17 +14441,46 @@
         "id": "f1",
         "round": "final",
         "title": "Gran Final del Torneo",
-        "team1": "Blanco y Negro",
-        "team2": "San Martín",
+        "team1": "Ganador Semifinal 1",
+        "team2": "Ganador Semifinal 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "Próximo Domingo 16:30 hs • En vivo en Pasión Lomonegra",
+        "dateInfo": "",
         "penalties1": null,
         "penalties2": null
       }
     ],
-    "goleadores": [],
+    "goleadores": [
+      {
+        "id": "g-1789352602795",
+        "pos": 1,
+        "name": "Alvarez Leroy",
+        "category": "Reserva",
+        "goals": 3
+      },
+      {
+        "id": "g-1789352611739",
+        "pos": 2,
+        "name": "Fogante Juan Cruz",
+        "category": "Reserva",
+        "goals": 2
+      },
+      {
+        "id": "g-1789352621290",
+        "pos": 3,
+        "name": "Garcia Marcos",
+        "category": "Reserva",
+        "goals": 1
+      },
+      {
+        "id": "g-1789352654106",
+        "pos": 4,
+        "name": "Markiewicz David",
+        "category": "Reserva",
+        "goals": 1
+      }
+    ],
     "deporte": "futbol"
   },
   "futbol_tercera_apertura": {
