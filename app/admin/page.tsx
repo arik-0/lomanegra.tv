@@ -22,6 +22,7 @@ import {
   Eye,
   LogOut,
   RefreshCw,
+  ArrowDownWideNarrow,
   Trophy,
   Flame,
   Award,
@@ -62,6 +63,8 @@ import {
   resolvePlayoffSeed,
   generatePlayoffsByModality,
   advancePlayoffWinners,
+  detectZoneQualificationQuota,
+  sortGoleadores,
 } from '@/lib/standingsStore';
 
 interface Match {
@@ -620,7 +623,12 @@ export default function AdminPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.standings) {
-          setStandings(data.standings);
+          let st = data.standings;
+          if ((!st.playoffs || st.playoffs.length === 0) && st.playoffModality && st.playoffModality !== 'none') {
+            st = generatePlayoffsByModality(st, st.playoffModality);
+          }
+          const synced = syncPlayoffMatches(st);
+          setStandings(synced);
         }
       }
     } catch (err) {
@@ -650,6 +658,7 @@ export default function AdminPage() {
   const handleSaveStandings = async () => {
     setStandingsLoading(true);
     try {
+      const sortedGoleadores = sortGoleadores(standings.goleadores);
       const res = await fetch(
         `/api/admin/standings?deporte=${adminDeporte}&categoria=${adminCategoria}&torneo=${adminTorneo}`,
         {
@@ -657,6 +666,7 @@ export default function AdminPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...standings,
+            goleadores: sortedGoleadores,
             deporte: adminDeporte,
             categoria: adminCategoria,
             torneo: adminTorneo,
@@ -789,11 +799,30 @@ export default function AdminPage() {
       dif: 0,
       pts: 0,
       form: ['D'],
-      qualified: zone.teams.length < 4,
+      qualified: zone.teams.length < (zone.qualificationQuota || detectZoneQualificationQuota(zone, standings.playoffs)),
     };
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
         return { ...z, teams: [...z.teams, newTeam] };
+      }
+      return z;
+    });
+    const synced = syncPlayoffMatches({ ...standings, zones: updatedZones });
+    setStandings(synced);
+  };
+
+  const handleUpdateZoneQuota = (zoneId: string, quota: number) => {
+    const updatedZones = standings.zones.map((z) => {
+      if (z.id === zoneId) {
+        const updatedTeams = z.teams.map((t, idx) => ({
+          ...t,
+          qualified: idx < quota,
+        }));
+        return {
+          ...z,
+          qualificationQuota: quota,
+          teams: updatedTeams,
+        };
       }
       return z;
     });
@@ -835,12 +864,13 @@ export default function AdminPage() {
 
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
+        const quota = z.qualificationQuota || detectZoneQualificationQuota(z, standings.playoffs);
         const remainingTeams = z.teams
           .filter((t) => t.id !== teamId)
           .map((t, idx) => ({
             ...t,
             pos: idx + 1,
-            qualified: idx < 4,
+            qualified: idx < quota,
           }));
 
         // Limpiar partidos que involucren al equipo eliminado
@@ -853,7 +883,7 @@ export default function AdminPage() {
         );
 
         const updatedZone = { ...z, teams: remainingTeams, fixtures: cleanedFixtures };
-        return recalculateZoneStandings(updatedZone);
+        return recalculateZoneStandings(updatedZone, quota, standings.playoffs);
       }
       return z;
     });
@@ -910,7 +940,7 @@ export default function AdminPage() {
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
         const updatedZone = { ...z, fixtures: fullFixtures };
-        return recalculateZoneStandings(updatedZone);
+        return recalculateZoneStandings(updatedZone, undefined, standings.playoffs);
       }
       return z;
     });
@@ -936,7 +966,7 @@ export default function AdminPage() {
         const updatedZone = { ...z, fixtures: updatedFixs };
         // Auto-calcular tabla inmediatamente al registrar goles
         if (field === 'homeGoals' || field === 'awayGoals') {
-          return recalculateZoneStandings(updatedZone);
+          return recalculateZoneStandings(updatedZone, undefined, standings.playoffs);
         }
         return updatedZone;
       }
@@ -952,7 +982,7 @@ export default function AdminPage() {
       if (z.id === zoneId) {
         const updatedFixs = (z.fixtures || []).filter((f) => f.id !== fixId);
         const updatedZone = { ...z, fixtures: updatedFixs };
-        return recalculateZoneStandings(updatedZone);
+        return recalculateZoneStandings(updatedZone, undefined, standings.playoffs);
       }
       return z;
     });
@@ -963,7 +993,7 @@ export default function AdminPage() {
   const handleRecalculateZone = (zoneId: string) => {
     const updatedZones = standings.zones.map((z) => {
       if (z.id === zoneId) {
-        return recalculateZoneStandings(z);
+        return recalculateZoneStandings(z, undefined, standings.playoffs);
       }
       return z;
     });
@@ -972,7 +1002,12 @@ export default function AdminPage() {
   };
 
   const handleSyncPlayoffsFromTable = () => {
-    const synced = syncPlayoffMatches(standings);
+    let targetStandings = standings;
+    if (!targetStandings.playoffs || targetStandings.playoffs.length === 0) {
+      const mod = targetStandings.playoffModality || 'cuartos';
+      targetStandings = generatePlayoffsByModality(targetStandings, mod);
+    }
+    const synced = syncPlayoffMatches(targetStandings);
     setStandings(synced);
   };
 
@@ -1135,6 +1170,14 @@ export default function AdminPage() {
   };
 
   // GOLEADORES BYN (SIN PARTIDOS JUGADOS)
+  const handleSortGoleadores = () => {
+    const sorted = sortGoleadores(standings.goleadores);
+    setStandings({
+      ...standings,
+      goleadores: sorted,
+    });
+  };
+
   const handleAddGoleador = () => {
     const newGoleador: GoleadorRow = {
       id: `g-${Date.now()}`,
@@ -1143,9 +1186,10 @@ export default function AdminPage() {
       category: adminGoleadorCategory === 'Todas' ? 'Primera' : adminGoleadorCategory,
       goals: 1,
     };
+    const updated = sortGoleadores([...standings.goleadores, newGoleador]);
     setStandings({
       ...standings,
-      goleadores: [...standings.goleadores, newGoleador],
+      goleadores: updated,
     });
   };
 
@@ -2287,13 +2331,48 @@ export default function AdminPage() {
 
                     {/* Tabla editable de la zona (Preserva edición manual libre) */}
                     <div className="space-y-2 pt-2 border-t border-zinc-800/80">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black uppercase text-zinc-300">
-                          Posiciones Oficiales ({zone.teams.length} Equipos)
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          Edición libre en tiempo real
-                        </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-black uppercase text-zinc-300">
+                            Posiciones Oficiales ({zone.teams.length} Equipos)
+                          </span>
+                          <span className="text-[10px] text-zinc-500 hidden sm:inline">
+                            • Edición en tiempo real
+                          </span>
+                        </div>
+
+                        {/* Selector de Clasificados a Play-offs (Autocálculo sin reseleccionar filas) */}
+                        <div className="flex items-center gap-1.5 bg-[#12131a] border border-zinc-800 rounded-xl px-2.5 py-1 w-fit">
+                          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                            Clasifican:
+                          </span>
+                          <div className="flex items-center gap-1">
+                            {[2, 4, 6, 8, 16]
+                              .filter((q) => q <= Math.max(zone.teams.length, 4))
+                              .map((q) => {
+                                const currentQuota =
+                                  zone.qualificationQuota ||
+                                  detectZoneQualificationQuota(zone, standings.playoffs);
+                                const isSelected = currentQuota === q;
+                                return (
+                                  <button
+                                    key={q}
+                                    type="button"
+                                    onClick={() => handleUpdateZoneQuota(zone.id, q)}
+                                    className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
+                                      isSelected
+                                        ? 'bg-emerald-500 text-black font-black shadow-sm'
+                                        : 'bg-[#181922] text-zinc-400 hover:text-white hover:bg-zinc-700'
+                                    }`}
+                                    title={`Clasificar automáticamente los primeros ${q} equipos de ${zone.name}`}
+                                  >
+                                    {q}
+                                  </button>
+                                );
+                              })}
+                            <span className="text-[9px] text-zinc-500 font-mono">equipos</span>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="overflow-x-auto">
@@ -2318,7 +2397,14 @@ export default function AdminPage() {
                           <tbody className="divide-y divide-zinc-800/40 font-mono">
                             {zone.teams.map((team) => (
                               <tr key={team.id} className="hover:bg-zinc-800/30">
-                                <td className="py-2 px-1 text-center font-bold text-zinc-500">{team.pos}</td>
+                                <td className="py-2 px-1 text-center font-bold relative">
+                                  {team.qualified && (
+                                    <span className="absolute left-0 top-1 bottom-1 w-1 bg-emerald-500 rounded-r" />
+                                  )}
+                                  <span className={team.qualified ? 'text-emerald-400 font-black' : 'text-zinc-500'}>
+                                    {team.pos}
+                                  </span>
+                                </td>
                                 <td className="py-2 px-2">
                                   <div className="flex items-center gap-1.5">
                                     <div className="w-5 h-5 relative shrink-0 flex items-center justify-center">
@@ -2560,11 +2646,11 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={handleSyncPlayoffsFromTable}
-                    className="px-3 py-1.5 rounded-xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/60 text-amber-300 text-[11px] font-bold flex items-center gap-1.5 transition"
-                    title="Recalcular automáticamente todos los equipos a partir de los casilleros y las posiciones"
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-950/70 hover:bg-amber-900 border border-amber-600/80 text-amber-300 hover:text-white text-[11px] font-black flex items-center gap-1.5 transition shadow-sm shadow-amber-950"
+                    title="Autocargar y sincronizar automáticamente todos los clasificados de play-off según la tabla de posiciones"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Sincronizar Tablas</span>
+                    <span>Autocargar Clasificados</span>
                   </button>
                 </div>
               </div>
@@ -2910,6 +2996,16 @@ export default function AdminPage() {
 
                   <button
                     type="button"
+                    onClick={handleSortGoleadores}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-800/70 text-amber-300 rounded-xl text-xs font-bold transition shadow-sm"
+                    title="Ordenar goleadores de mayor a menor cantidad de goles"
+                  >
+                    <ArrowDownWideNarrow className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Ordenar por Goles</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleAddGoleador}
                     className="flex items-center gap-1 px-3 py-1.5 bg-red-950/60 hover:bg-red-900/80 border border-red-800/70 text-white rounded-xl text-xs font-bold transition shadow-sm"
                   >
@@ -2940,6 +3036,11 @@ export default function AdminPage() {
                           return gCat.includes('primera') || gCat.includes('mayor');
                         }
                         return gCat.includes(filterCat);
+                      })
+                      .sort((a, b) => {
+                        const diff = (Number(b.goals) || 0) - (Number(a.goals) || 0);
+                        if (diff !== 0) return diff;
+                        return (a.name || '').localeCompare(b.name || '');
                       })
                       .map((g, idx) => (
                         <tr key={g.id} className="hover:bg-zinc-800/30">

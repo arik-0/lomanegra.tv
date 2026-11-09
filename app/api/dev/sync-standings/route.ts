@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 import { resetStandings, ensureGlobalStore } from '@/lib/standingsPersistence';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    // Blindaje estricto: Restringido exclusivamente a administradores autenticados
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Esta operación requiere privilegios de administrador.' },
+        { status: 401 }
+      );
+    }
+
     const categoriesToSync: { deporte: string; categoria: string; torneo: string }[] = [
       // Fútbol Senior y Reserva +30
       { deporte: 'futbol', categoria: 'senior', torneo: 'clausura' },

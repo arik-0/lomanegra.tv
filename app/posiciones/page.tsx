@@ -572,7 +572,9 @@ export default function PosicionesPage() {
                 <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between text-[10px] text-zinc-500">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-sm bg-emerald-500" />
-                    <span>Puestos 1 al 4 clasifican a Play-Offs</span>
+                    <span>
+                      Puestos 1 al {zone.teams.filter((t) => t.qualified).length || zone.qualificationQuota || 4} clasifican a Play-Offs
+                    </span>
                   </div>
                   <span>PJ: Partidos Jugados &bull; DIF: Diferencia de Gol</span>
                 </div>
@@ -1224,6 +1226,11 @@ export default function PosicionesPage() {
                       const gCat = (g?.category || '').toLowerCase();
                       if (selCat === 'primera' && (gCat.includes('primera') || gCat.includes('mayor'))) return true;
                       return gCat === selCat || gCat.includes(selCat);
+                    })
+                    .sort((a, b) => {
+                      const diff = (Number(b.goals) || 0) - (Number(a.goals) || 0);
+                      if (diff !== 0) return diff;
+                      return (a.name || '').localeCompare(b.name || '');
                     })
                     .map((g, idx) => (
                       <tr

@@ -10,6 +10,28 @@ if (typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+  'image/avif',
+]);
+
+const ALLOWED_EXTENSIONS = new Set([
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.gif',
+  '.svg',
+  '.avif',
+]);
+
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export async function POST(req: Request) {
   try {
     if (!verifyAdminSession()) {
@@ -26,15 +48,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No se envió ningún archivo' }, { status: 400 });
     }
 
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: 'El archivo supera el tamaño máximo permitido de 10 MB.' },
+        { status: 400 }
+      );
+    }
+
+    const originalName = file.name || 'uploaded_image.png';
+    const extension = path.extname(originalName).toLowerCase() || '.png';
+    const contentType = (file.type || 'image/png').toLowerCase();
+
+    if (!ALLOWED_EXTENSIONS.has(extension) || !ALLOWED_MIME_TYPES.has(contentType)) {
+      return NextResponse.json(
+        { error: 'Tipo de archivo no permitido. Solo se admiten imágenes (JPG, PNG, WEBP, GIF, SVG, AVIF).' },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Sanitizar nombre de archivo y generar nombre único
-    const originalName = file.name || 'uploaded_image.png';
-    const extension = path.extname(originalName).toLowerCase() || '.png';
     const baseName = path.basename(originalName, extension).replace(/[^a-zA-Z0-9_-]/g, '_');
     const uniqueFileName = `${baseName}_${Date.now()}${extension}`;
-    const contentType = file.type || 'image/png';
 
     // 1. Intentar subir a Supabase Storage (bucket: 'images')
     try {
@@ -107,6 +144,14 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    // Blindaje de seguridad: requerir sesión de administrador para eliminar archivos
+    if (!verifyAdminSession()) {
+      return NextResponse.json(
+        { error: 'No autorizado. Se requiere sesión de operador o administrador para eliminar archivos.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     let url = searchParams.get('url');
 
@@ -124,7 +169,14 @@ export async function DELETE(req: Request) {
     // Si es un archivo local /uploads/nombre.ext
     if (url.startsWith('/uploads/')) {
       const fileName = path.basename(url);
-      const localFilePath = path.join(process.cwd(), 'public', 'uploads', fileName);
+      const publicUploadsDir = path.resolve(process.cwd(), 'public', 'uploads');
+      const localFilePath = path.resolve(publicUploadsDir, fileName);
+
+      // Protección contra Path Traversal
+      if (!localFilePath.startsWith(publicUploadsDir)) {
+        return NextResponse.json({ error: 'Ruta de archivo inválida' }, { status: 400 });
+      }
+
       if (fs.existsSync(localFilePath)) {
         fs.unlinkSync(localFilePath);
       }
@@ -150,4 +202,3 @@ export async function DELETE(req: Request) {
     );
   }
 }
-

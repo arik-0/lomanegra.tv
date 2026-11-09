@@ -9,16 +9,12 @@ import {
   Radio,
   Trophy,
   Youtube,
-  ExternalLink,
   ChevronRight,
   X,
   Play,
   Camera,
-  Shield,
-  Clock,
   Instagram,
-  Settings,
-  Flame,
+  Smartphone,
 } from 'lucide-react';
 import { getTeamLogo } from '@/lib/standingsStore';
 
@@ -135,8 +131,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
     }
   }, [isOpen]);
 
-
-
   // Cerrar al presionar Escape en móviles
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -251,6 +245,22 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <span className="flex items-center gap-2">
               <Camera className="w-3.5 h-3.5 text-red-500" />
               <span>Galería</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
+          </Link>
+
+          <Link
+            href="/app"
+            onClick={handleLinkClick}
+            className={`flex items-center justify-between px-3 py-2 rounded-xl transition font-bold ${
+              pathname === '/app'
+                ? 'bg-red-600 text-white shadow-md shadow-red-950/60'
+                : 'text-zinc-300 hover:text-white hover:bg-zinc-800/50'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>App Móvil &amp; TV</span>
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
           </Link>
@@ -394,8 +404,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               </Link>
             </div>
           )}
-
-
         </div>
 
         {/* 6. Footer del Sidebar con CTA Rápido y Redes */}
@@ -432,14 +440,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono uppercase tracking-[0.15em] text-zinc-500 mt-2 px-1">
-            <Link href="/posiciones" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
-              Tablas
-            </Link>
-            <Link href="/galeria" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
-              Galería
+            <Link href="/app" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
+              App
             </Link>
             <Link href="/terminos" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
               Términos
+            </Link>
+            <Link href="/privacidad" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
+              Privacidad
+            </Link>
+            <Link href="/arrepentimiento" onClick={handleLinkClick} className="text-zinc-400 hover:text-white transition-colors">
+              Baja
             </Link>
             <Link href="/admin" onClick={handleLinkClick} className="text-zinc-500 hover:text-red-400 transition-colors">
               Admin

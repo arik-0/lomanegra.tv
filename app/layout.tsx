@@ -82,50 +82,82 @@ export default function RootLayout({
           <Navbar />
           <div className="flex-1">{children}</div>
 
-          {/* Footer Técnico Forg1 */}
+          {/* Footer Técnico y Legal Oficial */}
           <footer className="border-t border-white/[0.07] bg-[#060608] py-8 text-xs font-mono mb-14 lg:mb-0">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2.5">
-                <div className="w-7 h-7 relative shrink-0">
-                  <Image
-                    src="/logo-pasion-lomonegra.png"
-                    alt="Pasión Lomonegra"
-                    fill
-                    className="object-contain"
-                  />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2.5">
+                  <div className="w-7 h-7 relative shrink-0">
+                    <Image
+                      src="/logo-pasion-lomonegra.png"
+                      alt="Pasión Lomonegra"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <span className="font-bold text-white">
+                    Pasión Lomonegra
+                  </span>
+                  <span className="text-zinc-500">· Transmisión Oficial en Vivo</span>
                 </div>
-                <span className="font-bold text-white">
-                  Pasión Lomonegra
-                </span>
-                <span className="text-zinc-500">· Transmisión Oficial en Vivo</span>
+
+                <div className="flex flex-wrap items-center justify-center gap-3 text-zinc-400">
+                  <Link href="/app" className="text-red-400 hover:text-red-300 font-bold transition-colors">
+                    App Móvil &amp; TV
+                  </Link>
+                  <span>·</span>
+                  <Link href="/vincular" className="hover:text-white transition-colors">
+                    Vincular TV
+                  </Link>
+                  <span>·</span>
+                  <Link href="/posiciones" className="hover:text-white transition-colors">
+                    Tablas
+                  </Link>
+                  <span>·</span>
+                  <a
+                    href="https://www.youtube.com/@PasionlomonegraByN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    YouTube
+                  </a>
+                  <span>·</span>
+                  <a
+                    href="https://www.instagram.com/pasion_lomonegra?igsi=ejZkcWJlejZ1NXU0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-pink-500 transition-colors"
+                  >
+                    Instagram
+                  </a>
+                </div>
+
+                <div className="flex items-center justify-center md:justify-end gap-3 text-zinc-500">
+                  <span className="text-zinc-400 font-bold">© {new Date().getFullYear()} Pasión Lomonegra</span>
+                </div>
               </div>
 
-              <div className="flex items-center justify-center gap-4 text-zinc-400">
-                <a
-                  href="https://www.youtube.com/@PasionlomonegraByN"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-red-500 transition-colors"
-                >
-                  YouTube Oficial
-                </a>
-                <span>·</span>
-                <a
-                  href="https://www.instagram.com/pasion_lomonegra?igsi=ejZkcWJlejZ1NXU0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-pink-500 transition-colors"
-                >
-                  Instagram Oficial
-                </a>
-                <span>·</span>
-                <Link href="/posiciones" className="hover:text-white transition-colors">
-                  Tablas
-                </Link>
-              </div>
-
-              <div className="flex items-center justify-center md:justify-end gap-3 text-zinc-500">
-                <span className="text-zinc-400 font-bold">© {new Date().getFullYear()} Pasión Lomonegra</span>
+              <div className="pt-5 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-zinc-500">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Link href="/terminos" className="hover:text-zinc-300 transition-colors">
+                    Términos y Condiciones
+                  </Link>
+                  <span>·</span>
+                  <Link href="/privacidad" className="hover:text-zinc-300 transition-colors">
+                    Política de Privacidad (Ley 25.326)
+                  </Link>
+                  <span>·</span>
+                  <Link
+                    href="/arrepentimiento"
+                    className="px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white transition-colors"
+                  >
+                    Botón de Arrepentimiento (Ley 24.240)
+                  </Link>
+                </div>
+                <div className="text-[10px] text-zinc-600 text-center sm:text-right">
+                  Protegido por Ley 11.723 de Propiedad Intelectual · Pagos procesados con estándar PCI-DSS
+                </div>
               </div>
             </div>
           </footer>

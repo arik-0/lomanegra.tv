@@ -1,20 +1,17 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export async function POST(req: Request) {
   try {
-    const cookieStore = cookies();
-    const adminSession = cookieStore.get('admin_session');
-    if (adminSession?.value === 'authenticated') {
+    if (verifyAdminSession()) {
       return NextResponse.json({ success: true, mode: 'admin' }, { status: 200 });
     }
 
     const supabase = createServerSupabaseClient();
     const {
       data: { user },
-      error: authError,
     } = await supabase.auth.getUser();
 
     const body = await req.json().catch(() => ({}));

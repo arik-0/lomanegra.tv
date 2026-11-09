@@ -11,6 +11,7 @@ import {
   defaultAperturaStandings,
   defaultClausuraStandings,
   syncPlayoffMatches,
+  sortGoleadores,
   TorneoType,
   DeporteType,
   CategoriaType,
@@ -95,7 +96,7 @@ function sanitizeStandings(st: any, key?: string): TournamentStandings {
     ...st,
     zones: Array.isArray(st.zones) ? st.zones : [],
     playoffs: Array.isArray(st.playoffs) ? st.playoffs : [],
-    goleadores: Array.isArray(st.goleadores) ? st.goleadores : [],
+    goleadores: Array.isArray(st.goleadores) ? sortGoleadores(st.goleadores) : [],
   };
   return clean;
 }
@@ -321,15 +322,21 @@ export async function getStandings(
   const key = normalizeTournamentKey(deporte, categoria, torneo);
 
   if (store[key]) {
-    return store[key];
+    const synced = syncPlayoffMatches(store[key]);
+    store[key] = synced;
+    return synced;
   }
 
   // Compatibilidad hacia atrás
   if ((key === 'futbol_mayor_apertura' || !deporte) && store['apertura']) {
-    return store['apertura'];
+    const synced = syncPlayoffMatches(store['apertura']);
+    store['apertura'] = synced;
+    return synced;
   }
   if ((key === 'futbol_mayor_clausura' || !deporte) && store['clausura']) {
-    return store['clausura'];
+    const synced = syncPlayoffMatches(store['clausura']);
+    store['clausura'] = synced;
+    return synced;
   }
 
   // El store en memoria no tiene esta key → puede ser un cold-start serverless.
@@ -344,7 +351,9 @@ export async function getStandings(
       }
       saveToPersistenceFile(store);
       if (store[key]) {
-        return store[key];
+        const synced = syncPlayoffMatches(store[key]);
+        store[key] = synced;
+        return synced;
       }
     }
   } catch (retryErr) {
@@ -358,11 +367,12 @@ export async function getStandings(
     (torneo as TorneoType) || 'apertura'
   );
 
-  store[key] = generated;
+  const syncedGenerated = syncPlayoffMatches(generated);
+  store[key] = syncedGenerated;
   saveToPersistenceFile(store);
-  saveToSupabase(key, generated, store).catch(() => {});
+  saveToSupabase(key, syncedGenerated, store).catch(() => {});
 
-  return generated;
+  return syncedGenerated;
 }
 
 export function getStandingsSync(
@@ -385,18 +395,20 @@ export function getStandingsSync(
   const key = normalizeTournamentKey(deporte, categoria, torneo);
 
   if (globalThis.globalTournamentsStore && globalThis.globalTournamentsStore[key]) {
-    return globalThis.globalTournamentsStore[key];
+    return syncPlayoffMatches(globalThis.globalTournamentsStore[key]);
   }
   const fromDisk = loadFromPersistenceFile();
   if (fromDisk && fromDisk[key]) {
     if (!globalThis.globalTournamentsStore) globalThis.globalTournamentsStore = fromDisk;
-    return fromDisk[key];
+    return syncPlayoffMatches(fromDisk[key]);
   }
 
-  return createDefaultStandings(
-    (deporte as DeporteType) || 'futbol',
-    (categoria as CategoriaType) || 'mayor',
-    (torneo as TorneoType) || 'apertura'
+  return syncPlayoffMatches(
+    createDefaultStandings(
+      (deporte as DeporteType) || 'futbol',
+      (categoria as CategoriaType) || 'mayor',
+      (torneo as TorneoType) || 'apertura'
+    )
   );
 }
 
@@ -431,6 +443,9 @@ export async function updateStandings(
     torneo: (torneo as TorneoType) || current.torneo || 'apertura',
   };
 
+  if (Array.isArray(merged.goleadores)) {
+    merged.goleadores = sortGoleadores(merged.goleadores);
+  }
   const synced = syncPlayoffMatches(merged);
   store[key] = synced;
 

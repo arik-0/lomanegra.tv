@@ -498,6 +498,7 @@ export interface ZoneData {
   name: string; // ej: "Zona A", "Zona B"
   teams: TeamStandingsRow[];
   fixtures?: FixtureMatch[];
+  qualificationQuota?: number; // Cantidad de clasificados automáticos a Play-offs (ej: 4, 6, 8)
 }
 
 export interface PlayoffMatch {
@@ -525,6 +526,22 @@ export interface GoleadorRow {
   goals: number;
 }
 
+// Ordena los goleadores de mayor a menor cantidad de goles (y alfabéticamente en empates)
+export function sortGoleadores(goleadores: GoleadorRow[]): GoleadorRow[] {
+  if (!Array.isArray(goleadores)) return [];
+  return [...goleadores]
+    .sort((a, b) => {
+      const gA = Number(a.goals) || 0;
+      const gB = Number(b.goals) || 0;
+      if (gB !== gA) return gB - gA;
+      return (a.name || '').localeCompare(b.name || '');
+    })
+    .map((g, idx) => ({
+      ...g,
+      pos: idx + 1,
+    }));
+}
+
 export interface TournamentStandings {
   year: string;
   torneo: TorneoType;
@@ -536,15 +553,82 @@ export interface TournamentStandings {
   goleadores: GoleadorRow[];
 }
 
+// Detecta automáticamente la cantidad de clasificados a Play-offs para una zona
+// sin que el administrador deba reseleccionar manualmente los casilleros de clasificación.
+export function detectZoneQualificationQuota(zone: ZoneData, playoffs?: PlayoffMatch[]): number {
+  if (typeof zone.qualificationQuota === 'number' && zone.qualificationQuota > 0) {
+    return zone.qualificationQuota;
+  }
+
+  // 1. Detectar desde los casilleros de semillas de los playoffs si están disponibles
+  if (playoffs && playoffs.length > 0) {
+    const zName = (zone.name || '').toLowerCase();
+    const zId = (zone.id || '').toLowerCase();
+    const letterMatch = zId.match(/([a-z0-9])$/i) || zName.match(/([a-z0-9])$/i);
+    const zLetter = letterMatch ? letterMatch[1].toLowerCase() : null;
+
+    let maxSeedFound = 0;
+    playoffs.forEach((m) => {
+      [m.seed1, m.seed2, m.team1, m.team2].forEach((seed) => {
+        if (!seed || typeof seed !== 'string') return;
+        const sLower = seed.toLowerCase().trim();
+        const matchZone = zLetter
+          ? sLower.includes(`zona ${zLetter}`) || sLower.includes(` ${zLetter}`) || sLower.endsWith(zLetter)
+          : true;
+        if (matchZone) {
+          const numMatch = sLower.match(/^(\d+)/) || sLower.match(/(\d+)/);
+          if (numMatch) {
+            const seedNum = parseInt(numMatch[1], 10);
+            if (seedNum > maxSeedFound && seedNum <= (zone.teams?.length || 20)) {
+              maxSeedFound = seedNum;
+            }
+          }
+        }
+      });
+    });
+
+    if (maxSeedFound > 0) {
+      return maxSeedFound;
+    }
+  }
+
+  // 2. Si ya hay equipos marcados con qualified = true, respetar esa cantidad
+  const currentlyQualified = (zone.teams || []).filter((t) => t.qualified).length;
+  if (currentlyQualified > 0) {
+    return currentlyQualified;
+  }
+
+  // 3. Fallback inteligente según tamaño de zona
+  const teamCount = zone.teams?.length || 0;
+  if (teamCount >= 10) return 6;
+  if (teamCount >= 8) return 4;
+  return Math.min(4, Math.max(2, Math.floor(teamCount / 2)));
+}
+
 // Función que recalcula automáticamente la tabla de posiciones a partir de los partidos cargados,
 // preservando al mismo tiempo la capacidad de edición manual en cualquier momento.
-export function recalculateZoneStandings(zone: ZoneData): ZoneData {
+export function recalculateZoneStandings(
+  zone: ZoneData,
+  quota?: number,
+  playoffs?: PlayoffMatch[]
+): ZoneData {
+  const effectiveQuota = quota || zone.qualificationQuota || detectZoneQualificationQuota(zone, playoffs);
+
   const fixtures = (zone.fixtures || []).filter(
     (f) => f.homeGoals !== null && f.awayGoals !== null && !isNaN(Number(f.homeGoals)) && !isNaN(Number(f.awayGoals))
   );
 
   if (fixtures.length === 0) {
-    return zone;
+    const updated = (zone.teams || []).map((t, idx) => ({
+      ...t,
+      pos: idx + 1,
+      qualified: idx < effectiveQuota,
+    }));
+    return {
+      ...zone,
+      qualificationQuota: effectiveQuota,
+      teams: updated,
+    };
   }
 
   const statsMap: Record<
@@ -650,11 +734,12 @@ export function recalculateZoneStandings(zone: ZoneData): ZoneData {
   const finalizedTeams = updatedTeams.map((t, idx) => ({
     ...t,
     pos: idx + 1,
-    qualified: idx < 4,
+    qualified: idx < effectiveQuota,
   }));
 
   return {
     ...zone,
+    qualificationQuota: effectiveQuota,
     teams: finalizedTeams,
   };
 }
@@ -759,6 +844,7 @@ export function generateFullRoundRobinFixture(
 
 // Resuelve dinámicamente el equipo que ocupa la posición especificada en una zona o en la tabla general
 // Admite expresiones de casillero flexibles: "1ero A", "1A", "1° A", "2do B", "4to B", "8vo A", "16vo B",
+// "1ero Zona A", "4to Zona B", "Mejor 3°", "Segundo Mejor 3°",
 // y también ordinales sin zona para ligas de zona única o reordenamiento general: "1ero", "2do", "5to", "9no", "11vo", etc.
 export function resolvePlayoffSeed(expression?: string, zones?: ZoneData[]): string | null {
   if (!expression || typeof expression !== 'string' || !zones || zones.length === 0) return null;
@@ -767,6 +853,33 @@ export function resolvePlayoffSeed(expression?: string, zones?: ZoneData[]): str
 
   // Si dice "ganador...", no es una semilla directa de tabla
   if (clean.startsWith('ganador')) return null;
+
+  // Soporte para "Mejor 3°", "Segundo Mejor 3°", "Mejor 4°", etc. en ligas multizona
+  if (clean.includes('mejor') && zones.length > 1) {
+    let targetRank = 3;
+    const mRank = clean.match(/(\d+)/);
+    if (mRank) targetRank = parseInt(mRank[1], 10);
+    const nth = clean.includes('segundo') || clean.includes('2do') ? 2 : 1;
+    const candidates: TeamStandingsRow[] = [];
+    zones.forEach((z) => {
+      const sorted = [...(z.teams || [])].sort((a, b) => {
+        if (a.pos && b.pos) return a.pos - b.pos;
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.dif !== a.dif) return b.dif - a.dif;
+        return b.gf - a.gf;
+      });
+      if (sorted[targetRank - 1]) {
+        candidates.push(sorted[targetRank - 1]);
+      }
+    });
+    candidates.sort((a, b) => {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      if (b.dif !== a.dif) return b.dif - a.dif;
+      return b.gf - a.gf;
+    });
+    const chosen = candidates[nth - 1];
+    if (chosen) return chosen.name;
+  }
 
   // Extraer número de posición
   let pos: number | null = null;
@@ -868,6 +981,37 @@ export function resolvePlayoffSeed(expression?: string, zones?: ZoneData[]): str
   return team ? team.name : null;
 }
 
+// Determina si un texto representa una expresión de semilla (ej: "4to Zona B", "1ero A", "2do", "Mejor 3°")
+export function isPlayoffSeedExpression(str?: string | null): boolean {
+  if (!str || typeof str !== 'string') return false;
+  const clean = str.trim().toLowerCase();
+  if (!clean) return false;
+  if (clean.startsWith('ganador') || clean.startsWith('clasificado') || clean.startsWith('perdedor')) return false;
+  return (
+    /^(\d+|primer|primero|segund|segundo|tercer|tercero|cuart|cuarto|quint|quinto|sext|sexto|septim|septimo|octav|octavo|noven|noveno|decim|decimo)/i.test(clean) ||
+    /zona\s*[a-z0-9]/i.test(clean) ||
+    /\b(1ero|2do|3ro|4to|5to|6to|7mo|8vo|1°|2°|3°|4°|5°|6°|7°|8°)\b/i.test(clean) ||
+    clean.includes('mejor')
+  );
+}
+
+// Determina si un equipo actual es un placeholder provisional que debe ser reemplazado por el clasificado real
+export function isPlayoffPlaceholder(t?: string | null): boolean {
+  if (!t) return true;
+  const clean = t.trim().toLowerCase();
+  return (
+    clean === '' ||
+    clean === 'a definir' ||
+    clean === 'tbd' ||
+    clean === 'por definir' ||
+    clean === 'pendiente' ||
+    clean.startsWith('ganador') ||
+    clean.startsWith('clasificado') ||
+    clean.startsWith('perdedor') ||
+    isPlayoffSeedExpression(clean)
+  );
+}
+
 // Función que propaga automáticamente los ganadores de cada fase de play-off a la siguiente ronda
 // RESPETANDO siempre los casilleros de semillas y cruces personalizados por el administrador.
 export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] {
@@ -891,87 +1035,63 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
     return null;
   };
 
-  const isPlaceholder = (t?: string | null): boolean => {
-    if (!t) return true;
-    const clean = t.trim();
-    return clean === '' || clean === 'A definir' || clean.startsWith('Ganador') || clean.startsWith('Clasificado');
-  };
-
   const octavos = playoffs.filter((m) => m.round === '8vos');
   const cuartos = playoffs.filter((m) => m.round === 'cuartos');
   const semis = playoffs.filter((m) => m.round === 'semifinal');
   const finals = playoffs.filter((m) => m.round === 'final');
 
   // 1. De 8vos a Cuartos
-  if (octavos.length === 4 && cuartos.length === 4) {
-    for (let i = 0; i < 4; i++) {
+  if (octavos.length > 0 && cuartos.length > 0) {
+    for (let i = 0; i < cuartos.length; i++) {
       const c = cuartos[i];
-      const oct = octavos[i];
-      const s2Target = (c.seed2 || '').toLowerCase();
-      // Solo avanzar si seed2 no está seteado como posición fija (ej: "4to B")
-      if (!c.seed2 || c.seed2.trim() === '' || s2Target.includes('octav') || s2Target.includes('ganador')) {
-        const w = getWinner(oct);
-        if (w) {
-          c.team2 = w;
-        } else if (isPlaceholder(c.team2)) {
-          c.team2 = c.seed2 || `Ganador Octavos ${i + 1}`;
+      const octIndex = i;
+      if (octavos[octIndex]) {
+        const s2Target = (c.seed2 || '').toLowerCase();
+        const t2Target = (c.team2 || '').toLowerCase();
+        if (!c.seed2 || c.seed2.trim() === '' || s2Target.includes('octav') || s2Target.includes('ganador') || t2Target.includes('octav') || t2Target.includes('ganador')) {
+          const w = getWinner(octavos[octIndex]);
+          if (w) {
+            c.team2 = w;
+          } else if (isPlayoffPlaceholder(c.team2)) {
+            c.team2 = c.seed2 || `Ganador Octavos ${octIndex + 1}`;
+          }
         }
-      }
-    }
-  } else if (octavos.length >= 8 && cuartos.length >= 4) {
-    for (let i = 0; i < 4; i++) {
-      const c = cuartos[i];
-      const oct1 = octavos[i * 2];
-      const oct2 = octavos[i * 2 + 1];
-      const s1Target = (c.seed1 || '').toLowerCase();
-      const s2Target = (c.seed2 || '').toLowerCase();
-      if (!c.seed1 || c.seed1.trim() === '' || s1Target.includes('octav') || s1Target.includes('ganador')) {
-        const w1 = getWinner(oct1);
-        if (w1) c.team1 = w1;
-        else if (isPlaceholder(c.team1)) c.team1 = c.seed1 || `Ganador Octavos ${i * 2 + 1}`;
-      }
-      if (!c.seed2 || c.seed2.trim() === '' || s2Target.includes('octav') || s2Target.includes('ganador')) {
-        const w2 = getWinner(oct2);
-        if (w2) c.team2 = w2;
-        else if (isPlaceholder(c.team2)) c.team2 = c.seed2 || `Ganador Octavos ${i * 2 + 2}`;
       }
     }
   }
 
   // 2. De Cuartos a Semifinal
-  // Solo auto-propagar si los casilleros de semillas apuntan explícitamente a ganadores de cuartos,
-  // nunca si el admin configuró posiciones de tabla (ej: "2do vs 5to" o "1ero vs 9no").
-  if (cuartos.length >= 4 && semis.length >= 2) {
-    const s1 = semis[0];
-    const s2 = semis[1];
-
-    const s1_1 = (s1.seed1 || '').toLowerCase();
-    const s1_2 = (s1.seed2 || '').toLowerCase();
-    const s2_1 = (s2.seed1 || '').toLowerCase();
-    const s2_2 = (s2.seed2 || '').toLowerCase();
-
+  if (cuartos.length >= 2 && semis.length >= 1) {
     // Semifinal 1
-    if (s1_1.includes('ganador c') || s1_1.includes('ganador cuartos')) {
-      const wC1 = getWinner(cuartos[0]);
-      if (wC1) s1.team1 = wC1;
-      else if (isPlaceholder(s1.team1)) s1.team1 = s1.seed1 || 'Ganador Cuartos 1';
-    }
-    if (s1_2.includes('ganador c') || s1_2.includes('ganador cuartos')) {
-      const wC2 = getWinner(cuartos[1]);
-      if (wC2) s1.team2 = wC2;
-      else if (isPlaceholder(s1.team2)) s1.team2 = s1.seed2 || 'Ganador Cuartos 2';
+    if (semis[0]) {
+      const s1_1 = (semis[0].seed1 || '').toLowerCase();
+      const s1_2 = (semis[0].seed2 || '').toLowerCase();
+      if (!semis[0].seed1 || s1_1.includes('ganador c') || s1_1.includes('ganador cuartos') || isPlayoffPlaceholder(semis[0].team1)) {
+        const wC1 = getWinner(cuartos[0]);
+        if (wC1) semis[0].team1 = wC1;
+        else if (isPlayoffPlaceholder(semis[0].team1)) semis[0].team1 = semis[0].seed1 || 'Ganador Cuartos 1';
+      }
+      if (!semis[0].seed2 || s1_2.includes('ganador c') || s1_2.includes('ganador cuartos') || isPlayoffPlaceholder(semis[0].team2)) {
+        const wC2 = getWinner(cuartos[1]);
+        if (wC2) semis[0].team2 = wC2;
+        else if (isPlayoffPlaceholder(semis[0].team2)) semis[0].team2 = semis[0].seed2 || 'Ganador Cuartos 2';
+      }
     }
 
     // Semifinal 2
-    if (s2_1.includes('ganador c') || s2_1.includes('ganador cuartos')) {
-      const wC3 = getWinner(cuartos[2]);
-      if (wC3) s2.team1 = wC3;
-      else if (isPlaceholder(s2.team1)) s2.team1 = s2.seed1 || 'Ganador Cuartos 3';
-    }
-    if (s2_2.includes('ganador c') || s2_2.includes('ganador cuartos')) {
-      const wC4 = getWinner(cuartos[3]);
-      if (wC4) s2.team2 = wC4;
-      else if (isPlaceholder(s2.team2)) s2.team2 = s2.seed2 || 'Ganador Cuartos 4';
+    if (semis[1] && cuartos.length >= 4) {
+      const s2_1 = (semis[1].seed1 || '').toLowerCase();
+      const s2_2 = (semis[1].seed2 || '').toLowerCase();
+      if (!semis[1].seed1 || s2_1.includes('ganador c') || s2_1.includes('ganador cuartos') || isPlayoffPlaceholder(semis[1].team1)) {
+        const wC3 = getWinner(cuartos[2]);
+        if (wC3) semis[1].team1 = wC3;
+        else if (isPlayoffPlaceholder(semis[1].team1)) semis[1].team1 = semis[1].seed1 || 'Ganador Cuartos 3';
+      }
+      if (!semis[1].seed2 || s2_2.includes('ganador c') || s2_2.includes('ganador cuartos') || isPlayoffPlaceholder(semis[1].team2)) {
+        const wC4 = getWinner(cuartos[3]);
+        if (wC4) semis[1].team2 = wC4;
+        else if (isPlayoffPlaceholder(semis[1].team2)) semis[1].team2 = semis[1].seed2 || 'Ganador Cuartos 4';
+      }
     }
   }
 
@@ -981,17 +1101,53 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
     const f1_1 = (f1.seed1 || '').toLowerCase();
     const f1_2 = (f1.seed2 || '').toLowerCase();
 
-    if (!f1.seed1 || f1.seed1.trim() === '' || f1_1.includes('ganador semi') || f1_1.includes('ganador s')) {
+    if (!f1.seed1 || f1.seed1.trim() === '' || f1_1.includes('ganador semi') || f1_1.includes('ganador s') || isPlayoffPlaceholder(f1.team1)) {
       const wS1 = getWinner(semis[0]);
       if (wS1) f1.team1 = wS1;
-      else if (isPlaceholder(f1.team1)) f1.team1 = f1.seed1 || 'Ganador Semifinal 1';
+      else if (isPlayoffPlaceholder(f1.team1)) f1.team1 = f1.seed1 || 'Ganador Semifinal 1';
     }
-    if (!f1.seed2 || f1.seed2.trim() === '' || f1_2.includes('ganador semi') || f1_2.includes('ganador s')) {
+    if (!f1.seed2 || f1.seed2.trim() === '' || f1_2.includes('ganador semi') || f1_2.includes('ganador s') || isPlayoffPlaceholder(f1.team2)) {
       const wS2 = getWinner(semis[1]);
       if (wS2) f1.team2 = wS2;
-      else if (isPlaceholder(f1.team2)) f1.team2 = f1.seed2 || 'Ganador Semifinal 2';
+      else if (isPlayoffPlaceholder(f1.team2)) f1.team2 = f1.seed2 || 'Ganador Semifinal 2';
     }
   }
+
+  // Propagación genérica para cualquier casillero que exprese "Ganador ..."
+  playoffs.forEach((m) => {
+    (['seed1', 'seed2'] as const).forEach((seedKey) => {
+      const sVal = m[seedKey];
+      const teamKey = seedKey === 'seed1' ? 'team1' : 'team2';
+      if (typeof sVal === 'string' && sVal.toLowerCase().includes('ganador')) {
+        const sLower = sVal.toLowerCase();
+        const sourceMatch = playoffs.find((src) => {
+          if (src.id === m.id) return false;
+          const sTitle = src.title.toLowerCase();
+          const sId = src.id.toLowerCase();
+          if (sLower.includes('c1') && (sId.includes('c1') || sTitle.includes('cuartos 1') || sTitle.includes('cuartos a'))) return true;
+          if (sLower.includes('c2') && (sId.includes('c2') || sTitle.includes('cuartos 2') || sTitle.includes('cuartos b'))) return true;
+          if (sLower.includes('c3') && (sId.includes('c3') || sTitle.includes('cuartos 3') || sTitle.includes('cuartos c'))) return true;
+          if (sLower.includes('c4') && (sId.includes('c4') || sTitle.includes('cuartos 4') || sTitle.includes('cuartos d'))) return true;
+          if (sLower.includes('semi 1') || sLower.includes('semifinal 1')) {
+            return sId.includes('s1') || sTitle.includes('semi 1') || sTitle.includes('semifinal 1');
+          }
+          if (sLower.includes('semi 2') || sLower.includes('semifinal 2')) {
+            return sId.includes('s2') || sTitle.includes('semi 2') || sTitle.includes('semifinal 2');
+          }
+          return false;
+        });
+
+        if (sourceMatch) {
+          const w = getWinner(sourceMatch);
+          if (w) {
+            m[teamKey] = w;
+          } else if (isPlayoffPlaceholder(m[teamKey])) {
+            m[teamKey] = sVal;
+          }
+        }
+      }
+    });
+  });
 
   // Asegurar que ningún partido tenga team1 o team2 como string vacío
   playoffs.forEach((m) => {
@@ -1014,33 +1170,50 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
   const currentPlayoffs = standings.playoffs || [];
   if (currentPlayoffs.length === 0) return standings;
 
-  const isPlaceholder = (t?: string | null): boolean => {
-    if (!t) return true;
-    const clean = t.trim();
-    return clean === '' || clean === 'A definir' || clean.startsWith('Ganador') || clean.startsWith('Clasificado');
-  };
-
   const updatedPlayoffs = currentPlayoffs.map((m) => {
-    const seed1 = m.seed1;
-    const seed2 = m.seed2;
-    let team1 = m.team1;
-    let team2 = m.team2;
+    let seed1 = m.seed1 || '';
+    let seed2 = m.seed2 || '';
+    let team1 = m.team1 || '';
+    let team2 = m.team2 || '';
 
-    // Solo intentar resolver desde las tablas si hay casillero semilla y el equipo actual es placeholder o coincide con el seed
+    // Si seed1 está vacío pero team1 tiene una expresión de semilla (ej: "4to Zona B", "1ero A"), inferir seed1
+    if (!seed1 && isPlayoffSeedExpression(team1)) {
+      seed1 = team1;
+    }
+    // Si seed2 está vacío pero team2 tiene una expresión de semilla (ej: "5to Zona A", "2do B"), inferir seed2
+    if (!seed2 && isPlayoffSeedExpression(team2)) {
+      seed2 = team2;
+    }
+
+    // Un partido programado no jugado (goles null y no finalizado) debe sincronizarse con su clasificado de tabla
+    const matchNotPlayed = m.score1 === null && m.score2 === null && m.status !== 'finalizado';
+
     if (standings.zones && standings.zones.length > 0) {
       if (seed1 && !seed1.toLowerCase().includes('ganador')) {
         const resolved = resolvePlayoffSeed(seed1, standings.zones);
-        if (resolved && (isPlaceholder(team1) || team1 === seed1)) {
-          team1 = resolved;
+        if (resolved) {
+          if (isPlayoffPlaceholder(team1) || matchNotPlayed) {
+            team1 = resolved;
+          }
         }
       }
 
       if (seed2 && !seed2.toLowerCase().includes('ganador')) {
         const resolved = resolvePlayoffSeed(seed2, standings.zones);
-        if (resolved && (isPlaceholder(team2) || team2 === seed2)) {
-          team2 = resolved;
+        if (resolved) {
+          if (isPlayoffPlaceholder(team2) || matchNotPlayed) {
+            team2 = resolved;
+          }
         }
       }
+    }
+
+    // Asegurar semillas si dicen "Ganador..."
+    if (!seed2 && typeof team2 === 'string' && team2.toLowerCase().includes('ganador')) {
+      seed2 = team2;
+    }
+    if (!seed1 && typeof team1 === 'string' && team1.toLowerCase().includes('ganador')) {
+      seed1 = team1;
     }
 
     if (!team1 || team1.trim() === '') team1 = seed1 || 'A definir';

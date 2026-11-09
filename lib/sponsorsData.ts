@@ -110,4 +110,18 @@ export const SPONSORS: Sponsor[] = [
     tier: 'SPONSOR OFICIAL',
     logo: '/sponsors/maria-juana.jpeg',
   },
+  {
+    id: 'roberto-cucco',
+    name: 'Roberto Cucco e Hijo',
+    category: 'Servicios Agropecuarios • Cosecha, Siembra & Alquiler de Campos',
+    tier: 'SPONSOR OFICIAL',
+    logo: '/sponsors/roberto-cucco.jpg',
+  },
+  {
+    id: 'huevos-de-campo',
+    name: 'Huevos de Campo',
+    category: 'Huevos Orgánicos • Alcorta, Santa Fe',
+    tier: 'SPONSOR OFICIAL',
+    logo: '/sponsors/huevos-de-campo.png',
+  },
 ];

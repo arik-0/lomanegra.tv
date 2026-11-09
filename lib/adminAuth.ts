@@ -21,13 +21,13 @@ export function verifyPassword(candidate: string, storedHash: string): boolean {
     if (!salt || !expectedHash) return false;
 
     const candidateHash = crypto.pbkdf2Sync(candidate, salt, 100000, 64, 'sha512').toString('hex');
-    
+
     const candidateBuffer = Buffer.from(candidateHash, 'hex');
     const expectedBuffer = Buffer.from(expectedHash, 'hex');
 
     if (candidateBuffer.length !== expectedBuffer.length) return false;
     return crypto.timingSafeEqual(candidateBuffer, expectedBuffer);
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -44,6 +44,37 @@ export function getAdminPasswordHash(): string {
 }
 
 /**
+ * Genera un token de sesión firmado con HMAC-SHA256 para evitar falsificación de cookies.
+ */
+export function createAdminSessionToken(): string {
+  const secret = getAdminPasswordHash();
+  const payload = 'authenticated_v2';
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  return `${payload}.${signature}`;
+}
+
+/**
+ * Verifica un valor de cookie de sesión de administrador de forma criptográfica.
+ */
+export function isValidAdminTokenValue(val?: string | null): boolean {
+  if (!val) return false;
+  try {
+    const expectedToken = createAdminSessionToken();
+    const a = Buffer.from(val);
+    const b = Buffer.from(expectedToken);
+    if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Verifica si la petición actual proviene de un administrador autenticado con cookie de sesión segura.
  */
 export function verifyAdminSession(): boolean {
@@ -51,8 +82,63 @@ export function verifyAdminSession(): boolean {
     const { cookies } = require('next/headers');
     const cookieStore = cookies();
     const session = cookieStore.get('admin_session');
-    return session?.value === 'authenticated';
+    return isValidAdminTokenValue(session?.value);
   } catch {
     return false;
   }
+}
+
+// Control de límite de intentos (Rate Limiting) contra ataques de fuerza bruta
+interface LoginAttemptRecord {
+  count: number;
+  resetAt: number;
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var globalAdminRateLimit: Record<string, LoginAttemptRecord> | undefined;
+}
+
+const MAX_ATTEMPTS = 6;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutos
+
+function getRateLimitStore(): Record<string, LoginAttemptRecord> {
+  if (!globalThis.globalAdminRateLimit) {
+    globalThis.globalAdminRateLimit = {};
+  }
+  return globalThis.globalAdminRateLimit;
+}
+
+export function checkAdminLoginRateLimit(ip: string): { allowed: boolean; retryAfterSeconds?: number } {
+  const store = getRateLimitStore();
+  const now = Date.now();
+  const record = store[ip];
+
+  if (!record || now > record.resetAt) {
+    return { allowed: true };
+  }
+
+  if (record.count >= MAX_ATTEMPTS) {
+    const retryAfterSeconds = Math.ceil((record.resetAt - now) / 1000);
+    return { allowed: false, retryAfterSeconds };
+  }
+
+  return { allowed: true };
+}
+
+export function recordAdminLoginFailure(ip: string): void {
+  const store = getRateLimitStore();
+  const now = Date.now();
+  const record = store[ip];
+
+  if (!record || now > record.resetAt) {
+    store[ip] = { count: 1, resetAt: now + WINDOW_MS };
+  } else {
+    record.count += 1;
+  }
+}
+
+export function resetAdminLoginFailures(ip: string): void {
+  const store = getRateLimitStore();
+  delete store[ip];
 }

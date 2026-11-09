@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { generateStreamToken } from '@/lib/cloudflare';
 import { getStoredMatches } from '@/lib/adminStore';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +27,7 @@ export async function POST(req: Request) {
     let user = null;
     let sessionUserKey = `guest_${guestEmail || 'invitado'}`;
     const currentSessionId = crypto.randomUUID();
+    const isAdmin = verifyAdminSession();
 
     // 1. Buscar el partido en el almacén local primero para alta velocidad
     const localMatch = getStoredMatches().find((m) => m.id === matchId);
@@ -83,8 +85,6 @@ export async function POST(req: Request) {
 
         // 3. Verificación de Autorización Resiliente (Operador Admin o Compra Aprobada)
         const cookieStore = cookies();
-        const adminSession = cookieStore.get('admin_session');
-        const isAdmin = adminSession?.value === 'authenticated';
         const cookieEmail = cookieStore.get('lomonegro_user_email')?.value?.toLowerCase().trim();
         const cleanGuestEmail = guestEmail?.toLowerCase().trim();
 
@@ -158,10 +158,6 @@ export async function POST(req: Request) {
         console.warn('DB no disponible para stream token, operando en modo local resiliente.');
       }
     }
-
-    const cookieStore = cookies();
-    const adminSession = cookieStore.get('admin_session');
-    const isAdmin = adminSession?.value === 'authenticated';
 
     const matchTitle = resolvedMatch?.title || 'Carreras vs Blanco y Negro';
     const matchDate = resolvedMatch?.date || null;

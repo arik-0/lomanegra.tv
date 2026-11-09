@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram, Camera, Menu } from 'lucide-react';
+import { LogOut, User as UserIcon, Radio, Trophy, Youtube, Instagram, Camera, Menu, Smartphone } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 import UserProfileModal from '@/components/UserProfileModal';
 import { useSidebar } from '@/components/AppLayoutWrapper';
@@ -146,6 +146,14 @@ export default function Navbar() {
           >
             <Camera className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
             <span>Galería</span>
+          </Link>
+
+          <Link
+            href="/app"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/30 hover:bg-red-900/40 border border-red-800/50 text-red-300 hover:text-white transition-all shadow-sm"
+          >
+            <Smartphone className="w-3.5 h-3.5 text-red-400" />
+            <span>App Móvil &amp; TV</span>
           </Link>
 
           <div className="flex items-center gap-2 pl-2 border-l border-zinc-800">

@@ -7,6 +7,7 @@ import { getStoredMatches } from '@/lib/adminStore';
 import MatchViewClient from './MatchViewClient';
 import { ArrowLeft } from 'lucide-react';
 import { sanitizeRegionalText } from '@/lib/sanitize';
+import { verifyAdminSession } from '@/lib/adminAuth';
 
 export const revalidate = 0;
 
@@ -116,8 +117,7 @@ export default async function MatchPage({
   let serverHasPaid = false;
 
   const cookieStore = cookies();
-  const adminSession = cookieStore.get('admin_session');
-  const isAdmin = adminSession?.value === 'authenticated';
+  const isAdmin = verifyAdminSession();
 
   // serverHasPaid reflejará estrictamente si existe compra aprobada en la base de datos
 
