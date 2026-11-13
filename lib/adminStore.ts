@@ -89,7 +89,7 @@ function loadMatchesFromDisk(): MatchData[] | null {
     if (fs.existsSync(MATCHES_FILE)) {
       const raw = fs.readFileSync(MATCHES_FILE, 'utf8').replace(/^\uFEFF/, '');
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
@@ -101,7 +101,7 @@ function loadMatchesFromDisk(): MatchData[] | null {
 
 if (!globalThis.globalMatchesStore) {
   const diskMatches = loadMatchesFromDisk();
-  if (diskMatches) {
+  if (diskMatches !== null) {
     globalThis.globalMatchesStore = diskMatches;
   } else {
     globalThis.globalMatchesStore = [...initialAdminMatches];
@@ -112,9 +112,14 @@ if (!globalThis.globalMatchesStore) {
 export function getStoredMatches(): MatchData[] {
   if (!globalThis.globalMatchesStore) {
     const diskMatches = loadMatchesFromDisk();
-    globalThis.globalMatchesStore = diskMatches || [...initialAdminMatches];
+    globalThis.globalMatchesStore = diskMatches !== null ? diskMatches : [...initialAdminMatches];
   }
   return globalThis.globalMatchesStore;
+}
+
+export function setStoredMatches(matches: MatchData[]): void {
+  globalThis.globalMatchesStore = [...matches];
+  saveMatchesToDisk(globalThis.globalMatchesStore);
 }
 
 export function updateStoredMatch(id: string, updates: Partial<MatchData>): MatchData | null {

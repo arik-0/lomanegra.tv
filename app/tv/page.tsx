@@ -296,7 +296,7 @@ export default function TvPage() {
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 relative drop-shadow-md">
                 <Image
-                  src={getTeamLogo(t1)}
+                  src={getTeamLogo(t1) || '/teams/Blanco y Negro.png'}
                   alt={t1}
                   fill
                   className="object-contain"
@@ -314,7 +314,7 @@ export default function TvPage() {
               <span className="text-lg font-black text-white">{t2}</span>
               <div className="w-14 h-14 relative drop-shadow-md">
                 <Image
-                  src={getTeamLogo(t2)}
+                  src={getTeamLogo(t2) || '/logo-pasion-lomonegra.png'}
                   alt={t2}
                   fill
                   className="object-contain"

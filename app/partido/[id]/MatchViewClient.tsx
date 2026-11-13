@@ -504,7 +504,7 @@ export default function MatchViewClient({
                 const matchVsParts = match.title.split(/vs/i);
                 const t1 = matchVsParts[0]?.trim() || 'Blanco y Negro';
                 const t2 = matchVsParts[1]?.trim() || 'Rival';
-                const t1Logo = getTeamLogo(t1) || '/teams/blanco-y-negro.png';
+                const t1Logo = getTeamLogo(t1) || '/teams/Blanco y Negro.png';
                 const t2Logo = getTeamLogo(t2) || '/teams/ifc.png';
                 return (
                   <div className="flex items-center gap-4 sm:gap-6 bg-[#121218] border border-white/[0.08] px-4 py-2.5 rounded-2xl w-fit mb-6">

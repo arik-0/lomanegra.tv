@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getStoredMatches } from '@/lib/adminStore';
 import MatchViewClient from './MatchViewClient';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Clock, Trophy } from 'lucide-react';
 import { sanitizeRegionalText } from '@/lib/sanitize';
 import { verifyAdminSession } from '@/lib/adminAuth';
 
@@ -119,8 +119,6 @@ export default async function MatchPage({
   const cookieStore = cookies();
   const isAdmin = verifyAdminSession();
 
-  // serverHasPaid reflejará estrictamente si existe compra aprobada en la base de datos
-
   if (isSupabaseConfigured) {
     try {
       const supabase = createServerSupabaseClient();
@@ -174,7 +172,7 @@ export default async function MatchPage({
       ]);
 
       user = authRes?.data?.user || null;
-      let rawMatch = matchRes?.data || null;
+      const rawMatch = matchRes?.data || null;
 
       if (rawMatch) {
         const rawDesc = rawMatch.description || '';
@@ -239,8 +237,6 @@ export default async function MatchPage({
               .select('id, status, match_id')
               .eq('status', 'approved');
 
-            // Blindaje estricto: SIEMPRE exigir coincidencia exacta con el partido abonado (match_id).
-            // Si el partido no posee UUID válido en base de datos, jamás puede haber compras asociadas.
             if (!isValidUUID(match.id)) {
               return { data: null };
             }
@@ -279,25 +275,58 @@ export default async function MatchPage({
     }
   }
 
-  // Fallback de seguridad inmediato si no se encontró en la DB
+  // Buscar en el almacén en memoria si no se encontró en la DB
   if (!match) {
-    const fromStore = getStoredMatches().find((m) => m.id === params.id);
+    const stored = getStoredMatches();
+    const fromStore = stored.find((m) => m.id === params.id) || stored.find((m) => m.is_active !== false);
     if (fromStore) {
       match = fromStore;
-    } else {
-      match = {
-        id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
-        title: 'Carreras vs Blanco y Negro',
-        description: 'Primera • Liga Deportiva del Sur',
-        date: '2026-09-21T23:40:00.000Z',
-        is_date_confirmed: true,
-        price: 1,
-        cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
-        image_url: '/matches/blanco-y-negro-vs-ifc.png',
-        is_active: true,
-        is_live: true,
-      };
     }
+  }
+
+  // Si no hay ningún partido activo o el partido fue eliminado, mostrar pantalla limpia en lugar de romperse
+  if (!match) {
+    return (
+      <main className="min-h-screen bg-[#08080a] text-white px-4 py-10 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <Link
+            href="/"
+            prefetch={true}
+            className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white bg-[#0c0c10] hover:bg-[#121218] border border-white/[0.07] px-4 py-2 rounded-xl transition"
+          >
+            <ArrowLeft className="w-4 h-4 text-red-500" />
+            <span>Volver a la Cartelera</span>
+          </Link>
+
+          <div className="bg-[#0c0c10] border border-white/[0.08] rounded-3xl p-8 sm:p-12 text-center space-y-5 shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-amber-950/50 border border-amber-700/60 flex items-center justify-center mx-auto">
+              <Clock className="w-7 h-7 text-amber-400" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              No hay transmisiones activas en este momento
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto leading-relaxed font-mono">
+              Este encuentro ya ha finalizado o aún no se ha habilitado la próxima transmisión en cartelera.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <Link
+                href="/"
+                className="px-5 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-black text-xs uppercase tracking-wider transition"
+              >
+                Ir al Inicio
+              </Link>
+              <Link
+                href="/posiciones"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-white/[0.1] text-white font-bold text-xs uppercase tracking-wider transition"
+              >
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Ver Tablas &amp; Play-Offs</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   // Asegurar que el UID no sea un mock/placeholder en producción
@@ -333,8 +362,8 @@ export default async function MatchPage({
         <MatchViewClient
           match={{
             ...match,
-            title: sanitizeRegionalText(match.title),
-            description: sanitizeRegionalText(match.description),
+            title: sanitizeRegionalText(match.title || 'Blanco y Negro vs Rival'),
+            description: sanitizeRegionalText(match.description || ''),
           }}
           serverHasPaid={serverHasPaid}
           currentUserEmail={persistentEmail}

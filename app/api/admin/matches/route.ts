@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { getStoredMatches, addStoredMatch, updateStoredMatch, deleteStoredMatch, MatchData } from '@/lib/adminStore';
+import { getStoredMatches, setStoredMatches, addStoredMatch, updateStoredMatch, deleteStoredMatch, MatchData } from '@/lib/adminStore';
 import { sanitizeRegionalText } from '@/lib/sanitize';
 import { verifyAdminSession } from '@/lib/adminAuth';
 
@@ -135,10 +135,11 @@ export async function GET() {
       mpStatus = 'sandbox';
     }
 
-    if (res && !res.error && res.data && res.data.length > 0) {
+    if (res && !res.error && Array.isArray(res.data)) {
       // Filtrar filas del sistema (como persistencia de tablas o galería)
       const realMatches = res.data.filter((m: any) => !m.title?.startsWith('__SYSTEM_'));
       const normalized = sortMatches(realMatches.map(decodeMatchFields));
+      setStoredMatches(normalized);
       return NextResponse.json(
         { matches: normalized, source: 'supabase', mpStatus, isAdmin },
         { headers: NO_CACHE_HEADERS }

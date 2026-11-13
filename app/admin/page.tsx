@@ -247,9 +247,12 @@ export default function AdminPage() {
 
       if (res.ok) {
         const data = await res.json();
-        if (data.matches && data.matches.length > 0) {
+        if (Array.isArray(data.matches)) {
           setMatches(data.matches);
-          if (!selectedMatchId) {
+          if (data.matches.length === 0) {
+            setSelectedMatchId('');
+            setStreamInput('');
+          } else if (!selectedMatchId || !data.matches.some((m: Match) => m.id === selectedMatchId)) {
             setSelectedMatchId(data.matches[0].id);
             setStreamInput(data.matches[0].cloudflare_live_input_uid || '');
           }

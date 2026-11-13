@@ -17,11 +17,11 @@ import {
   Radio,
   Trophy,
   ShieldCheck,
-  Flame,
   ArrowRight,
-  Tv,
   CheckCircle2,
   Clock,
+  Camera,
+  Smartphone,
 } from 'lucide-react';
 
 export const revalidate = 0; // Datos frescos en cada petición
@@ -37,7 +37,9 @@ export default async function HomePage() {
     try {
       const withTimeout = async <T,>(p: PromiseLike<T>, ms = 2500): Promise<T | null> => {
         let t: any;
-        const timeout = new Promise<null>((res) => { t = setTimeout(() => res(null), ms); });
+        const timeout = new Promise<null>((res) => {
+          t = setTimeout(() => res(null), ms);
+        });
         try {
           const res = await Promise.race([Promise.resolve(p), timeout]);
           clearTimeout(t);
@@ -61,7 +63,7 @@ export default async function HomePage() {
         5000
       );
 
-      if (matchesRes && !matchesRes.error && matchesRes.data && matchesRes.data.length > 0) {
+      if (matchesRes && !matchesRes.error && Array.isArray(matchesRes.data)) {
         matches = matchesRes.data
           .filter((m: any) => !m.title?.startsWith('__SYSTEM_'))
           .map((m: any) => {
@@ -93,7 +95,7 @@ export default async function HomePage() {
 
             return {
               ...m,
-              title: sanitizeRegionalText(m.title),
+              title: sanitizeRegionalText(m.title || 'Blanco y Negro vs Rival'),
               is_date_confirmed: !isTbd,
               date: isTbd ? null : m.date,
               description: sanitizeRegionalText(cleanDesc),
@@ -138,85 +140,34 @@ export default async function HomePage() {
     }
   }
 
-  // Datos estelares de respaldo para asegurar que el Hero y la Cartelera siempre se muestren
-  const defaultFeaturedMatch = {
-    id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
-    title: 'Carreras vs Blanco y Negro',
-    description: 'Primera • Liga Deportiva del Sur',
-    date: '2026-09-24T00:45:00.000Z',
-    is_date_confirmed: true,
-    price: 12000,
-    cloudflare_live_input_uid: 'dac066a4fb5c97117189392adae3f453',
-    image_url: '/matches/blanco-y-negro-vs-ifc.png',
-    is_active: true,
-    is_live: false,
-    category: 'Primera',
-    league: 'Liga Deportiva del Sur',
-  };
-
-  const defaultOtherMatches = [
-    {
-      id: '11db1ce1-b9c5-4dcb-9fa7-3b788feaeb20',
-      title: 'Blanco y Negro vs Nuevo Alberdi',
-      description: 'Primera • Liga Deportiva del Sur',
-      date: null,
-      is_date_confirmed: false,
-      price: 12000,
-      cloudflare_live_input_uid: 'live_input_byn',
-      image_url: '/matches/blanco-y-negro-vs-ifc.png',
-      is_active: true,
-      category: 'Primera',
-      league: 'Liga Deportiva del Sur',
-    },
-    {
-      id: '480f1946-bd9b-4503-b1ae-9da69c733301',
-      title: 'Bombal Juniors vs Blanco y Negro',
-      description: 'Torneo Clausura • Transmisión oficial en vivo',
-      date: null,
-      is_date_confirmed: false,
-      price: 12000,
-      cloudflare_live_input_uid: 'live_input_byn_vs_bombal',
-      image_url: null,
-      is_active: true,
-      category: 'Primera',
-      league: 'Liga Deportiva del Sur',
-    },
-  ];
-
-  // Combinar partidos de Supabase o del almacén de administración
+  // Combinar partidos de Supabase o del almacén de administración (solo si Supabase falló por red)
   const adminMatches = getStoredMatches().map((m) => ({
     ...m,
-    title: sanitizeRegionalText(m.title),
-    description: sanitizeRegionalText(m.description),
+    title: sanitizeRegionalText(m.title || 'Blanco y Negro vs Rival'),
+    description: sanitizeRegionalText(m.description || ''),
     category: m.category === 'Fútbol Mayor' ? 'Primera' : (m.category || 'Primera'),
     price: Number(m.price) || 12000,
   }));
 
-  // Si Supabase tiene partidos válidos, esa es la ÚNICA fuente de verdad para la cartelera
-  const candidateList =
-    matches && matches.length > 0
-      ? matches
-      : adminMatches.length > 0
-      ? adminMatches
-      : [defaultFeaturedMatch, ...defaultOtherMatches];
+  // Si Supabase respondió (incluso con [] cuando no hay partidos activos), esa es la ÚNICA fuente de verdad
+  const candidateList = matches !== null ? matches : adminMatches;
 
   const seenIds = new Set<string>();
   const combinedMatches = candidateList.filter((m) => {
-    if (seenIds.has(m.id)) return false;
+    if (!m || !m.id || seenIds.has(m.id)) return false;
     seenIds.add(m.id);
     return true;
   });
 
   // Filtrar exclusivamente partidos activos de Pasión Lomonegra
-  const validMatches = combinedMatches.filter(
+  const activeMatches = combinedMatches.filter(
     (m) =>
       m.is_active !== false &&
-      !m.title.toLowerCase().includes('boca juniors vs river') &&
-      !m.title.toLowerCase().includes('real madrid') &&
-      !m.title.toLowerCase().includes('argentina vs')
+      !(m.title || '').toLowerCase().includes('boca juniors vs river') &&
+      !(m.title || '').toLowerCase().includes('real madrid') &&
+      !(m.title || '').toLowerCase().includes('argentina vs')
   );
 
-  const activeMatches = validMatches.length > 0 ? validMatches : [defaultFeaturedMatch, ...defaultOtherMatches];
   const now = Date.now();
 
   // Buscar todos los partidos confirmados con fecha futura o en curso (hasta 12 horas de iniciados)
@@ -230,28 +181,34 @@ export default async function HomePage() {
   // Si no hay partidos confirmados próximos, buscar uno "A Confirmar"
   const pendingMatch = activeMatches.find((m) => !m.is_date_confirmed || !m.date);
 
-  // El partido estelar seleccionado automáticamente para el contador
+  // El partido estelar seleccionado automáticamente (o null si no hay partidos en cartelera)
   const featuredMatch =
     upcomingConfirmedMatches[0] ||
     pendingMatch ||
     activeMatches[0] ||
-    defaultFeaturedMatch;
+    null;
 
   // Sanitizar descripción eliminando textos publicitarios obsoletos o redundantes
-  const cleanDescription = (featuredMatch.description || '')
-    .replace(/transmisi[oó]n exclusiva en 4k ultra hd.*?relatos oficiales\.?/gi, '')
-    .replace(/acceso exclusivo pay-per-view.*?clubes\.?/gi, '')
-    .trim() || 'Transmisión oficial en directo para toda la hinchada lomonegra.';
+  const cleanDescription = featuredMatch
+    ? (featuredMatch.description || '')
+        .replace(/transmisi[oó]n exclusiva en 4k ultra hd.*?relatos oficiales\.?/gi, '')
+        .replace(/acceso exclusivo pay-per-view.*?clubes\.?/gi, '')
+        .trim() || 'Transmisión oficial en directo para toda la hinchada lomonegra.'
+    : '';
 
-  const otherMatches = activeMatches.filter((m) => m.id !== featuredMatch.id);
+  const otherMatches = featuredMatch
+    ? activeMatches.filter((m) => m.id !== featuredMatch.id)
+    : [];
 
   // Estado de confirmación de la fecha para el contador
-  const isFeaturedDateConfirmed = featuredMatch.is_date_confirmed !== false && !!featuredMatch.date;
+  const isFeaturedDateConfirmed = Boolean(
+    featuredMatch && featuredMatch.is_date_confirmed !== false && featuredMatch.date
+  );
 
   const featuredParts = (featuredMatch?.title || '').split(/vs/i);
   const featuredT1 = featuredParts[0]?.trim() || 'Blanco y Negro';
   const featuredT2 = featuredParts[1]?.trim() || 'Rival';
-  const featuredT1Logo = getTeamLogo(featuredT1) || '/teams/blanco-y-negro.png';
+  const featuredT1Logo = getTeamLogo(featuredT1) || '/teams/Blanco y Negro.png';
   const featuredT2Logo = getTeamLogo(featuredT2) || '/teams/ifc.png';
 
   return (
@@ -263,9 +220,9 @@ export default async function HomePage() {
         <SponsorsTicker />
 
         {/* ============================================================================== */}
-        {/* 1. HERO ESTELAR ESTILO FORG1.COM (HUD TACTICAL FRAME + SHADER GLOW)           */}
+        {/* 1. HERO ESTELAR ESTILO FORG1.COM (CON PARTIDO ACTIVO O ESTADO SIN PARTIDOS)   */}
         {/* ============================================================================== */}
-        {featuredMatch && (
+        {featuredMatch ? (
           <section className="relative isolate overflow-hidden rounded-3xl bg-[#0c0c10] border border-white/[0.07] shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
             {/* Escuadras tácticas HUD en las 4 esquinas */}
             <span className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-red-500/50 z-20 pointer-events-none" />
@@ -287,7 +244,9 @@ export default async function HomePage() {
 
                 <div>
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
-                    TRANSMISIÓN DE PRIMERA
+                    {featuredMatch.category
+                      ? `TRANSMISIÓN DE ${featuredMatch.category.toUpperCase()}`
+                      : 'TRANSMISIÓN OFICIAL'}
                   </div>
                   <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-white leading-none [text-shadow:0_2px_24px_rgba(0,0,0,0.8)]">
                     {featuredMatch.title}
@@ -331,10 +290,14 @@ export default async function HomePage() {
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   ) : (
-                    <div className="flex items-center gap-2 px-5 py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider bg-zinc-900 border border-amber-800/60 text-amber-400">
+                    <Link
+                      href={`/partido/${featuredMatch.id}`}
+                      prefetch={true}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider bg-zinc-900 hover:bg-zinc-800 border border-amber-800/60 text-amber-400 transition"
+                    >
                       <Clock className="w-4 h-4 text-amber-500" />
                       <span>Venta al Confirmar Fecha</span>
-                    </div>
+                    </Link>
                   )}
                 </div>
 
@@ -416,6 +379,85 @@ export default async function HomePage() {
               </div>
             </div>
           </section>
+        ) : (
+          /* ESTADO LIMPIO Y RESILIENTE CUANDO NO HAY PARTIDOS ACTIVOS EN CARTELERA */
+          <section className="relative isolate overflow-hidden rounded-3xl bg-[#0c0c10] border border-white/[0.07] shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+            <span className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-red-500/50 z-20 pointer-events-none" />
+            <span className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-red-500/50 z-20 pointer-events-none" />
+            <span className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-red-500/50 z-20 pointer-events-none" />
+            <span className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-red-500/50 z-20 pointer-events-none" />
+
+            <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_35%,rgba(220,38,38,0.12),transparent_72%)]" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center p-6 sm:p-8 lg:p-10 relative z-10">
+              <div className="lg:col-span-7 space-y-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-[10px] font-mono font-black uppercase tracking-wider bg-zinc-900 border border-zinc-700/80 text-amber-400">
+                  <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>CARTELERA EN ACTUALIZACIÓN // PRÓXIMA FECHA</span>
+                </div>
+
+                <div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-1">
+                    CANAL OFICIAL • PASIÓN LOMONEGRA
+                  </div>
+                  <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.8)]">
+                    Sin transmisiones programadas en este momento
+                  </h1>
+                  <p className="mt-3 text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-xl">
+                    Estamos preparando la cartelera para la próxima fecha de Blanco y Negro. Mientras se confirma el horario oficial, podés seguir todas las posiciones, fixture, play-offs y la galería multimedia del club.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/posiciones"
+                    className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_24px_rgba(255,255,255,0.12)] active:scale-95 bg-white hover:bg-zinc-200 text-black"
+                  >
+                    <Trophy className="w-4 h-4 text-red-600" />
+                    <span>Ver Tablas &amp; Play-Offs</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+
+                  <Link
+                    href="/galeria"
+                    className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-zinc-900 hover:bg-zinc-800 border border-white/[0.1] text-white transition"
+                  >
+                    <Camera className="w-4 h-4 text-red-500" />
+                    <span>Galería &amp; Videos</span>
+                  </Link>
+
+                  <Link
+                    href="/app"
+                    className="flex items-center gap-2 px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-zinc-900/70 hover:bg-zinc-800 border border-white/[0.08] text-zinc-300 transition"
+                  >
+                    <Smartphone className="w-4 h-4 text-emerald-400" />
+                    <span>App Oficial</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                <div className="relative rounded-3xl overflow-hidden border border-white/[0.08] bg-[#0a0a0e] aspect-video flex flex-col items-center justify-center p-6 text-center shadow-2xl">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(220,38,38,0.14),transparent_75%)] pointer-events-none" />
+                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 mb-3 drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]">
+                    <Image
+                      src="/teams/Blanco y Negro.png"
+                      alt="Club Blanco y Negro"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="text-sm sm:text-base font-black uppercase tracking-wider text-white">
+                    Pasión Lomonegra TV
+                  </div>
+                  <div className="text-[11px] font-mono text-zinc-400 mt-1">
+                    La transmisión se activará al confirmarse el próximo encuentro
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
 
         {/* ============================================================================== */}
@@ -428,7 +470,10 @@ export default async function HomePage() {
               TRANSMISIÓN OFICIAL
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              1080p <span className="text-[10px] sm:text-xs font-bold text-red-400 bg-red-950/70 border border-red-800/60 px-1.5 py-0.5 rounded align-middle">60 FPS</span>
+              1080p{' '}
+              <span className="text-[10px] sm:text-xs font-bold text-red-400 bg-red-950/70 border border-red-800/60 px-1.5 py-0.5 rounded align-middle">
+                60 FPS
+              </span>
             </div>
             <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 font-mono">
               Ultra HD en directo
@@ -440,15 +485,17 @@ export default async function HomePage() {
             <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
               COMIENZA
             </div>
-            {isFeaturedDateConfirmed && featuredMatch.date ? (
+            {featuredMatch && isFeaturedDateConfirmed && featuredMatch.date ? (
               <div className="space-y-1">
                 <div className="text-xs sm:text-sm font-bold text-zinc-300 font-mono tracking-wider">
-                  {new Date(featuredMatch.date).toLocaleDateString('es-AR', {
-                    weekday: 'short',
-                    day: '2-digit',
-                    month: 'short',
-                    timeZone: 'America/Argentina/Buenos_Aires',
-                  }).toUpperCase()}
+                  {new Date(featuredMatch.date)
+                    .toLocaleDateString('es-AR', {
+                      weekday: 'short',
+                      day: '2-digit',
+                      month: 'short',
+                      timeZone: 'America/Argentina/Buenos_Aires',
+                    })
+                    .toUpperCase()}
                 </div>
                 <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
                   {new Date(featuredMatch.date).toLocaleTimeString('es-AR', {
@@ -462,12 +509,12 @@ export default async function HomePage() {
               </div>
             ) : (
               <div className="text-xl sm:text-2xl font-black font-mono tracking-tight text-amber-400 leading-none">
-                A CONFIRMAR
+                {featuredMatch ? 'A CONFIRMAR' : 'PRÓXIMAMENTE'}
               </div>
             )}
             <div className="text-[10px] sm:text-[11px] text-red-400 mt-2 font-mono flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-              <span>Transmisión en vivo</span>
+              <span>{featuredMatch ? 'Transmisión en vivo' : 'Agenda oficial'}</span>
             </div>
           </div>
 
@@ -477,7 +524,8 @@ export default async function HomePage() {
               PASE DIGITAL
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-              ${Number(featuredMatch.price || 12000).toLocaleString('es-AR')} <span className="text-xs font-bold text-red-500">ARS</span>
+              ${Number(featuredMatch?.price || 12000).toLocaleString('es-AR')}{' '}
+              <span className="text-xs font-bold text-red-500">ARS</span>
             </div>
             <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 font-mono">
               Sin abono mensual
@@ -487,7 +535,7 @@ export default async function HomePage() {
           {/* Métrica 4 */}
           <div className="p-4 sm:p-6 text-left">
             <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">
-              ACCESO & CONEXIÓN
+              ACCESO &amp; CONEXIÓN
             </div>
             <div className="text-xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
               1 Pantalla
@@ -499,7 +547,7 @@ export default async function HomePage() {
         </div>
 
         {/* ============================================================================== */}
-        {/* 3. CARTELERA DE OTROS ENCUENTROS */}
+        {/* 3. CARTELERA DE OTROS ENCUENTROS                                               */}
         {/* ============================================================================== */}
         {otherMatches.length > 0 && (
           <section className="space-y-4">
@@ -572,7 +620,8 @@ export default async function HomePage() {
                                 minute: '2-digit',
                                 hour12: false,
                                 timeZone: 'America/Argentina/Buenos_Aires',
-                              })} HS
+                              })}{' '}
+                              HS
                             </span>
                           </div>
                         ) : (
@@ -643,12 +692,12 @@ export default async function HomePage() {
         )}
 
         {/* ============================================================================== */}
-        {/* 4. SPONSORS OFICIALES DE LA TRANSMISIÓN */}
+        {/* 4. SPONSORS OFICIALES DE LA TRANSMISIÓN                                        */}
         {/* ============================================================================== */}
         <SponsorsStrip />
 
         {/* ============================================================================== */}
-        {/* 5. BANNER TÉCNICO INFORMATIVO */}
+        {/* 5. BANNER TÉCNICO INFORMATIVO                                                  */}
         {/* ============================================================================== */}
         <section className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">

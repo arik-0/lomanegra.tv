@@ -15,6 +15,7 @@ import {
   Camera,
   Instagram,
   Smartphone,
+  Clock,
 } from 'lucide-react';
 import { getTeamLogo } from '@/lib/standingsStore';
 
@@ -23,62 +24,51 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+interface SidebarMatchItem {
+  id: string;
+  team1: string;
+  team2: string;
+  time: string;
+  isLive: boolean;
+  category: string;
+  price: string;
+  logo1: string;
+  logo2: string;
+}
+
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'matches' | 'events'>('matches');
-
-  // Partidos oficiales de la agenda (sincronizados con los partidos reales)
-  const defaultSidebarMatches = [
-    {
-      id: 'b1343cdc-be37-4e30-9c29-fbb505721566',
-      team1: 'Carreras',
-      team2: 'Blanco y Negro',
-      time: 'MIÉRCOLES 21:45 HS',
-      isLive: false,
-      category: 'Primera • Liga Deportiva del Sur',
-      price: '$12.000 ARS',
-      logo1: getTeamLogo('Carreras') || '/teams/carreras.png',
-      logo2: getTeamLogo('Blanco y Negro') || '/teams/Blanco y Negro.png',
-    },
-    {
-      id: '11db1ce1-b9c5-4dcb-9fa7-3b788feaeb20',
-      team1: 'Blanco y Negro',
-      team2: 'Nuevo Alberdi',
-      time: 'A CONFIRMAR',
-      isLive: false,
-      category: 'Primera • Liga Deportiva del Sur',
-      price: '$12.000 ARS',
-      logo1: getTeamLogo('Blanco y Negro') || '/teams/Blanco y Negro.png',
-      logo2: getTeamLogo('Nuevo Alberdi') || '/teams/nuevo-alberdi.png',
-    },
-  ];
-
-  const [matches, setMatches] = useState(defaultSidebarMatches);
+  const [matches, setMatches] = useState<SidebarMatchItem[]>([]);
 
   const fetchMatches = () => {
     fetch('/api/admin/matches', { cache: 'no-store' })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.matches && data.matches.length > 0) {
+        if (Array.isArray(data?.matches)) {
           const activeMatches = data.matches.filter((m: any) => m.is_active !== false);
-          const mapped = activeMatches.map((m: any) => {
+          const mapped: SidebarMatchItem[] = activeMatches.map((m: any) => {
             const parts = (m.title || '').split(/vs/i);
             const t1 = parts[0]?.trim() || 'Blanco y Negro';
             const t2 = parts[1]?.trim() || 'Rival';
             let timeStr = 'A CONFIRMAR';
             if (m.is_date_confirmed && m.date) {
               const d = new Date(m.date);
-              timeStr = `${d.toLocaleDateString('es-AR', {
-                weekday: 'short',
-                day: '2-digit',
-                month: 'short',
-                timeZone: 'America/Argentina/Buenos_Aires',
-              }).toUpperCase()} ${d.toLocaleTimeString('es-AR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-                timeZone: 'America/Argentina/Buenos_Aires',
-              })} HS`;
+              if (!isNaN(d.getTime())) {
+                timeStr = `${d
+                  .toLocaleDateString('es-AR', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    timeZone: 'America/Argentina/Buenos_Aires',
+                  })
+                  .toUpperCase()} ${d.toLocaleTimeString('es-AR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
+                  timeZone: 'America/Argentina/Buenos_Aires',
+                })} HS`;
+              }
             }
             return {
               id: m.id,
@@ -92,9 +82,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               logo2: getTeamLogo(t2) || '/teams/ifc.png',
             };
           });
-          if (mapped.length > 0) {
-            setMatches(mapped);
-          }
+          setMatches(mapped);
         }
       })
       .catch(() => {});
@@ -228,7 +216,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           >
             <span className="flex items-center gap-2">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>Tablas & Play-Offs</span>
+              <span>Tablas &amp; Play-Offs</span>
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-zinc-500" />
           </Link>
@@ -304,52 +292,70 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
               </div>
 
-              <div className="space-y-2">
-                {matches.map((m) => (
-                  <Link
-                    key={m.id}
-                    href={`/partido/${m.id}`}
-                    onClick={handleLinkClick}
-                    className="block p-3 rounded-2xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition-all group shadow-sm"
-                  >
-                    <div className="flex items-center justify-between text-[10px] font-mono mb-2">
-                      <span className="text-zinc-400 flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-red-500" />
-                        <span>{m.time}</span>
-                      </span>
-                      {m.isLive ? (
-                        <span className="px-1.5 py-0.5 rounded bg-red-950/80 border border-red-700/80 text-red-400 text-[8px] font-mono font-black uppercase flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                          EN DIRECTO
+              {matches.length > 0 ? (
+                <div className="space-y-2">
+                  {matches.map((m) => (
+                    <Link
+                      key={m.id}
+                      href={`/partido/${m.id}`}
+                      onClick={handleLinkClick}
+                      className="block p-3 rounded-2xl bg-[#14151e] hover:bg-[#1c1e2a] border border-zinc-800/80 hover:border-red-500/40 transition-all group shadow-sm"
+                    >
+                      <div className="flex items-center justify-between text-[10px] font-mono mb-2">
+                        <span className="text-zinc-400 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-red-500" />
+                          <span>{m.time}</span>
                         </span>
-                      ) : (
-                        <span className="text-zinc-400 font-bold text-[9px]">{m.price}</span>
-                      )}
-                    </div>
-
-                    {/* Escudos de los clubes */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center -space-x-1.5">
-                        <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
-                          <Image src={m.logo1} alt={m.team1} fill className="object-contain" unoptimized />
-                        </div>
-                        <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
-                          <Image src={m.logo2} alt={m.team2} fill className="object-contain" unoptimized />
-                        </div>
+                        {m.isLive ? (
+                          <span className="px-1.5 py-0.5 rounded bg-red-950/80 border border-red-700/80 text-red-400 text-[8px] font-mono font-black uppercase flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                            EN DIRECTO
+                          </span>
+                        ) : (
+                          <span className="text-zinc-400 font-bold text-[9px]">{m.price}</span>
+                        )}
                       </div>
 
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-black text-white group-hover:text-red-400 transition-colors truncate">
-                          {m.team1} vs {m.team2}
+                      {/* Escudos de los clubes */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center -space-x-1.5">
+                          <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
+                            <Image src={m.logo1} alt={m.team1} fill className="object-contain" unoptimized />
+                          </div>
+                          <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-700 p-0.5 relative shrink-0">
+                            <Image src={m.logo2} alt={m.team2} fill className="object-contain" unoptimized />
+                          </div>
                         </div>
-                        <div className="text-[10px] text-zinc-500 truncate mt-0.5">
-                          {m.category}
+
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-black text-white group-hover:text-red-400 transition-colors truncate">
+                            {m.team1} vs {m.team2}
+                          </div>
+                          <div className="text-[10px] text-zinc-500 truncate mt-0.5">
+                            {m.category}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-[#14151e] border border-zinc-800/80 text-center space-y-2">
+                  <Clock className="w-5 h-5 text-amber-400 mx-auto" />
+                  <p className="text-xs font-bold text-white">Sin emisiones programadas</p>
+                  <p className="text-[10px] text-zinc-400 leading-relaxed">
+                    La cartelera se actualizará al confirmarse el próximo encuentro oficial.
+                  </p>
+                  <Link
+                    href="/posiciones"
+                    onClick={handleLinkClick}
+                    className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-red-400 hover:text-red-300 pt-1"
+                  >
+                    <span>Ver Tablas &amp; Play-Offs</span>
+                    <ChevronRight className="w-3 h-3" />
                   </Link>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -409,12 +415,21 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {/* 6. Footer del Sidebar con CTA Rápido y Redes */}
         <div className="p-3 border-t border-zinc-800/80 bg-[#12131a] shrink-0 pb-20 lg:pb-3">
           <Link
-            href={`/partido/${matches[0]?.id || 'b1343cdc-be37-4e30-9c29-fbb505721566'}`}
+            href={matches[0]?.id ? `/partido/${matches[0].id}` : '/posiciones'}
             onClick={handleLinkClick}
             className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-white text-black hover:bg-zinc-200 text-xs font-black tracking-wider uppercase rounded-xl no-underline transition-colors shadow-[0_4px_16px_rgba(255,255,255,0.1)]"
           >
-            <Play className="w-3.5 h-3.5 fill-black" />
-            <span>Pase En Vivo</span>
+            {matches[0]?.id ? (
+              <>
+                <Play className="w-3.5 h-3.5 fill-black" />
+                <span>Pase En Vivo</span>
+              </>
+            ) : (
+              <>
+                <Trophy className="w-3.5 h-3.5 text-red-600" />
+                <span>Tablas &amp; Play-Offs</span>
+              </>
+            )}
           </Link>
 
           {/* Redes Sociales Oficiales */}
