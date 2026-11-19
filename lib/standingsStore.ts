@@ -2095,6 +2095,40 @@ export function createDefaultStandings(
     base.categoria = categoria;
     base.torneo = normTorneo;
     base.goleadores = [];
+    // Nunca heredar estadísticas, resultados ni llaves de Primera División al generar una plantilla limpia de otra categoría
+    base.zones = (base.zones || []).map((z: ZoneData) => ({
+      ...z,
+      teams: (z.teams || []).map((t: TeamStandingsRow, idx: number) => ({
+        ...t,
+        pos: idx + 1,
+        pj: 0,
+        pg: 0,
+        pe: 0,
+        pp: 0,
+        gf: 0,
+        gc: 0,
+        dif: 0,
+        pts: 0,
+        form: [],
+        qualified: idx < 4,
+      })),
+      fixtures: (z.fixtures || []).map((f: FixtureMatch) => ({
+        ...f,
+        homeGoals: null,
+        awayGoals: null,
+      })),
+    }));
+    base.playoffs = (base.playoffs || []).map((p: PlayoffMatch) => ({
+      ...p,
+      team1: 'A definir',
+      team2: 'A definir',
+      score1: null,
+      score2: null,
+      penalties1: null,
+      penalties2: null,
+      winner: undefined,
+      status: 'programado',
+    }));
     return syncPlayoffMatches(base);
   }
 

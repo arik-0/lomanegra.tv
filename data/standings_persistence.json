@@ -2969,12 +2969,13 @@
         "seed2": "5to a",
         "team1": "Firmat FBC",
         "team2": "Eduardo Hertz",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "8vos-6-1789140928359",
@@ -2984,12 +2985,13 @@
         "seed2": "6to b",
         "team1": "Olimpia",
         "team2": "Bombal Jrs",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "8vos-7-1789140928359",
@@ -2999,12 +3001,13 @@
         "seed2": "6to a",
         "team1": "Blanco y Negro",
         "team2": "C.A. Argentino",
-        "score1": null,
-        "score2": null,
+        "score1": 1,
+        "score2": 2,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 2
       },
       {
         "id": "8vos-8-1789140928359",
@@ -3014,72 +3017,73 @@
         "seed2": "5to b",
         "team1": "Los Andes",
         "team2": "Hughes FBC",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A Definir",
+        "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "c1",
         "round": "cuartos",
         "title": "Cuartos 1 ",
         "seed1": "1ero a",
-        "seed2": "",
+        "seed2": "Ganador Octavos 1",
         "team1": "Fredriksson FBC",
-        "team2": "Ganador Octavos 1",
-        "score1": null,
-        "score2": null,
+        "team2": "Firmat FBC",
+        "score1": 0,
+        "score2": 1,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida 0-1"
       },
       {
         "id": "c2",
         "round": "cuartos",
         "title": "Cuartos 2 ",
         "seed1": "2do B",
-        "seed2": "",
+        "seed2": "Ganador Octavos 2",
         "team1": "Independiente FC",
-        "team2": "Ganador Octavos 2",
-        "score1": null,
-        "score2": null,
+        "team2": "Olimpia",
+        "score1": 1,
+        "score2": 1,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida"
       },
       {
         "id": "c3",
         "round": "cuartos",
         "title": "Cuartos 3  ",
         "seed1": "2do a",
-        "seed2": "",
+        "seed2": "Ganador Octavos 3",
         "team1": "Sp. Bombal",
-        "team2": "Ganador Octavos 3",
-        "score1": null,
-        "score2": null,
+        "team2": "C.A. Argentino",
+        "score1": 0,
+        "score2": 2,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "ida 0-2"
       },
       {
         "id": "c4",
         "round": "cuartos",
         "title": "Cuartos 4  ",
         "seed1": "1ero B",
-        "seed2": "",
+        "seed2": "Ganador Octavos 4",
         "team1": "Atlético Paz",
-        "team2": "Ganador Octavos 4",
-        "score1": null,
-        "score2": null,
+        "team2": "Los Andes",
+        "score1": 0,
+        "score2": 2,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida"
       },
       {
         "id": "s1",
@@ -3087,7 +3091,7 @@
         "title": "Semifinal 1  ",
         "seed1": "Ganador C1",
         "seed2": "Ganador C2",
-        "team1": "Ganador C1",
+        "team1": "Firmat FBC",
         "team2": "Ganador C2",
         "score1": null,
         "score2": null,
@@ -3102,8 +3106,8 @@
         "title": "Semifinal 2",
         "seed1": "Ganador C3",
         "seed2": "Ganador C4",
-        "team1": "Ganador C3",
-        "team2": "Ganador C4",
+        "team1": "C.A. Argentino",
+        "team2": "Los Andes",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -3133,7 +3137,7 @@
         "pos": 1,
         "name": "Villan Lucas",
         "category": "Fútbol Mayor",
-        "goals": 8
+        "goals": 9
       },
       {
         "id": "g-1789352582859",
@@ -5083,12 +5087,13 @@
         "seed2": "5to a",
         "team1": "Firmat FBC",
         "team2": "Eduardo Hertz",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "8vos-6-1789140928359",
@@ -5098,12 +5103,13 @@
         "seed2": "6to b",
         "team1": "Olimpia",
         "team2": "Bombal Jrs",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "8vos-7-1789140928359",
@@ -5113,12 +5119,13 @@
         "seed2": "6to a",
         "team1": "Blanco y Negro",
         "team2": "C.A. Argentino",
-        "score1": null,
-        "score2": null,
+        "score1": 1,
+        "score2": 2,
         "status": "programado",
         "dateInfo": "A Definir",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 2
       },
       {
         "id": "8vos-8-1789140928359",
@@ -5128,72 +5135,73 @@
         "seed2": "5to b",
         "team1": "Los Andes",
         "team2": "Hughes FBC",
-        "score1": null,
-        "score2": null,
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A Definir",
+        "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "c1",
         "round": "cuartos",
         "title": "Cuartos 1 ",
         "seed1": "1ero a",
-        "seed2": "",
+        "seed2": "Ganador Octavos 1",
         "team1": "Fredriksson FBC",
-        "team2": "Ganador Octavos 1",
-        "score1": null,
-        "score2": null,
+        "team2": "Firmat FBC",
+        "score1": 0,
+        "score2": 1,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida 0-1"
       },
       {
         "id": "c2",
         "round": "cuartos",
         "title": "Cuartos 2 ",
         "seed1": "2do B",
-        "seed2": "",
+        "seed2": "Ganador Octavos 2",
         "team1": "Independiente FC",
-        "team2": "Ganador Octavos 2",
-        "score1": null,
-        "score2": null,
+        "team2": "Olimpia",
+        "score1": 1,
+        "score2": 1,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida"
       },
       {
         "id": "c3",
         "round": "cuartos",
         "title": "Cuartos 3  ",
         "seed1": "2do a",
-        "seed2": "",
+        "seed2": "Ganador Octavos 3",
         "team1": "Sp. Bombal",
-        "team2": "Ganador Octavos 3",
-        "score1": null,
-        "score2": null,
+        "team2": "C.A. Argentino",
+        "score1": 0,
+        "score2": 2,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "ida 0-2"
       },
       {
         "id": "c4",
         "round": "cuartos",
         "title": "Cuartos 4  ",
         "seed1": "1ero B",
-        "seed2": "",
+        "seed2": "Ganador Octavos 4",
         "team1": "Atlético Paz",
-        "team2": "Ganador Octavos 4",
-        "score1": null,
-        "score2": null,
+        "team2": "Los Andes",
+        "score1": 0,
+        "score2": 2,
         "status": "programado",
         "penalties1": null,
         "penalties2": null,
-        "dateInfo": "A Definir"
+        "dateInfo": "Ida"
       },
       {
         "id": "s1",
@@ -5201,7 +5209,7 @@
         "title": "Semifinal 1  ",
         "seed1": "Ganador C1",
         "seed2": "Ganador C2",
-        "team1": "Ganador C1",
+        "team1": "Firmat FBC",
         "team2": "Ganador C2",
         "score1": null,
         "score2": null,
@@ -5216,8 +5224,8 @@
         "title": "Semifinal 2",
         "seed1": "Ganador C3",
         "seed2": "Ganador C4",
-        "team1": "Ganador C3",
-        "team2": "Ganador C4",
+        "team1": "C.A. Argentino",
+        "team2": "Los Andes",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -5247,7 +5255,7 @@
         "pos": 1,
         "name": "Villan Lucas",
         "category": "Fútbol Mayor",
-        "goals": 8
+        "goals": 9
       },
       {
         "id": "g-1789352582859",
@@ -14502,7 +14510,7 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "1ero A",
-        "seed2": ""
+        "seed2": "Ganador Octavos 1"
       },
       {
         "id": "c2",
@@ -14517,7 +14525,7 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "2do b",
-        "seed2": ""
+        "seed2": "Ganador Octavos 2"
       },
       {
         "id": "c3",
@@ -14532,7 +14540,7 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "2do a",
-        "seed2": ""
+        "seed2": "Ganador Octavos 3"
       },
       {
         "id": "c4",
@@ -14547,7 +14555,7 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "1ero B",
-        "seed2": ""
+        "seed2": "Ganador Octavos 4"
       },
       {
         "id": "s1",
@@ -14560,7 +14568,9 @@
         "status": "programado",
         "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador C1",
+        "seed2": "Ganador C2"
       },
       {
         "id": "s2",
@@ -14573,7 +14583,9 @@
         "status": "programado",
         "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador C3",
+        "seed2": "Ganador C4"
       },
       {
         "id": "f1",
@@ -14586,7 +14598,9 @@
         "status": "programado",
         "dateInfo": "",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Semi 1",
+        "seed2": "Ganador Semi 2"
       }
     ],
     "goleadores": [
@@ -14647,7 +14661,8 @@
         "goals": 1
       }
     ],
-    "deporte": "futbol"
+    "deporte": "futbol",
+    "playoffModality": "8vos"
   },
   "futbol_tercera_apertura": {
     "year": "2026",
@@ -14875,8 +14890,30 @@
         "name": "Zona A",
         "teams": [
           {
-            "id": "ca-argentino",
+            "id": "hughes-fbc",
             "pos": 1,
+            "name": "Hughes FBC",
+            "logoUrl": "/teams/Hughes.png",
+            "pj": 5,
+            "pg": 2,
+            "pe": 3,
+            "pp": 0,
+            "gf": 8,
+            "gc": 2,
+            "dif": 6,
+            "pts": 9,
+            "form": [
+              "W",
+              "D",
+              "W",
+              "D",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "ca-argentino",
+            "pos": 2,
             "name": "C.A. Argentino",
             "logoUrl": "/teams/Argentino de Firmat.png",
             "pj": 5,
@@ -14898,41 +14935,21 @@
           },
           {
             "id": "firmat-fbc-blanco",
-            "pos": 2,
+            "pos": 3,
             "name": "Firmat FBC (Blanco)",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 3,
+            "pj": 4,
             "pg": 2,
             "pe": 1,
-            "pp": 0,
+            "pp": 1,
             "gf": 7,
-            "gc": 1,
-            "dif": 6,
+            "gc": 3,
+            "dif": 4,
             "pts": 7,
             "form": [
               "W",
+              "L",
               "W",
-              "D"
-            ],
-            "qualified": true
-          },
-          {
-            "id": "hughes-fbc",
-            "pos": 3,
-            "name": "Hughes FBC",
-            "logoUrl": "/teams/Hughes.png",
-            "pj": 4,
-            "pg": 1,
-            "pe": 3,
-            "pp": 0,
-            "gf": 6,
-            "gc": 2,
-            "dif": 4,
-            "pts": 6,
-            "form": [
-              "D",
-              "W",
-              "D",
               "D"
             ],
             "qualified": true
@@ -15013,8 +15030,8 @@
             "homeTeamName": "Firmat FBC (Blanco)",
             "awayTeamId": "hughes-fbc",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "inf-za-f2-2",
@@ -15115,7 +15132,8 @@
             "homeGoals": 1,
             "awayGoals": 1
           }
-        ]
+        ],
+        "qualificationQuota": 4
       },
       {
         "id": "zona-b",
@@ -15126,14 +15144,14 @@
             "pos": 1,
             "name": "Los Andes",
             "logoUrl": "/teams/Los Andes.png",
-            "pj": 5,
-            "pg": 4,
+            "pj": 6,
+            "pg": 5,
             "pe": 1,
             "pp": 0,
-            "gf": 14,
-            "gc": 7,
-            "dif": 7,
-            "pts": 13,
+            "gf": 18,
+            "gc": 10,
+            "dif": 8,
+            "pts": 16,
             "form": [
               "W",
               "W",
@@ -15144,8 +15162,30 @@
             "qualified": true
           },
           {
-            "id": "sp-bombal",
+            "id": "independiente-fc",
             "pos": 2,
+            "name": "Independiente FC",
+            "logoUrl": "/teams/ifc.png",
+            "pj": 6,
+            "pg": 3,
+            "pe": 1,
+            "pp": 2,
+            "gf": 10,
+            "gc": 5,
+            "dif": 5,
+            "pts": 10,
+            "form": [
+              "L",
+              "W",
+              "W",
+              "L",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "sp-bombal",
+            "pos": 3,
             "name": "Sp. Bombal",
             "logoUrl": "/teams/Sportivo Bombal.png",
             "pj": 6,
@@ -15166,39 +15206,17 @@
             "qualified": true
           },
           {
-            "id": "independiente-fc",
-            "pos": 3,
-            "name": "Independiente FC",
-            "logoUrl": "/teams/ifc.png",
-            "pj": 5,
-            "pg": 2,
-            "pe": 1,
-            "pp": 2,
-            "gf": 7,
-            "gc": 5,
-            "dif": 2,
-            "pts": 7,
-            "form": [
-              "L",
-              "W",
-              "W",
-              "L",
-              "D"
-            ],
-            "qualified": true
-          },
-          {
             "id": "sporting-cs",
             "pos": 4,
             "name": "Sporting CS",
             "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 2,
             "pe": 0,
-            "pp": 3,
+            "pp": 4,
             "gf": 7,
-            "gc": 10,
-            "dif": -3,
+            "gc": 13,
+            "dif": -6,
             "pts": 6,
             "form": [
               "L",
@@ -15214,13 +15232,13 @@
             "pos": 5,
             "name": "Carreras AC",
             "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 1,
             "pe": 2,
-            "pp": 2,
-            "gf": 2,
-            "gc": 4,
-            "dif": -2,
+            "pp": 3,
+            "gf": 5,
+            "gc": 8,
+            "dif": -3,
             "pts": 5,
             "form": [
               "D",
@@ -15229,7 +15247,7 @@
               "W",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "blanco-y-negro",
@@ -15252,7 +15270,7 @@
               "W",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           }
         ],
         "fixtures": [
@@ -15275,8 +15293,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "sporting-cs",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "inf-zb-f1-3",
@@ -15286,8 +15304,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 4
           },
           {
             "id": "inf-zb-f2-1",
@@ -15454,7 +15472,8 @@
             "homeGoals": 0,
             "awayGoals": 0
           }
-        ]
+        ],
+        "qualificationQuota": 4
       },
       {
         "id": "zona-c",
@@ -15568,7 +15587,7 @@
               "L",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "b-rivadavia",
@@ -15590,7 +15609,7 @@
               "L",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           }
         ],
         "fixtures": [
@@ -15797,116 +15816,192 @@
     ],
     "playoffs": [
       {
-        "id": "8vos-5-1789767482089",
+        "id": "8vos-1-1794353046576",
         "round": "8vos",
-        "title": "Octavos 1",
+        "title": "Octavos 1 (1°A vs 8°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Eduardo Hertz",
+        "team2": "Bernardino Rivadavia",
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
-        "id": "8vos-6-1789767482089",
+        "id": "8vos-2-1794353046576",
         "round": "8vos",
-        "title": "Octavos 2",
+        "title": "Octavos 2 (2°A vs 7°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Olimpia",
+        "team2": "San Martín",
+        "score1": 7,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
-        "id": "8vos-7-1789767482089",
+        "id": "8vos-3-1794353046576",
         "round": "8vos",
-        "title": "Octavos 3",
+        "title": "Octavos 3 (3°A vs 6°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Los Andes",
+        "team2": "Blanco y Negro",
+        "score1": 0,
+        "score2": 3,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 2
       },
       {
-        "id": "8vos-8-1789767482089",
+        "id": "8vos-4-1794353046576",
         "round": "8vos",
-        "title": "Octavos 4",
+        "title": "Octavos 4 (4°A vs 5°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Hughes FBC",
+        "team2": "Carreras AC",
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "8vos-5-1794353046576",
+        "round": "8vos",
+        "title": "Octavos 5 (5°A vs 4°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Firmat FBC",
+        "team2": "Atlético Paz",
+        "score1": 5,
+        "score2": 1,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "8vos-6-1794353046576",
+        "round": "8vos",
+        "title": "Octavos 6 (6°A vs 3°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Independiente FC",
+        "team2": "Sporting CS",
+        "score1": 1,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "8vos-7-1794353046576",
+        "round": "8vos",
+        "title": "Octavos 7 (7°A vs 2°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "C.A. Argentino",
+        "team2": "Ítalo Argentino",
+        "score1": 2,
+        "score2": 2,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": 5,
+        "penalties2": 4,
+        "winner": 1
+      },
+      {
+        "id": "8vos-8-1794353046576",
+        "round": "8vos",
+        "title": "Octavos 8 (8°A vs 1°B)",
+        "seed1": "8ero A",
+        "seed2": "1to B",
+        "team1": "Atl. Acebal",
+        "team2": "Sportivo Bombal",
+        "score1": 1,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "cuartos-1",
         "round": "cuartos",
         "title": "Cuartos 1",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 1",
+        "team1": "Eduardo Hertz",
+        "team2": "Eduardo Hertz",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 1"
       },
       {
         "id": "cuartos-2",
         "round": "cuartos",
         "title": "Cuartos 2",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 2",
+        "team1": "Olimpia",
+        "team2": "Olimpia",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 2"
       },
       {
         "id": "cuartos-3",
         "round": "cuartos",
         "title": "Cuartos 3",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 3",
+        "team1": "Hughes FBC",
+        "team2": "Blanco y Negro",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 3"
       },
       {
         "id": "cuartos-4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 4",
+        "team1": "Firmat FBC",
+        "team2": "Hughes FBC",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 4"
       },
       {
         "id": "semi-1",
@@ -15919,7 +16014,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Cuartos 1",
+        "seed2": "Ganador Cuartos 2"
       },
       {
         "id": "semi-2",
@@ -15932,7 +16029,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Cuartos 3",
+        "seed2": "Ganador Cuartos 4"
       },
       {
         "id": "final-1",
@@ -15945,7 +16044,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Semifinal 1",
+        "seed2": "Ganador Semifinal 2"
       }
     ],
     "playoffModality": "cuartos",
@@ -16010,18 +16111,19 @@
             "pos": 2,
             "name": "Firmat FBC (Blanco)",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 4,
+            "pj": 6,
             "pg": 3,
-            "pe": 1,
+            "pe": 3,
             "pp": 0,
-            "gf": 10,
-            "gc": 3,
+            "gf": 11,
+            "gc": 4,
             "dif": 7,
-            "pts": 10,
+            "pts": 12,
             "form": [
               "D",
               "W",
               "W",
+              "D",
               "W"
             ],
             "qualified": true
@@ -16053,16 +16155,16 @@
             "pos": 4,
             "name": "Hughes FBC",
             "logoUrl": "/teams/Hughes.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 2,
-            "pe": 0,
+            "pe": 1,
             "pp": 3,
             "gf": 6,
             "gc": 9,
             "dif": -3,
-            "pts": 6,
+            "pts": 7,
             "form": [
-              "W",
+              "D",
               "L",
               "L",
               "L",
@@ -16075,40 +16177,41 @@
             "pos": 5,
             "name": "Nuevo Alberdi",
             "logoUrl": "/teams/Nuevo Alberdi.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 1,
-            "pe": 0,
+            "pe": 1,
             "pp": 4,
-            "gf": 6,
-            "gc": 9,
+            "gf": 7,
+            "gc": 10,
             "dif": -3,
-            "pts": 3,
+            "pts": 4,
             "form": [
-              "L",
+              "D",
               "L",
               "W",
               "L",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "firmat-fbc-rojo",
             "pos": 6,
             "name": "Firmat FBC (Rojo)",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 4,
+            "pj": 6,
             "pg": 0,
-            "pe": 0,
+            "pe": 2,
             "pp": 4,
-            "gf": 2,
-            "gc": 17,
+            "gf": 4,
+            "gc": 19,
             "dif": -15,
-            "pts": 0,
+            "pts": 2,
             "form": [
+              "D",
               "L",
               "L",
-              "L",
+              "D",
               "L"
             ],
             "qualified": false
@@ -16156,8 +16259,8 @@
             "homeTeamName": "Firmat FBC (Blanco)",
             "awayTeamId": "hughes-fbc",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "inf-za-f2-2",
@@ -16178,8 +16281,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "firmat-fbc-rojo",
             "awayTeamName": "Firmat FBC (Rojo)",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "inf-za-f3-1",
@@ -16266,8 +16369,8 @@
             "homeTeamName": "Firmat FBC (Blanco)",
             "awayTeamId": "firmat-fbc-rojo",
             "awayTeamName": "Firmat FBC (Rojo)",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 1,
+            "awayGoals": 1
           },
           {
             "id": "inf-za-f5-3",
@@ -16313,7 +16416,8 @@
             "homeGoals": 1,
             "awayGoals": 6
           }
-        ]
+        ],
+        "qualificationQuota": 4
       },
       {
         "id": "zona-b",
@@ -16347,14 +16451,14 @@
             "pos": 2,
             "name": "Carreras AC",
             "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
-            "pg": 2,
+            "pj": 6,
+            "pg": 3,
             "pe": 1,
             "pp": 2,
-            "gf": 21,
+            "gf": 30,
             "gc": 13,
-            "dif": 8,
-            "pts": 7,
+            "dif": 17,
+            "pts": 10,
             "form": [
               "L",
               "W",
@@ -16391,14 +16495,14 @@
             "pos": 4,
             "name": "Sporting CS",
             "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 2,
-            "pe": 0,
+            "pe": 1,
             "pp": 3,
             "gf": 10,
             "gc": 15,
             "dif": -5,
-            "pts": 6,
+            "pts": 7,
             "form": [
               "W",
               "L",
@@ -16413,14 +16517,14 @@
             "pos": 5,
             "name": "Independiente FC",
             "logoUrl": "/teams/ifc.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 1,
-            "pe": 2,
+            "pe": 3,
             "pp": 2,
             "gf": 8,
             "gc": 9,
             "dif": -1,
-            "pts": 5,
+            "pts": 6,
             "form": [
               "D",
               "W",
@@ -16428,20 +16532,20 @@
               "L",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "los-andes",
             "pos": 6,
             "name": "Los Andes",
             "logoUrl": "/teams/Los Andes.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 0,
             "pe": 2,
-            "pp": 3,
+            "pp": 4,
             "gf": 7,
-            "gc": 12,
-            "dif": -5,
+            "gc": 21,
+            "dif": -14,
             "pts": 2,
             "form": [
               "D",
@@ -16473,8 +16577,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "sporting-cs",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 0
           },
           {
             "id": "inf-zb-f1-3",
@@ -16484,8 +16588,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 9,
+            "awayGoals": 0
           },
           {
             "id": "inf-zb-f2-1",
@@ -16652,7 +16756,8 @@
             "homeGoals": 1,
             "awayGoals": 0
           }
-        ]
+        ],
+        "qualificationQuota": 4
       },
       {
         "id": "zona-c",
@@ -16766,7 +16871,7 @@
               "D",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "b-rivadavia",
@@ -16788,7 +16893,7 @@
               "L",
               "D"
             ],
-            "qualified": false
+            "qualified": true
           }
         ],
         "fixtures": [
@@ -16994,116 +17099,192 @@
     ],
     "playoffs": [
       {
-        "id": "8vos-1-1789768815838",
+        "id": "8vos-1-1794353235928",
         "round": "8vos",
-        "title": "Octavos 1",
+        "title": "Octavos 1 (1°A vs 8°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Blanco y Negro",
+        "team2": "Nuevo Alberdi",
+        "score1": 2,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
-        "id": "8vos-2-1789768815838",
+        "id": "8vos-2-1794353235928",
         "round": "8vos",
-        "title": "Octavos 2 ",
+        "title": "Octavos 2 (2°A vs 7°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "C.A. Argentino",
+        "team2": "Bernardino Rivadavia",
+        "score1": 3,
+        "score2": 0,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
-        "id": "8vos-3-1789768815838",
+        "id": "8vos-3-1794353235928",
         "round": "8vos",
-        "title": "Octavos 3 ",
+        "title": "Octavos 3 (3°A vs 6°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Olimpia",
+        "team2": "San Martín",
+        "score1": 4,
+        "score2": 1,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 1
       },
       {
-        "id": "8vos-4-1789768815838",
+        "id": "8vos-4-1794353235928",
         "round": "8vos",
-        "title": "Octavos 4 ",
+        "title": "Octavos 4 (4°A vs 5°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
-        "score1": null,
-        "score2": null,
+        "team1": "Firmat FBC (Blanco)",
+        "team2": "Atl. Acebal",
+        "score1": 1,
+        "score2": 2,
         "status": "programado",
-        "dateInfo": "A disputarse",
+        "dateInfo": "Finalizado",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "winner": 2
+      },
+      {
+        "id": "8vos-5-1794353235928",
+        "round": "8vos",
+        "title": "Octavos 5 (5°A vs 4°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Eduardo Hertz",
+        "team2": "Independiente FC",
+        "score1": 0,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": 4,
+        "penalties2": 5,
+        "winner": 2
+      },
+      {
+        "id": "8vos-6-1794353235928",
+        "round": "8vos",
+        "title": "Octavos 6 (6°A vs 3°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Carreras AC",
+        "team2": "Sporting CS",
+        "score1": 2,
+        "score2": 1,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "8vos-7-1794353235928",
+        "round": "8vos",
+        "title": "Octavos 7 (7°A vs 2°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Ítalo Argentino",
+        "team2": "Sp. Bombal",
+        "score1": 0,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": 5,
+        "penalties2": 4,
+        "winner": 1
+      },
+      {
+        "id": "8vos-8-1794353235928",
+        "round": "8vos",
+        "title": "Octavos 8 (8°A vs 1°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Atlético Paz",
+        "team2": "Hughes FBC",
+        "score1": 3,
+        "score2": 2,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
       },
       {
         "id": "cuartos-1",
         "round": "cuartos",
         "title": "Cuartos 1",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 1",
+        "team1": "Blanco y Negro",
+        "team2": "Blanco y Negro",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 1"
       },
       {
         "id": "cuartos-2",
         "round": "cuartos",
         "title": "Cuartos 2",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 2",
+        "team1": "C.A. Argentino",
+        "team2": "C.A. Argentino",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 2"
       },
       {
         "id": "cuartos-3",
         "round": "cuartos",
         "title": "Cuartos 3",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 3",
+        "team1": "Olimpia",
+        "team2": "Olimpia",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 3"
       },
       {
         "id": "cuartos-4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "A definir",
-        "team2": "Ganador Octavos 4",
+        "team1": "Carreras",
+        "team2": "Atl. Acebal",
         "score1": null,
         "score2": null,
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "",
+        "seed2": "Ganador Octavos 4"
       },
       {
         "id": "semi-1",
@@ -17116,7 +17297,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Cuartos 1",
+        "seed2": "Ganador Cuartos 2"
       },
       {
         "id": "semi-2",
@@ -17129,7 +17312,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Cuartos 3",
+        "seed2": "Ganador Cuartos 4"
       },
       {
         "id": "final-1",
@@ -17142,7 +17327,9 @@
         "status": "programado",
         "dateInfo": "A confirmar",
         "penalties1": null,
-        "penalties2": null
+        "penalties2": null,
+        "seed1": "Ganador Semifinal 1",
+        "seed2": "Ganador Semifinal 2"
       }
     ],
     "playoffModality": "cuartos",
@@ -17209,24 +17396,24 @@
         "name": "Zona A",
         "teams": [
           {
-            "id": "hughes-fbc",
+            "id": "firmat-fbc-rojo",
             "pos": 1,
-            "name": "Hughes FBC",
-            "logoUrl": "/teams/Hughes.png",
-            "pj": 5,
-            "pg": 3,
-            "pe": 1,
+            "name": "Firmat FBC (Rojo)",
+            "logoUrl": "/teams/Firmat FBC.png",
+            "pj": 6,
+            "pg": 5,
+            "pe": 0,
             "pp": 1,
-            "gf": 11,
-            "gc": 5,
-            "dif": 6,
-            "pts": 10,
+            "gf": 10,
+            "gc": 1,
+            "dif": 9,
+            "pts": 15,
             "form": [
-              "L",
-              "D",
               "W",
               "W",
-              "W"
+              "W",
+              "W",
+              "L"
             ],
             "qualified": true
           },
@@ -17253,8 +17440,30 @@
             "qualified": true
           },
           {
-            "id": "ca-argentino",
+            "id": "hughes-fbc",
             "pos": 3,
+            "name": "Hughes FBC",
+            "logoUrl": "/teams/Hughes.png",
+            "pj": 6,
+            "pg": 3,
+            "pe": 1,
+            "pp": 2,
+            "gf": 11,
+            "gc": 7,
+            "dif": 4,
+            "pts": 10,
+            "form": [
+              "L",
+              "D",
+              "W",
+              "W",
+              "W"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "ca-argentino",
+            "pos": 4,
             "name": "C.A. Argentino",
             "logoUrl": "/teams/Argentino de Firmat.png",
             "pj": 6,
@@ -17275,62 +17484,42 @@
             "qualified": true
           },
           {
-            "id": "firmat-fbc-rojo",
-            "pos": 4,
-            "name": "Firmat FBC (Rojo)",
-            "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 4,
-            "pg": 3,
-            "pe": 0,
-            "pp": 1,
-            "gf": 4,
-            "gc": 1,
-            "dif": 3,
-            "pts": 9,
-            "form": [
-              "W",
-              "W",
-              "W",
-              "L"
-            ],
-            "qualified": true
-          },
-          {
             "id": "nuevo-alberdi",
             "pos": 5,
             "name": "Nuevo Alberdi",
             "logoUrl": "/teams/Nuevo Alberdi.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 1,
             "pe": 1,
-            "pp": 3,
+            "pp": 4,
             "gf": 9,
-            "gc": 12,
-            "dif": -3,
+            "gc": 14,
+            "dif": -5,
             "pts": 4,
             "form": [
-              "D",
+              "L",
               "L",
               "L",
               "L",
               "W"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "firmat-fbc-blanco",
             "pos": 6,
             "name": "Firmat FBC (Blanco)",
             "logoUrl": "/teams/Firmat FBC.png",
-            "pj": 4,
-            "pg": 0,
+            "pj": 6,
+            "pg": 1,
             "pe": 0,
-            "pp": 4,
-            "gf": 3,
-            "gc": 14,
-            "dif": -11,
-            "pts": 0,
+            "pp": 5,
+            "gf": 5,
+            "gc": 18,
+            "dif": -13,
+            "pts": 3,
             "form": [
+              "W",
               "L",
               "L",
               "L",
@@ -17381,8 +17570,8 @@
             "homeTeamName": "Firmat FBC (Blanco)",
             "awayTeamId": "hughes-fbc",
             "awayTeamName": "Hughes FBC",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 2,
+            "awayGoals": 0
           },
           {
             "id": "inf-za-f2-2",
@@ -17403,8 +17592,8 @@
             "homeTeamName": "Nuevo Alberdi",
             "awayTeamId": "firmat-fbc-rojo",
             "awayTeamName": "Firmat FBC (Rojo)",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 2
           },
           {
             "id": "inf-za-f3-1",
@@ -17491,8 +17680,8 @@
             "homeTeamName": "Firmat FBC (Blanco)",
             "awayTeamId": "firmat-fbc-rojo",
             "awayTeamName": "Firmat FBC (Rojo)",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 4
           },
           {
             "id": "inf-za-f5-3",
@@ -17538,7 +17727,8 @@
             "homeGoals": 0,
             "awayGoals": 1
           }
-        ]
+        ],
+        "qualificationQuota": 1
       },
       {
         "id": "zona-b",
@@ -17594,13 +17784,13 @@
             "pos": 3,
             "name": "Independiente FC",
             "logoUrl": "/teams/ifc.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 2,
             "pe": 1,
-            "pp": 2,
+            "pp": 3,
             "gf": 8,
-            "gc": 6,
-            "dif": 2,
+            "gc": 7,
+            "dif": 1,
             "pts": 7,
             "form": [
               "L",
@@ -17612,17 +17802,61 @@
             "qualified": true
           },
           {
-            "id": "los-andes",
+            "id": "sporting-cs",
             "pos": 4,
+            "name": "Sporting CS",
+            "logoUrl": "/teams/Sporting de Bigan.png",
+            "pj": 6,
+            "pg": 1,
+            "pe": 4,
+            "pp": 1,
+            "gf": 6,
+            "gc": 8,
+            "dif": -2,
+            "pts": 7,
+            "form": [
+              "L",
+              "D",
+              "D",
+              "D",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "carreras-ac",
+            "pos": 5,
+            "name": "Carreras AC",
+            "logoUrl": "/teams/Carreras.png",
+            "pj": 6,
+            "pg": 2,
+            "pe": 1,
+            "pp": 3,
+            "gf": 8,
+            "gc": 15,
+            "dif": -7,
+            "pts": 7,
+            "form": [
+              "L",
+              "L",
+              "L",
+              "W",
+              "D"
+            ],
+            "qualified": true
+          },
+          {
+            "id": "los-andes",
+            "pos": 6,
             "name": "Los Andes",
             "logoUrl": "/teams/Los Andes.png",
-            "pj": 5,
+            "pj": 6,
             "pg": 1,
             "pe": 2,
-            "pp": 2,
+            "pp": 3,
             "gf": 5,
-            "gc": 9,
-            "dif": -4,
+            "gc": 12,
+            "dif": -7,
             "pts": 5,
             "form": [
               "W",
@@ -17632,50 +17866,6 @@
               "L"
             ],
             "qualified": true
-          },
-          {
-            "id": "sporting-cs",
-            "pos": 5,
-            "name": "Sporting CS",
-            "logoUrl": "/teams/Sporting de Bigan.png",
-            "pj": 5,
-            "pg": 0,
-            "pe": 4,
-            "pp": 1,
-            "gf": 5,
-            "gc": 8,
-            "dif": -3,
-            "pts": 4,
-            "form": [
-              "L",
-              "D",
-              "D",
-              "D",
-              "D"
-            ],
-            "qualified": false
-          },
-          {
-            "id": "carreras-ac",
-            "pos": 6,
-            "name": "Carreras AC",
-            "logoUrl": "/teams/Carreras.png",
-            "pj": 5,
-            "pg": 1,
-            "pe": 1,
-            "pp": 3,
-            "gf": 5,
-            "gc": 15,
-            "dif": -10,
-            "pts": 4,
-            "form": [
-              "L",
-              "L",
-              "L",
-              "W",
-              "D"
-            ],
-            "qualified": false
           }
         ],
         "fixtures": [
@@ -17698,8 +17888,8 @@
             "homeTeamName": "Independiente FC",
             "awayTeamId": "sporting-cs",
             "awayTeamName": "Sporting CS",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 0,
+            "awayGoals": 1
           },
           {
             "id": "inf-zb-f1-3",
@@ -17709,8 +17899,8 @@
             "homeTeamName": "Carreras AC",
             "awayTeamId": "los-andes",
             "awayTeamName": "Los Andes",
-            "homeGoals": null,
-            "awayGoals": null
+            "homeGoals": 3,
+            "awayGoals": 0
           },
           {
             "id": "inf-zb-f2-1",
@@ -17877,7 +18067,8 @@
             "homeGoals": 1,
             "awayGoals": 0
           }
-        ]
+        ],
+        "qualificationQuota": 1
       },
       {
         "id": "zona-c",
@@ -17991,7 +18182,7 @@
               "D",
               "L"
             ],
-            "qualified": false
+            "qualified": true
           },
           {
             "id": "eduardo-hertz",
@@ -18220,13 +18411,141 @@
     ],
     "playoffs": [
       {
-        "id": "8vos-1-1791909634495",
+        "id": "o1",
         "round": "8vos",
-        "title": "Octavos 1 (1°A vs 8°B)",
+        "title": "8vos 1 (1°A vs 8°B)",
         "seed1": "",
         "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
+        "team1": "Atl. Acebal",
+        "team2": "Atlético Paz",
+        "score1": 6,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado ",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o2",
+        "round": "8vos",
+        "title": "8vos 2 (4°A vs 5°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Sp. Bombal",
+        "team2": "Nuevo Alberdi",
+        "score1": 3,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o3",
+        "round": "8vos",
+        "title": "8vos 3 (2°A vs 7°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Firmat FBC (Rojo)",
+        "team2": "Los Andes",
+        "score1": 0,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": 5,
+        "penalties2": 4,
+        "winner": 1
+      },
+      {
+        "id": "o4",
+        "round": "8vos",
+        "title": "8vos 4 (3°A vs 6°B)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Hughes FBC",
+        "team2": "Carreras AC",
+        "score1": 5,
+        "score2": 1,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o5",
+        "round": "8vos",
+        "title": "8vos 5 (1°B vs 8°A)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "San Martín",
+        "team2": "Bernardino Rivadavia",
+        "score1": 1,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o6",
+        "round": "8vos",
+        "title": "8vos 6 (4°B vs 5°A)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Ítalo Argentino",
+        "team2": "Sporting CS",
+        "score1": 3,
+        "score2": 1,
+        "status": "programado",
+        "dateInfo": "Finalizado ",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o7",
+        "round": "8vos",
+        "title": "8vos 7 (2°B vs 7°A)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "Olimpia",
+        "team2": "Independiente FC",
+        "score1": 2,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": null,
+        "penalties2": null,
+        "winner": 1
+      },
+      {
+        "id": "o8",
+        "round": "8vos",
+        "title": "8vos 8 (3°B vs 6°A)",
+        "seed1": "",
+        "seed2": "",
+        "team1": "C.A. Argentino",
+        "team2": "Blanco y Negro",
+        "score1": 0,
+        "score2": 0,
+        "status": "programado",
+        "dateInfo": "Finalizado",
+        "penalties1": 5,
+        "penalties2": 4,
+        "winner": 1
+      },
+      {
+        "id": "c1",
+        "round": "cuartos",
+        "title": "Cuartos 1 (Ganador 8vos 1 vs 2)",
+        "seed1": "Ganador 8vos 1",
+        "seed2": "Ganador 8vos 2",
+        "team1": "Atl. Acebal",
+        "team2": "Atl. Acebal",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -18235,13 +18554,13 @@
         "penalties2": null
       },
       {
-        "id": "8vos-2-1791909634495",
-        "round": "8vos",
-        "title": "Octavos 2 (2°A vs 7°B)",
-        "seed1": "",
-        "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
+        "id": "c2",
+        "round": "cuartos",
+        "title": "Cuartos 2 (Ganador 8vos 3 vs 4)",
+        "seed1": "Ganador 8vos 3",
+        "seed2": "Ganador 8vos 4",
+        "team1": "Sp. Bombal",
+        "team2": "Sp. Bombal",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -18250,13 +18569,13 @@
         "penalties2": null
       },
       {
-        "id": "8vos-3-1791909634495",
-        "round": "8vos",
-        "title": "Octavos 3 (3°A vs 6°B)",
-        "seed1": "",
-        "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
+        "id": "c3",
+        "round": "cuartos",
+        "title": "Cuartos 3 (Ganador 8vos 5 vs 6)",
+        "seed1": "Ganador 8vos 5",
+        "seed2": "Ganador 8vos 6",
+        "team1": "Firmat FBC (Rojo)",
+        "team2": "Firmat FBC (Rojo)",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -18265,13 +18584,13 @@
         "penalties2": null
       },
       {
-        "id": "8vos-4-1791909634495",
-        "round": "8vos",
-        "title": "Octavos 4 (4°A vs 5°B)",
-        "seed1": "",
-        "seed2": "",
-        "team1": "A definir",
-        "team2": "A definir",
+        "id": "c4",
+        "round": "cuartos",
+        "title": "Cuartos 4 (Ganador 8vos 7 vs 8)",
+        "seed1": "Ganador 8vos 7",
+        "seed2": "Ganador 8vos 8",
+        "team1": "Hughes FBC",
+        "team2": "Hughes FBC",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -18280,98 +18599,52 @@
         "penalties2": null
       },
       {
-        "id": "cuartos-1",
-        "round": "cuartos",
-        "title": "Cuartos 1",
-        "team1": "1° Zona A",
-        "team2": "Ganador Octavos 1",
-        "score1": null,
-        "score2": null,
-        "status": "programado",
-        "dateInfo": "A confirmar",
-        "penalties1": null,
-        "penalties2": null
-      },
-      {
-        "id": "cuartos-2",
-        "round": "cuartos",
-        "title": "Cuartos 2",
-        "team1": "1° Zona B",
-        "team2": "Ganador Octavos 2",
-        "score1": null,
-        "score2": null,
-        "status": "programado",
-        "dateInfo": "A confirmar",
-        "penalties1": null,
-        "penalties2": null
-      },
-      {
-        "id": "cuartos-3",
-        "round": "cuartos",
-        "title": "Cuartos 3",
-        "team1": "1° Zona C",
-        "team2": "Ganador Octavos 3",
-        "score1": null,
-        "score2": null,
-        "status": "programado",
-        "dateInfo": "A confirmar",
-        "penalties1": null,
-        "penalties2": null
-      },
-      {
-        "id": "cuartos-4",
-        "round": "cuartos",
-        "title": "Cuartos 4",
-        "team1": "Mejor 2° ",
-        "team2": "Ganador Octavos 4",
-        "score1": null,
-        "score2": null,
-        "status": "programado",
-        "dateInfo": "A confirmar",
-        "penalties1": null,
-        "penalties2": null
-      },
-      {
-        "id": "semi-1",
+        "id": "s1",
         "round": "semifinal",
-        "title": "Semifinal 1",
-        "team1": "Ganador Cuartos 1",
-        "team2": "Ganador Cuartos 2",
+        "title": "Semifinal 1 (Ganador C1 vs C2)",
+        "seed1": "Ganador C1",
+        "seed2": "Ganador C2",
+        "team1": "Ganador C1",
+        "team2": "Ganador C2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar",
+        "dateInfo": "A disputarse",
         "penalties1": null,
         "penalties2": null
       },
       {
-        "id": "semi-2",
+        "id": "s2",
         "round": "semifinal",
-        "title": "Semifinal 2",
-        "team1": "Ganador Cuartos 3",
-        "team2": "Ganador Cuartos 4",
+        "title": "Semifinal 2 (Ganador C3 vs C4)",
+        "seed1": "Ganador C3",
+        "seed2": "Ganador C4",
+        "team1": "Ganador C3",
+        "team2": "Ganador C4",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar",
+        "dateInfo": "A disputarse",
         "penalties1": null,
         "penalties2": null
       },
       {
-        "id": "final-1",
+        "id": "f1",
         "round": "final",
-        "title": "Gran Final",
-        "team1": "Ganador Semifinal 1",
-        "team2": "Ganador Semifinal 2",
+        "title": "Gran Final del Torneo",
+        "seed1": "Ganador Semi 1",
+        "seed2": "Ganador Semi 2",
+        "team1": "Ganador Semi 1",
+        "team2": "Ganador Semi 2",
         "score1": null,
         "score2": null,
         "status": "programado",
-        "dateInfo": "A confirmar",
+        "dateInfo": "A disputarse",
         "penalties1": null,
         "penalties2": null
       }
     ],
-    "playoffModality": "cuartos",
+    "playoffModality": "8vos",
     "goleadores": []
   },
   "futbol_senior_clausura": {

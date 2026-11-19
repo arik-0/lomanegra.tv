@@ -300,6 +300,24 @@ ensureGlobalStore().catch((err) => {
   console.error('[StandingsPersistence] Error en inicialización temprana:', err);
 });
 
+async function loadSingleFromSupabase(key: string): Promise<TournamentStandings | null> {
+  try {
+    const id = keyToUUID(key);
+    const { data, error } = await supabaseAdmin
+      .from('matches')
+      .select('id, title, description')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (!error && data?.description) {
+      return sanitizeStandings(JSON.parse(data.description), key);
+    }
+  } catch (err) {
+    console.error('[StandingsPersistence] Error leyendo fila individual en Supabase:', key, err);
+  }
+  return null;
+}
+
 export async function getStandings(
   query?:
     | string
@@ -320,6 +338,22 @@ export async function getStandings(
   }
 
   const key = normalizeTournamentKey(deporte, categoria, torneo);
+
+  // Priorizar lectura directa de la fila individual del torneo en Supabase
+  // para garantizar aislamiento absoluto entre categorías y torneos en contenedores serverless
+  const directRow = await loadSingleFromSupabase(key);
+  if (directRow) {
+    const synced = syncPlayoffMatches({
+      ...directRow,
+      deporte: (deporte as DeporteType) || directRow.deporte || 'futbol',
+      categoria: (categoria as CategoriaType) || directRow.categoria || 'mayor',
+      torneo: (torneo as TorneoType) || directRow.torneo || 'apertura',
+    });
+    store[key] = synced;
+    if (key === 'futbol_mayor_apertura') store['apertura'] = synced;
+    if (key === 'futbol_mayor_clausura') store['clausura'] = synced;
+    return synced;
+  }
 
   if (store[key]) {
     const synced = syncPlayoffMatches(store[key]);

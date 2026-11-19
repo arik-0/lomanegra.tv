@@ -85,27 +85,37 @@ export default function PosicionesPage() {
   }, [mainTab, promiedosData]);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadStandings() {
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/admin/standings?deporte=${selectedDeporte}&categoria=${selectedCategoria}&torneo=${selectedTorneo}`
+          `/api/admin/standings?deporte=${selectedDeporte}&categoria=${selectedCategoria}&torneo=${selectedTorneo}`,
+          { cache: 'no-store' }
         );
+        if (cancelled) return;
         if (res.ok) {
           const data = await res.json();
-          if (data.standings) {
+          if (!cancelled && data.standings) {
             setStandings(data.standings);
           }
         }
       } catch (err) {
-        console.error('Error cargando tablas:', err);
+        if (!cancelled) {
+          console.error('Error cargando tablas:', err);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
     loadStandings();
     // Resetear filtro de goleadores al cambiar deporte o categoría
     setSelectedGoleadorCategory('Todas');
+    return () => {
+      cancelled = true;
+    };
   }, [selectedDeporte, selectedCategoria, selectedTorneo]);
 
   const categoryLabels: Record<string, string> = {

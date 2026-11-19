@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -130,10 +130,15 @@ export default function AdminPage() {
   // ==========================================
   const [adminDeporte, setAdminDeporte] = useState<DeporteType>('futbol');
   const [adminCategoria, setAdminCategoria] = useState<CategoriaType>('mayor');
-  const [adminTorneo, setAdminTorneo] = useState<'apertura' | 'clausura'>('apertura');
+  const [adminTorneo, setAdminTorneo] = useState<'apertura' | 'clausura'>(() => {
+    const month = new Date().getMonth() + 1;
+    return month >= 8 || month <= 1 ? 'clausura' : 'apertura';
+  });
   const [standings, setStandings] = useState<TournamentStandings>(defaultStandings);
   const [standingsLoading, setStandingsLoading] = useState(false);
   const [standingsSavedMsg, setStandingsSavedMsg] = useState(false);
+  const [loadedStandingsKey, setLoadedStandingsKey] = useState<string>('');
+  const standingsReqIdRef = useRef(0);
   const [adminGoleadorCategory, setAdminGoleadorCategory] = useState<string>('Todas');
   const [adminFixtureRounds, setAdminFixtureRounds] = useState<Record<string, string>>({});
   const [adminPlayoffRoundFilter, setAdminPlayoffRoundFilter] = useState<string>('todas');
@@ -617,27 +622,42 @@ export default function AdminPage() {
     deporteTarget?: DeporteType,
     categoriaTarget?: CategoriaType
   ) => {
+    const reqId = ++standingsReqIdRef.current;
     setStandingsLoading(true);
     try {
       const dep = deporteTarget || adminDeporte;
       const cat = categoriaTarget || adminCategoria;
       const tor = torneoTarget || adminTorneo;
-      const res = await fetch(`/api/admin/standings?deporte=${dep}&categoria=${cat}&torneo=${tor}`);
+      const res = await fetch(`/api/admin/standings?deporte=${dep}&categoria=${cat}&torneo=${tor}`, {
+        cache: 'no-store',
+      });
+      if (reqId !== standingsReqIdRef.current) return;
       if (res.ok) {
         const data = await res.json();
+        if (reqId !== standingsReqIdRef.current) return;
         if (data.standings) {
-          let st = data.standings;
+          let st = {
+            ...data.standings,
+            deporte: dep,
+            categoria: cat,
+            torneo: tor,
+          };
           if ((!st.playoffs || st.playoffs.length === 0) && st.playoffModality && st.playoffModality !== 'none') {
             st = generatePlayoffsByModality(st, st.playoffModality);
           }
           const synced = syncPlayoffMatches(st);
           setStandings(synced);
+          setLoadedStandingsKey(`${dep}_${cat}_${tor}`);
         }
       }
     } catch (err) {
-      console.error('Error cargando tablas:', err);
+      if (reqId === standingsReqIdRef.current) {
+        console.error('Error cargando tablas:', err);
+      }
     } finally {
-      setStandingsLoading(false);
+      if (reqId === standingsReqIdRef.current) {
+        setStandingsLoading(false);
+      }
     }
   };
 
@@ -659,6 +679,11 @@ export default function AdminPage() {
   };
 
   const handleSaveStandings = async () => {
+    const expectedKey = `${adminDeporte}_${adminCategoria}_${adminTorneo}`;
+    if (standingsLoading || (loadedStandingsKey && loadedStandingsKey !== expectedKey)) {
+      alert('Espera a que termine de cargarse la tabla seleccionada antes de guardar.');
+      return;
+    }
     setStandingsLoading(true);
     try {
       const sortedGoleadores = sortGoleadores(standings.goleadores);
