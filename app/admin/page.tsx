@@ -58,6 +58,7 @@ import {
   recalculateZoneStandings,
   getTeamLogo,
   syncPlayoffMatches,
+  isPlayoffSeedExpression,
   syncPlayoffQuarterfinals,
   generateFullRoundRobinFixture,
   resolvePlayoffSeed,
@@ -702,6 +703,10 @@ export default function AdminPage() {
         }
       );
       if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data?.standings) {
+          setStandings(data.standings);
+        }
         setStandingsSavedMsg(true);
         setTimeout(() => setStandingsSavedMsg(false), 3000);
       }
@@ -1035,7 +1040,7 @@ export default function AdminPage() {
       const mod = targetStandings.playoffModality || 'cuartos';
       targetStandings = generatePlayoffsByModality(targetStandings, mod);
     }
-    const synced = syncPlayoffMatches(targetStandings);
+    const synced = syncPlayoffMatches(targetStandings, true);
     setStandings(synced);
   };
 
@@ -1054,6 +1059,16 @@ export default function AdminPage() {
           const resolved = resolvePlayoffSeed(value, standings.zones);
           if (resolved) {
             updatedMatch.team2 = resolved;
+          }
+        } else if (field === 'team1' && typeof value === 'string') {
+          const valTrim = value.trim();
+          if (valTrim && !isPlayoffSeedExpression(valTrim) && !valTrim.toLowerCase().startsWith('ganador')) {
+            updatedMatch.seed1 = '';
+          }
+        } else if (field === 'team2' && typeof value === 'string') {
+          const valTrim = value.trim();
+          if (valTrim && !isPlayoffSeedExpression(valTrim) && !valTrim.toLowerCase().startsWith('ganador')) {
+            updatedMatch.seed2 = '';
           }
         }
         return updatedMatch;

@@ -631,6 +631,20 @@ export function recalculateZoneStandings(
     };
   }
 
+  const totalExistingPj = (zone.teams || []).reduce((acc, t) => acc + (Number(t.pj) || 0), 0);
+  if (totalExistingPj > 0 && fixtures.length * 2 < totalExistingPj * 0.5) {
+    const updated = (zone.teams || []).map((t, idx) => ({
+      ...t,
+      pos: idx + 1,
+      qualified: idx < effectiveQuota,
+    }));
+    return {
+      ...zone,
+      qualificationQuota: effectiveQuota,
+      teams: updated,
+    };
+  }
+
   const statsMap: Record<
     string,
     {
@@ -1017,13 +1031,26 @@ export function isPlayoffPlaceholder(t?: string | null): boolean {
 export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] {
   if (!playoffs || playoffs.length === 0) return playoffs;
 
+  const isSingleLegIdaOnly = (m: PlayoffMatch): boolean => {
+    const info = (m.dateInfo || '').toLowerCase();
+    if (!info) return false;
+    return (
+      /\bida\b/.test(info) &&
+      !info.includes('vuelta') &&
+      !info.includes('global') &&
+      !info.includes('finalizado') &&
+      m.status !== 'finalizado'
+    );
+  };
+
   const getWinner = (m?: PlayoffMatch): string | null => {
     if (!m || !m.team1 || !m.team2) return null;
     const t1 = m.team1.trim();
     const t2 = m.team2.trim();
-    if (!t1 || !t2 || t1 === 'A definir' || t2 === 'A definir' || t1.startsWith('Ganador') || t2.startsWith('Ganador')) return null;
+    if (isPlayoffPlaceholder(t1) || isPlayoffPlaceholder(t2)) return null;
     if (m.winner === 1) return t1;
     if (m.winner === 2) return t2;
+    if (isSingleLegIdaOnly(m)) return null;
     if (m.score1 !== null && m.score2 !== null) {
       if (m.score1 > m.score2) return t1;
       if (m.score2 > m.score1) return t2;
@@ -1035,80 +1062,121 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
     return null;
   };
 
+  const isDifferentClub = (a?: string | null, b?: string | null): boolean => {
+    if (!a || !b) return true;
+    if (isPlayoffPlaceholder(a) || isPlayoffPlaceholder(b)) return true;
+    const kA = canonicalTeamKey(a);
+    const kB = canonicalTeamKey(b);
+    if (kA && kB) return kA !== kB;
+    return a.trim().toLowerCase() !== b.trim().toLowerCase();
+  };
+
   const octavos = playoffs.filter((m) => m.round === '8vos');
   const cuartos = playoffs.filter((m) => m.round === 'cuartos');
   const semis = playoffs.filter((m) => m.round === 'semifinal');
   const finals = playoffs.filter((m) => m.round === 'final');
 
-  // 1. De 8vos a Cuartos
-  if (octavos.length > 0 && cuartos.length > 0) {
-    for (let i = 0; i < cuartos.length; i++) {
+  const resolveWinnerExpression = (expr?: string): string | null => {
+    if (!expr || typeof expr !== 'string') return null;
+    const lower = expr.toLowerCase().trim();
+    if (!lower.includes('ganador')) return null;
+
+    const octMatch = lower.match(/(?:octavos|8vos)\s*(\d+)/i);
+    if (octMatch) {
+      const idx = parseInt(octMatch[1], 10) - 1;
+      if (idx >= 0 && octavos[idx]) {
+        return getWinner(octavos[idx]);
+      }
+      return null;
+    }
+
+    const cuaMatch = lower.match(/(?:cuartos|c)\s*(\d+)/i);
+    if (cuaMatch) {
+      const idx = parseInt(cuaMatch[1], 10) - 1;
+      if (idx >= 0 && cuartos[idx]) {
+        return getWinner(cuartos[idx]);
+      }
+      return null;
+    }
+
+    const semiMatch = lower.match(/(?:semifinal|semi|s)\s*(\d+)/i);
+    if (semiMatch) {
+      const idx = parseInt(semiMatch[1], 10) - 1;
+      if (idx >= 0 && semis[idx]) {
+        return getWinner(semis[idx]);
+      }
+      return null;
+    }
+
+    return null;
+  };
+
+  // 1. De 8vos (formato repechaje de 4 cruces) a Cuartos, solo si el casillero pide Ganador/Octavos o aún es placeholder
+  if (octavos.length === 4 && cuartos.length > 0) {
+    for (let i = 0; i < cuartos.length && i < octavos.length; i++) {
       const c = cuartos[i];
-      const octIndex = i;
-      if (octavos[octIndex]) {
-        const s2Target = (c.seed2 || '').toLowerCase();
-        const t2Target = (c.team2 || '').toLowerCase();
-        if (!c.seed2 || c.seed2.trim() === '' || s2Target.includes('octav') || s2Target.includes('ganador') || t2Target.includes('octav') || t2Target.includes('ganador')) {
-          const w = getWinner(octavos[octIndex]);
-          if (w) {
-            c.team2 = w;
-          } else if (isPlayoffPlaceholder(c.team2)) {
-            c.team2 = c.seed2 || `Ganador Octavos ${octIndex + 1}`;
-          }
+      const s2Target = (c.seed2 || '').toLowerCase();
+      const t2IsPlaceholder = isPlayoffPlaceholder(c.team2);
+      const wantsOctWinner = s2Target.includes('ganador') || s2Target.includes('octav') || s2Target.includes('8vos');
+
+      if (wantsOctWinner || t2IsPlaceholder) {
+        const w = getWinner(octavos[i]);
+        if (w && isDifferentClub(c.team1, w)) {
+          c.team2 = w;
+        } else if (t2IsPlaceholder) {
+          c.team2 = c.seed2 || `Ganador Octavos ${i + 1}`;
         }
       }
     }
   }
 
-  // 2. De Cuartos a Semifinal
+  // 2. De Cuartos a Semifinal: solo si seed pide "Ganador..." o si el slot aún es placeholder
   if (cuartos.length >= 2 && semis.length >= 1) {
-    // Semifinal 1
     if (semis[0]) {
       const s1_1 = (semis[0].seed1 || '').toLowerCase();
       const s1_2 = (semis[0].seed2 || '').toLowerCase();
-      if (!semis[0].seed1 || s1_1.includes('ganador c') || s1_1.includes('ganador cuartos') || isPlayoffPlaceholder(semis[0].team1)) {
+      if (s1_1.includes('ganador') || isPlayoffPlaceholder(semis[0].team1)) {
         const wC1 = getWinner(cuartos[0]);
-        if (wC1) semis[0].team1 = wC1;
+        if (wC1 && isDifferentClub(semis[0].team2, wC1)) semis[0].team1 = wC1;
         else if (isPlayoffPlaceholder(semis[0].team1)) semis[0].team1 = semis[0].seed1 || 'Ganador Cuartos 1';
       }
-      if (!semis[0].seed2 || s1_2.includes('ganador c') || s1_2.includes('ganador cuartos') || isPlayoffPlaceholder(semis[0].team2)) {
+      if (s1_2.includes('ganador') || isPlayoffPlaceholder(semis[0].team2)) {
         const wC2 = getWinner(cuartos[1]);
-        if (wC2) semis[0].team2 = wC2;
+        if (wC2 && isDifferentClub(semis[0].team1, wC2)) semis[0].team2 = wC2;
         else if (isPlayoffPlaceholder(semis[0].team2)) semis[0].team2 = semis[0].seed2 || 'Ganador Cuartos 2';
       }
     }
 
-    // Semifinal 2
     if (semis[1] && cuartos.length >= 4) {
       const s2_1 = (semis[1].seed1 || '').toLowerCase();
       const s2_2 = (semis[1].seed2 || '').toLowerCase();
-      if (!semis[1].seed1 || s2_1.includes('ganador c') || s2_1.includes('ganador cuartos') || isPlayoffPlaceholder(semis[1].team1)) {
+      if (s2_1.includes('ganador') || isPlayoffPlaceholder(semis[1].team1)) {
         const wC3 = getWinner(cuartos[2]);
-        if (wC3) semis[1].team1 = wC3;
+        if (wC3 && isDifferentClub(semis[1].team2, wC3)) semis[1].team1 = wC3;
         else if (isPlayoffPlaceholder(semis[1].team1)) semis[1].team1 = semis[1].seed1 || 'Ganador Cuartos 3';
       }
-      if (!semis[1].seed2 || s2_2.includes('ganador c') || s2_2.includes('ganador cuartos') || isPlayoffPlaceholder(semis[1].team2)) {
+      if (s2_2.includes('ganador') || isPlayoffPlaceholder(semis[1].team2)) {
         const wC4 = getWinner(cuartos[3]);
-        if (wC4) semis[1].team2 = wC4;
+        if (wC4 && isDifferentClub(semis[1].team1, wC4)) semis[1].team2 = wC4;
         else if (isPlayoffPlaceholder(semis[1].team2)) semis[1].team2 = semis[1].seed2 || 'Ganador Cuartos 4';
       }
     }
   }
 
-  // 3. De Semifinal a Gran Final
+  // 3. De Semifinal a Gran Final: solo si seed pide "Ganador..." o si el slot aún es placeholder
   if (semis.length >= 2 && finals.length >= 1) {
     const f1 = finals[0];
     const f1_1 = (f1.seed1 || '').toLowerCase();
     const f1_2 = (f1.seed2 || '').toLowerCase();
 
-    if (!f1.seed1 || f1.seed1.trim() === '' || f1_1.includes('ganador semi') || f1_1.includes('ganador s') || isPlayoffPlaceholder(f1.team1)) {
+    if (f1_1.includes('ganador') || isPlayoffPlaceholder(f1.team1)) {
       const wS1 = getWinner(semis[0]);
-      if (wS1) f1.team1 = wS1;
+      if (wS1 && isDifferentClub(f1.team2, wS1)) f1.team1 = wS1;
       else if (isPlayoffPlaceholder(f1.team1)) f1.team1 = f1.seed1 || 'Ganador Semifinal 1';
     }
-    if (!f1.seed2 || f1.seed2.trim() === '' || f1_2.includes('ganador semi') || f1_2.includes('ganador s') || isPlayoffPlaceholder(f1.team2)) {
+    if (f1_2.includes('ganador') || isPlayoffPlaceholder(f1.team2)) {
       const wS2 = getWinner(semis[1]);
-      if (wS2) f1.team2 = wS2;
+      if (wS2 && isDifferentClub(f1.team1, wS2)) f1.team2 = wS2;
       else if (isPlayoffPlaceholder(f1.team2)) f1.team2 = f1.seed2 || 'Ganador Semifinal 2';
     }
   }
@@ -1118,32 +1186,20 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
     (['seed1', 'seed2'] as const).forEach((seedKey) => {
       const sVal = m[seedKey];
       const teamKey = seedKey === 'seed1' ? 'team1' : 'team2';
-      if (typeof sVal === 'string' && sVal.toLowerCase().includes('ganador')) {
-        const sLower = sVal.toLowerCase();
-        const sourceMatch = playoffs.find((src) => {
-          if (src.id === m.id) return false;
-          const sTitle = src.title.toLowerCase();
-          const sId = src.id.toLowerCase();
-          if (sLower.includes('c1') && (sId.includes('c1') || sTitle.includes('cuartos 1') || sTitle.includes('cuartos a'))) return true;
-          if (sLower.includes('c2') && (sId.includes('c2') || sTitle.includes('cuartos 2') || sTitle.includes('cuartos b'))) return true;
-          if (sLower.includes('c3') && (sId.includes('c3') || sTitle.includes('cuartos 3') || sTitle.includes('cuartos c'))) return true;
-          if (sLower.includes('c4') && (sId.includes('c4') || sTitle.includes('cuartos 4') || sTitle.includes('cuartos d'))) return true;
-          if (sLower.includes('semi 1') || sLower.includes('semifinal 1')) {
-            return sId.includes('s1') || sTitle.includes('semi 1') || sTitle.includes('semifinal 1');
-          }
-          if (sLower.includes('semi 2') || sLower.includes('semifinal 2')) {
-            return sId.includes('s2') || sTitle.includes('semi 2') || sTitle.includes('semifinal 2');
-          }
-          return false;
-        });
+      const otherTeam = seedKey === 'seed1' ? m.team2 : m.team1;
+      const exprToCheck =
+        typeof sVal === 'string' && sVal.toLowerCase().includes('ganador')
+          ? sVal
+          : isPlayoffPlaceholder(m[teamKey]) && String(m[teamKey] || '').toLowerCase().includes('ganador')
+          ? String(m[teamKey])
+          : '';
 
-        if (sourceMatch) {
-          const w = getWinner(sourceMatch);
-          if (w) {
-            m[teamKey] = w;
-          } else if (isPlayoffPlaceholder(m[teamKey])) {
-            m[teamKey] = sVal;
-          }
+      if (exprToCheck) {
+        const w = resolveWinnerExpression(exprToCheck);
+        if (w && isDifferentClub(otherTeam, w)) {
+          m[teamKey] = w;
+        } else if (isPlayoffPlaceholder(m[teamKey])) {
+          m[teamKey] = exprToCheck;
         }
       }
     });
@@ -1164,8 +1220,11 @@ export function advancePlayoffWinners(playoffs: PlayoffMatch[]): PlayoffMatch[] 
 
 // Sincroniza dinámicamente los cruces de PLAY-OFFS (16avos, 8vos, Cuartos, Semifinal, Final)
 // a partir de los casilleros de semillas (seed1 / seed2), tablas de posiciones y avance de ganadores.
-// NUNCA sobreescribe resultados ni marcadores ya cargados.
-export function syncPlayoffMatches(standings: TournamentStandings): TournamentStandings {
+// NUNCA sobreescribe clubes ya cargados manualmente ni resultados existentes.
+export function syncPlayoffMatches(
+  standings: TournamentStandings,
+  forceResolveSeeds = false
+): TournamentStandings {
   if (!standings) return standings;
   const currentPlayoffs = standings.playoffs || [];
   if (currentPlayoffs.length === 0) return standings;
@@ -1185,25 +1244,20 @@ export function syncPlayoffMatches(standings: TournamentStandings): TournamentSt
       seed2 = team2;
     }
 
-    // Un partido programado no jugado (goles null y no finalizado) debe sincronizarse con su clasificado de tabla
     const matchNotPlayed = m.score1 === null && m.score2 === null && m.status !== 'finalizado';
 
     if (standings.zones && standings.zones.length > 0) {
       if (seed1 && !seed1.toLowerCase().includes('ganador')) {
         const resolved = resolvePlayoffSeed(seed1, standings.zones);
-        if (resolved) {
-          if (isPlayoffPlaceholder(team1) || matchNotPlayed) {
-            team1 = resolved;
-          }
+        if (resolved && (isPlayoffPlaceholder(team1) || (forceResolveSeeds && matchNotPlayed))) {
+          team1 = resolved;
         }
       }
 
       if (seed2 && !seed2.toLowerCase().includes('ganador')) {
         const resolved = resolvePlayoffSeed(seed2, standings.zones);
-        if (resolved) {
-          if (isPlayoffPlaceholder(team2) || matchNotPlayed) {
-            team2 = resolved;
-          }
+        if (resolved && (isPlayoffPlaceholder(team2) || (forceResolveSeeds && matchNotPlayed))) {
+          team2 = resolved;
         }
       }
     }
