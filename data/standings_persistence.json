@@ -8472,17 +8472,17 @@
         "goals": 17
       },
       {
-        "id": "hg-s19-6",
+        "id": "hg-s19-5",
         "pos": 5,
-        "name": "Marturano Azul",
-        "category": "Blanco y Negro",
+        "name": "Silovich Paulina",
+        "category": "Eduardo Hertz",
         "goals": 16
       },
       {
-        "id": "hg-s19-5",
+        "id": "hg-s19-6",
         "pos": 6,
-        "name": "Silovich Paulina",
-        "category": "Eduardo Hertz",
+        "name": "Marturano Azul",
+        "category": "Blanco y Negro",
         "goals": 16
       }
     ]
@@ -9195,17 +9195,17 @@
         "goals": 17
       },
       {
-        "id": "hg-s19-6",
+        "id": "hg-s19-5",
         "pos": 5,
-        "name": "Marturano Azul",
-        "category": "Blanco y Negro",
+        "name": "Silovich Paulina",
+        "category": "Eduardo Hertz",
         "goals": 16
       },
       {
-        "id": "hg-s19-5",
+        "id": "hg-s19-6",
         "pos": 6,
-        "name": "Silovich Paulina",
-        "category": "Eduardo Hertz",
+        "name": "Marturano Azul",
+        "category": "Blanco y Negro",
         "goals": 16
       }
     ]
@@ -10946,16 +10946,16 @@
         "goals": 16
       },
       {
-        "id": "hg-s13-7",
+        "id": "hg-s13-6",
         "pos": 6,
-        "name": "Fuentes Pilar",
+        "name": "Ojeda Julia",
         "category": "Blanco y Negro",
         "goals": 11
       },
       {
-        "id": "hg-s13-6",
+        "id": "hg-s13-7",
         "pos": 7,
-        "name": "Ojeda Julia",
+        "name": "Fuentes Pilar",
         "category": "Blanco y Negro",
         "goals": 11
       }
@@ -11787,16 +11787,16 @@
         "goals": 16
       },
       {
-        "id": "hg-s13-7",
+        "id": "hg-s13-6",
         "pos": 6,
-        "name": "Fuentes Pilar",
+        "name": "Ojeda Julia",
         "category": "Blanco y Negro",
         "goals": 11
       },
       {
-        "id": "hg-s13-6",
+        "id": "hg-s13-7",
         "pos": 7,
-        "name": "Ojeda Julia",
+        "name": "Fuentes Pilar",
         "category": "Blanco y Negro",
         "goals": 11
       }
@@ -12156,17 +12156,17 @@
         "goals": 8
       },
       {
-        "id": "hg-m30-3",
+        "id": "hg-m30-2",
         "pos": 2,
-        "name": "Farina Paola",
-        "category": "Independiente de Bigand",
+        "name": "Sarradell Rocio",
+        "category": "Los Andes",
         "goals": 5
       },
       {
-        "id": "hg-m30-2",
+        "id": "hg-m30-3",
         "pos": 3,
-        "name": "Sarradell Rocio",
-        "category": "Los Andes",
+        "name": "Farina Paola",
+        "category": "Independiente de Bigand",
         "goals": 5
       },
       {
@@ -12532,17 +12532,17 @@
         "goals": 8
       },
       {
-        "id": "hg-m30-3",
+        "id": "hg-m30-2",
         "pos": 2,
-        "name": "Farina Paola",
-        "category": "Independiente de Bigand",
+        "name": "Sarradell Rocio",
+        "category": "Los Andes",
         "goals": 5
       },
       {
-        "id": "hg-m30-2",
+        "id": "hg-m30-3",
         "pos": 3,
-        "name": "Sarradell Rocio",
-        "category": "Los Andes",
+        "name": "Farina Paola",
+        "category": "Independiente de Bigand",
         "goals": 5
       },
       {
@@ -20041,7 +20041,7 @@
         "round": "cuartos",
         "title": "Cuartos 1",
         "team1": "Blanco y Negro",
-        "team2": "Blanco y Negro",
+        "team2": "Atl. Acebal",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20056,7 +20056,7 @@
         "round": "cuartos",
         "title": "Cuartos 2",
         "team1": "C.A. Argentino",
-        "team2": "C.A. Argentino",
+        "team2": "Independiente FC",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20064,14 +20064,14 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "",
-        "seed2": " "
+        "seed2": ""
       },
       {
         "id": "cuartos-3",
         "round": "cuartos",
         "title": "Cuartos 3",
         "team1": "Olimpia",
-        "team2": "Olimpia",
+        "team2": "Atlético Paz",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20079,14 +20079,14 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "",
-        "seed2": " "
+        "seed2": ""
       },
       {
         "id": "cuartos-4",
         "round": "cuartos",
         "title": "Cuartos 4",
-        "team1": "Carreras",
-        "team2": "Atl. Acebal",
+        "team1": "Carreras AC",
+        "team2": "Ítalo Argentino",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20094,14 +20094,14 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "",
-        "seed2": "Ganador Octavos 4"
+        "seed2": ""
       },
       {
         "id": "semi-1",
         "round": "semifinal",
         "title": "Semifinal 1",
         "team1": "Ganador Cuartos 1",
-        "team2": "C.A. Argentino",
+        "team2": "Ganador Cuartos 2",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20109,14 +20109,14 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "Ganador Cuartos 1",
-        "seed2": " "
+        "seed2": "Ganador Cuartos 2"
       },
       {
         "id": "semi-2",
         "round": "semifinal",
         "title": "Semifinal 2",
         "team1": "Ganador Cuartos 3",
-        "team2": "Firmat FBC (Blanco)",
+        "team2": "Ganador Cuartos 4",
         "score1": null,
         "score2": null,
         "status": "programado",
@@ -20124,7 +20124,7 @@
         "penalties1": null,
         "penalties2": null,
         "seed1": "Ganador Cuartos 3",
-        "seed2": ""
+        "seed2": "Ganador Cuartos 4"
       },
       {
         "id": "final-1",
@@ -23184,17 +23184,17 @@
         "goals": 6
       },
       {
-        "id": "sen-g-5",
+        "id": "sen-g-4",
         "pos": 4,
-        "name": "Bomba Matías",
-        "category": "Los Andes",
+        "name": "Morosine Sergio",
+        "category": "Firmat FBC",
         "goals": 5
       },
       {
-        "id": "sen-g-4",
+        "id": "sen-g-5",
         "pos": 5,
-        "name": "Morosine Sergio",
-        "category": "Firmat FBC",
+        "name": "Bomba Matías",
+        "category": "Los Andes",
         "goals": 5
       },
       {
@@ -24940,17 +24940,17 @@
         "goals": 6
       },
       {
-        "id": "sen-g-5",
+        "id": "sen-g-4",
         "pos": 4,
-        "name": "Bomba Matías",
-        "category": "Los Andes",
+        "name": "Morosine Sergio",
+        "category": "Firmat FBC",
         "goals": 5
       },
       {
-        "id": "sen-g-4",
+        "id": "sen-g-5",
         "pos": 5,
-        "name": "Morosine Sergio",
-        "category": "Firmat FBC",
+        "name": "Bomba Matías",
+        "category": "Los Andes",
         "goals": 5
       },
       {
@@ -25478,38 +25478,38 @@
         "goals": 2
       },
       {
-        "id": "r30-g-7",
-        "pos": 3,
-        "name": "Barreto Juan José",
-        "category": "Atl. Santa Teresita",
-        "goals": 1
-      },
-      {
-        "id": "r30-g-6",
-        "pos": 4,
-        "name": "Ferreyra Joel Gastón",
-        "category": "Atl. Estudiantes",
-        "goals": 1
-      },
-      {
         "id": "r30-g-3",
-        "pos": 5,
+        "pos": 3,
         "name": "Hernández Lucio",
         "category": "Carreras AC",
         "goals": 1
       },
       {
+        "id": "r30-g-4",
+        "pos": 4,
+        "name": "Ramírez Matías",
+        "category": "Carreras AC",
+        "goals": 1
+      },
+      {
         "id": "r30-g-5",
-        "pos": 6,
+        "pos": 5,
         "name": "Lucatti Giuliano",
         "category": "Atlético Paz",
         "goals": 1
       },
       {
-        "id": "r30-g-4",
+        "id": "r30-g-6",
+        "pos": 6,
+        "name": "Ferreyra Joel Gastón",
+        "category": "Atl. Estudiantes",
+        "goals": 1
+      },
+      {
+        "id": "r30-g-7",
         "pos": 7,
-        "name": "Ramírez Matías",
-        "category": "Carreras AC",
+        "name": "Barreto Juan José",
+        "category": "Atl. Santa Teresita",
         "goals": 1
       }
     ]
@@ -26023,38 +26023,38 @@
         "goals": 2
       },
       {
-        "id": "r30-g-7",
-        "pos": 3,
-        "name": "Barreto Juan José",
-        "category": "Atl. Santa Teresita",
-        "goals": 1
-      },
-      {
-        "id": "r30-g-6",
-        "pos": 4,
-        "name": "Ferreyra Joel Gastón",
-        "category": "Atl. Estudiantes",
-        "goals": 1
-      },
-      {
         "id": "r30-g-3",
-        "pos": 5,
+        "pos": 3,
         "name": "Hernández Lucio",
         "category": "Carreras AC",
         "goals": 1
       },
       {
+        "id": "r30-g-4",
+        "pos": 4,
+        "name": "Ramírez Matías",
+        "category": "Carreras AC",
+        "goals": 1
+      },
+      {
         "id": "r30-g-5",
-        "pos": 6,
+        "pos": 5,
         "name": "Lucatti Giuliano",
         "category": "Atlético Paz",
         "goals": 1
       },
       {
-        "id": "r30-g-4",
+        "id": "r30-g-6",
+        "pos": 6,
+        "name": "Ferreyra Joel Gastón",
+        "category": "Atl. Estudiantes",
+        "goals": 1
+      },
+      {
+        "id": "r30-g-7",
         "pos": 7,
-        "name": "Ramírez Matías",
-        "category": "Carreras AC",
+        "name": "Barreto Juan José",
+        "category": "Atl. Santa Teresita",
         "goals": 1
       }
     ]
